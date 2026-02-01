@@ -274,6 +274,9 @@ dotnet_diagnostic.SA1111.severity = none
 [*.cs]
 dotnet_diagnostic.SA1516.severity = none
 
+#Microsoft Code Quality analyzers
+dotnet_diagnostic.CA1040.severity = none
+
 # Отключаем или меняем уровень серьезности предупреждения SA1310, чтобы не конфликтовало с новыми правилами.
 dotnet_diagnostic.SA1310.severity = none
 
