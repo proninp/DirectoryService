@@ -1,17 +1,19 @@
-﻿using DirectoryService.Domain.Entities.Abstractions;
-using DirectoryService.Domain.Entities.ValueObjects;
+﻿using DirectoryService.Domain.Entities.ValueObjects;
+using SharedKernel.Domain.Entities;
+using SharedKernel.Domain.IDs;
 
 namespace DirectoryService.Domain.Entities;
 
-public sealed class Location : AuditableEntity
+public sealed class Location : AuditableEntity<LocationId>
 {
-    public string Name { get; set; } = string.Empty;
+    public string Name { get; set; }
 
     public Address? Address { get; set; }
 
     public Timezone Timezone { get; set; }
 
     public Location(string name, Address? address, Timezone timezone)
+        : base(LocationId.Create())
     {
         Name = name;
         Address = address;
