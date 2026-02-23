@@ -1,10 +1,9 @@
-﻿using DirectoryService.Domain.Entities.ValueObjects;
-using SharedKernel.Domain.Entities;
-using SharedKernel.Domain.IDs;
+﻿using DirectoryService.Domain.Entities.Abstractions;
+using DirectoryService.Domain.Entities.ValueObjects;
 
 namespace DirectoryService.Domain.Entities;
 
-public sealed class Location : AuditableEntity<LocationId>
+public sealed class Location : AuditableEntity
 {
     public string Name { get; set; }
 
@@ -13,7 +12,7 @@ public sealed class Location : AuditableEntity<LocationId>
     public Timezone Timezone { get; set; }
 
     public Location(string name, Address? address, Timezone timezone)
-        : base(LocationId.Create())
+        : base(Guid.NewGuid())
     {
         Name = name;
         Address = address;

@@ -1,6 +1,4 @@
-﻿using SharedKernel.Domain.IDs;
-
-namespace SharedKernel.Domain.Entities;
+﻿namespace DirectoryService.Domain.Entities.Abstractions;
 
 /// <summary>
 /// Маркерный интерфейс для сущности, хранимой в базе.
@@ -12,7 +10,7 @@ public interface IEntity;
 /// </summary>
 /// <typeparam name="TKey">Тип первичного ключа.</typeparam>
 public interface IEntity<TKey> : IEntity
-    where TKey : EntityId<TKey>
+    where TKey : struct, IEquatable<TKey>
 {
     /// <summary>
     /// Первичный ключ сущности.

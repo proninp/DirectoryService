@@ -1,10 +1,16 @@
-﻿using SharedKernel.Domain.IDs;
+﻿namespace DirectoryService.Domain.Entities.Abstractions;
 
-namespace SharedKernel.Domain.Entities;
-
-public abstract class AuditableEntity<TKey>(TKey id) : BaseEntity<TKey>(id)
-    where TKey : EntityId<TKey>
+public abstract class AuditableEntity : BaseEntity
 {
+    protected AuditableEntity(Guid id)
+        : base(id)
+    {
+    }
+
+    protected AuditableEntity()
+    {
+    }
+
     public DateTime CreatedAt { get; init; }
 
     public DateTime? UpdatedAt { get; set; }
@@ -16,7 +22,10 @@ public abstract class AuditableEntity<TKey>(TKey id) : BaseEntity<TKey>(id)
     public virtual void Delete()
     {
         if (!IsActive)
+        {
             return;
+        }
+
         IsActive = false;
         DeletedAt = DateTime.UtcNow;
     }
@@ -24,7 +33,10 @@ public abstract class AuditableEntity<TKey>(TKey id) : BaseEntity<TKey>(id)
     public virtual void Restore()
     {
         if (IsActive)
+        {
             return;
+        }
+
         IsActive = true;
         DeletedAt = null;
     }

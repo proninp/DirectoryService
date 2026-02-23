@@ -1,11 +1,10 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Domain.Common;
-using SharedKernel.Domain.Entities;
-using SharedKernel.Domain.IDs;
+using DirectoryService.Domain.Entities.Abstractions;
 
 namespace DirectoryService.Domain.Entities;
 
-public sealed class Department : AuditableEntity<DepartmentId>
+public sealed class Department : AuditableEntity
 {
     private List<Department> _children = [];
 
@@ -28,7 +27,7 @@ public sealed class Department : AuditableEntity<DepartmentId>
     private Department(string name, string identifier, Guid? parentId, string path, int depth,
         IEnumerable<Location> locations
     )
-        : base(DepartmentId.Create())
+        : base(Guid.NewGuid())
     {
         Name = name;
         Identifier = identifier;
