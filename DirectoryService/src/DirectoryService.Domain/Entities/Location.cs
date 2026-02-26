@@ -5,11 +5,15 @@ namespace DirectoryService.Domain.Entities;
 
 public sealed class Location : AuditableEntity
 {
+    private List<Department> _departments = [];
+
     public string Name { get; set; }
 
     public Address? Address { get; set; }
 
     public Timezone Timezone { get; set; }
+
+    public IReadOnlyList<Department> Departments => _departments;
 
     public Location(string name, Address? address, Timezone timezone)
         : base(Guid.NewGuid())
