@@ -64,14 +64,27 @@ public sealed class Department : AuditableEntity
 
     public Result AddLocation(Location location)
     {
-        return _locations.Any(l => l.Id == location.Id)
-            ? Result.Failure($"Location with id '{location.Id}' already exists")
-            : Result.Success();
+        if (!_locations.Contains(location))
+            _locations.Add(location);
+        return Result.Success();
     }
 
     public Result RemoveLocation(Location location)
     {
         _locations.Remove(location);
+        return Result.Success();
+    }
+
+    public Result AddPosition(Position position)
+    {
+        if (!_positions.Contains(position))
+            _positions.Add(position);
+        return Result.Success();
+    }
+
+    public Result RemovePosition(Position position)
+    {
+        _positions.Remove(position);
         return Result.Success();
     }
 }
