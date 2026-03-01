@@ -22,6 +22,7 @@ public sealed record Identifier
         if (!string.IsNullOrEmpty(identifier))
         {
             identifier = Regex.Replace(identifier.Trim(), @"\s+", " ");
+            identifier = Regex.Replace(identifier, @"\p{P}", "_");
         }
 
         var validationResult = Guard.ValidateStringField(identifier, nameof(Identifier), MinLength, MaxLength)

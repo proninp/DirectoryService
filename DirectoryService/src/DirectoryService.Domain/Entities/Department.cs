@@ -50,41 +50,85 @@ public sealed class Department : AuditableEntity
     {
         var validationResult = Result.Combine(
             Guard.ValidateStringField(name, nameof(Name), 3, 150),
-            Guard.ValidateStringField(identifier.Value, nameof(Identifier), 3, 150)
-                .Bind(() => Guard.ValidateLatinString(identifier.Value, nameof(Identifier))),
-            Result.Success()
+            ValidateDepth(depth, parentId)
         );
 
-        if (validationResult.IsFailure)
-            return Result.Failure<Department>(validationResult.Error);
+        if (validationResult.IsFailure) return Result.Failure<Department>(validationResult.Error);
 
         var department = new Department(name, identifier, path, depth, parentId);
         return Result.Success(department);
     }
 
+    public Result Rename(string newName)
+    {
+        var nameValidation = Guard.ValidateStringField(newName, nameof(Name), 3, 150);
+        if (nameValidation.IsFailure) return Result.Failure(nameValidation.Error);
+        Name = newName;
+        return Result.Success();
+    }
+
+    public Result UpdateIdentifier(Identifier identifier)
+    {
+        Identifier = identifier;
+        return Result.Success();
+    }
+
+    public Result MoveTo(Guid? newParentId, Path newPath, int newDepth)
+    {
+        var validationResult = ValidateDepth(newDepth, newParentId);
+        if (validationResult.IsFailure) return Result.Failure(validationResult.Error);
+
+        ParentId = newParentId;
+        Path = newPath;
+        Depth = newDepth;
+        return Result.Success();
+    }
+
     public Result AddLocation(Location location)
     {
-        if (!_locations.Contains(location))
+        if (_locations.All(l => l.Id != location.Id))
             _locations.Add(location);
         return Result.Success();
     }
 
-    public Result RemoveLocation(Location location)
+    public Result RemoveLocation(Guid locationId)
     {
-        _locations.Remove(location);
-        return Result.Success();
+        if (_locations.Count == 1 && _locations.First().Id == locationId)
+            return Result.Failure("Department must have at least one location");
+
+        var result = _locations.RemoveAll(l => l.Id == locationId);
+        return result > 0
+            ? Result.Success()
+            : Result.Failure("There are no locations in the department with the given id: " + locationId);
     }
 
     public Result AddPosition(Position position)
     {
-        if (!_positions.Contains(position))
+        if (_positions.All(p => p.Id != position.Id))
             _positions.Add(position);
         return Result.Success();
     }
 
-    public Result RemovePosition(Position position)
+    public Result RemovePosition(Guid positionId)
     {
-        _positions.Remove(position);
-        return Result.Success();
+        var result = _positions.RemoveAll(p => p.Id == positionId);
+        return result > 0
+            ? Result.Success()
+            : Result.Failure("There are no position in the department with the given id: " + positionId);
+    }
+
+    private static Result ValidateDepth(int depth, Guid? parentId)
+    {
+        return (depth < 0
+                ? Result.Failure("Depth must be greater than or equal to zero")
+                : Result.Success())
+            .Bind(() => depth > 0 && !parentId.HasValue
+                ? Result.Failure("Department with non zero depth must have at least one parent")
+                : Result.Success()
+            )
+            .Bind(() => depth == 0 && parentId.HasValue
+                ? Result.Failure("Department with zero depth can not have a parent")
+                : Result.Success()
+            );
     }
 }

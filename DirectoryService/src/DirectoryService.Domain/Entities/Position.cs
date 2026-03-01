@@ -14,9 +14,9 @@ public sealed class Position : AuditableEntity
 
     private List<Department> _departments = [];
 
-    public string Name { get; set; }
+    public string Name { get; private set; }
 
-    public string? Description { get; set; }
+    public string? Description { get; private set; }
 
     public IReadOnlyCollection<Department> Departments => _departments;
 
@@ -39,6 +39,33 @@ public sealed class Position : AuditableEntity
         if (validationResult.IsFailure)
             return Result.Failure<Position>(validationResult.Error);
 
-        return Create(name, description);
+        return new Position(name, description);
+    }
+
+    public Result Rename(string newName)
+    {
+        var validation = Guard.ValidateStringField(newName, nameof(Name), NameMinLength, NameMaxLength);
+        if (validation.IsFailure)
+        {
+            return Result.Failure(validation.Error);
+        }
+
+        Name = newName;
+        return Result.Success();
+    }
+
+    public Result Describe(string? newDescription)
+    {
+        if (newDescription is not null)
+        {
+            var validation = Guard.ValidateStringField(newDescription, nameof(Description), 0, DescriptionMaxLength);
+            if (validation.IsFailure)
+            {
+                return Result.Failure(validation.Error);
+            }
+        }
+
+        Description = newDescription;
+        return Result.Success();
     }
 }

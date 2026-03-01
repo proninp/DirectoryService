@@ -10,13 +10,13 @@ public sealed record Path
 
     private const int MaxLength = 500;
 
-    private const char Separator = '.';
+    private const char Separator = '/';
 
     public string Value { get; }
 
     private Path(string value) => Value = value;
 
-    public static Result<Path> Create(string path)
+    private static Result<Path> Create(string path)
     {
         if (!string.IsNullOrEmpty(path))
         {
@@ -29,8 +29,6 @@ public sealed record Path
             return Result.Failure<Path>(validationResult.Error);
         }
 
-        path = new string([.. path.Select(c => char.IsPunctuation(c) ? '_' : c)]);
-
         return new Path(path);
     }
 
@@ -39,5 +37,18 @@ public sealed record Path
         var fullPath = $"{parentPath.Value}{Separator}{childIdentifier.Value}";
 
         return Create(fullPath);
+    }
+
+    public static Result<Path> FromAncestors(IReadOnlyList<Department> ancestors, Identifier departmentIdentifier)
+    {
+        if (ancestors.Count == 0)
+            return Result.Failure<Path>($"No path found for ancestors of {departmentIdentifier}");
+
+        return CreateForChild(ancestors[^1].Path, departmentIdentifier);
+    }
+
+    public static Result<Path> Root(Identifier departmentIdentifier)
+    {
+        return Create(departmentIdentifier.Value);
     }
 }
