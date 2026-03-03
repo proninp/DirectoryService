@@ -5,7 +5,7 @@ using DirectoryService.Domain.Entities.ValueObjects;
 
 namespace DirectoryService.Domain.Entities;
 
-public sealed class Location : AuditableEntity
+public sealed class Location : BaseEntity
 {
     private const int NameMinLength = 3;
 

@@ -6,7 +6,7 @@ using Path = DirectoryService.Domain.Entities.ValueObjects.Path;
 
 namespace DirectoryService.Domain.Entities;
 
-public sealed class Department : AuditableEntity
+public sealed class Department : BaseEntity
 {
     private List<Department> _children = [];
 

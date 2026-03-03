@@ -13,6 +13,14 @@ public abstract class BaseEntity : IEntity<Guid>
     {
     }
 
+    public DateTime CreatedAt { get; init; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    public DateTime? DeletedAt { get; private set; }
+
+    public bool IsActive { get; private set; }
+
     public override bool Equals(object? obj)
     {
         if (obj is not BaseEntity other)
@@ -30,4 +38,26 @@ public abstract class BaseEntity : IEntity<Guid>
 
     public static bool operator !=(BaseEntity? left, BaseEntity? right) =>
         !Equals(left, right);
+
+    public virtual void Delete()
+    {
+        if (!IsActive)
+        {
+            return;
+        }
+
+        IsActive = false;
+        DeletedAt = DateTime.UtcNow;
+    }
+
+    public virtual void Restore()
+    {
+        if (IsActive)
+        {
+            return;
+        }
+
+        IsActive = true;
+        DeletedAt = null;
+    }
 }

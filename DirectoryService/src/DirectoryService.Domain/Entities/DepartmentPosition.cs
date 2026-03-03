@@ -2,7 +2,7 @@
 
 namespace DirectoryService.Domain.Entities;
 
-public sealed class DepartmentPosition : AuditableEntity
+public sealed class DepartmentPosition : BaseEntity
 {
     public Guid DepartmentId { get; private set; }
 

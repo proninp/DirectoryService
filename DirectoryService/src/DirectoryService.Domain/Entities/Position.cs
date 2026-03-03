@@ -4,7 +4,7 @@ using DirectoryService.Domain.Entities.Abstractions;
 
 namespace DirectoryService.Domain.Entities;
 
-public sealed class Position : AuditableEntity
+public sealed class Position : BaseEntity
 {
     private const int NameMinLength = 3;
 
