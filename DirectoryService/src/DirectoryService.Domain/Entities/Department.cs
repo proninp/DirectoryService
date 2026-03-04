@@ -10,9 +10,9 @@ public sealed class Department : BaseEntity
 {
     private List<Department> _children = [];
 
-    private List<Location> _locations = [];
+    private List<DepartmentLocation> _departmentLocations = [];
 
-    private List<Position> _positions = [];
+    private List<DepartmentPosition> _departmentPositions = [];
 
     public string Name { get; private set; }
 
@@ -20,17 +20,17 @@ public sealed class Department : BaseEntity
 
     public Guid? ParentId { get; private set; }
 
+    public Path Path { get; private set; }
+
+    public int Depth { get; private set; }
+
     public Department? Parent { get; private set; }
 
     public IReadOnlyList<Department> Children => _children;
 
-    public IReadOnlyList<Location> Locations => _locations;
+    public IReadOnlyList<DepartmentLocation> DepartmentLocations => _departmentLocations;
 
-    public IReadOnlyList<Position> Positions => _positions;
-
-    public Path Path { get; private set; }
-
-    public int Depth { get; private set; }
+    public IReadOnlyList<DepartmentPosition> DepartmentPositions => _departmentPositions;
 
     private Department(
         string name, Identifier identifier, Path path, int depth, Guid? parentId
@@ -84,37 +84,45 @@ public sealed class Department : BaseEntity
         return Result.Success();
     }
 
-    public Result AddLocation(Location location)
+    public Result AddLocation(Guid locationId)
     {
-        if (_locations.All(l => l.Id != location.Id))
-            _locations.Add(location);
-        return Result.Success();
+        if (_departmentLocations.All(dl => dl.LocationId != locationId))
+        {
+            _departmentLocations.Add(new DepartmentLocation(Id, locationId));
+            return Result.Success();
+        }
+
+        return Result.Failure("The location '" + locationId + "' has already been added to the department.");
     }
 
     public Result RemoveLocation(Guid locationId)
     {
-        if (_locations.Count == 1 && _locations.First().Id == locationId)
+        if (_departmentLocations.Count == 1 && _departmentLocations[0].LocationId == locationId)
             return Result.Failure("Department must have at least one location");
 
-        var result = _locations.RemoveAll(l => l.Id == locationId);
-        return result > 0
+        var removed = _departmentLocations.RemoveAll(dl => dl.LocationId == locationId);
+        return removed > 0
             ? Result.Success()
             : Result.Failure("There are no locations in the department with the given id: " + locationId);
     }
 
-    public Result AddPosition(Position position)
+    public Result AddPosition(Guid positionId)
     {
-        if (_positions.All(p => p.Id != position.Id))
-            _positions.Add(position);
-        return Result.Success();
+        if (_departmentPositions.All(dp => dp.PositionId != positionId))
+        {
+            _departmentPositions.Add(new DepartmentPosition(Id, positionId));
+            return Result.Success();
+        }
+
+        return Result.Failure("The position '" + positionId + "' has already been added to the department.");
     }
 
     public Result RemovePosition(Guid positionId)
     {
-        var result = _positions.RemoveAll(p => p.Id == positionId);
-        return result > 0
+        var removed = _departmentPositions.RemoveAll(dp => dp.PositionId == positionId);
+        return removed > 0
             ? Result.Success()
-            : Result.Failure("There are no position in the department with the given id: " + positionId);
+            : Result.Failure("There are no positions in the department with the given id: " + positionId);
     }
 
     private static Result ValidateDepth(int depth, Guid? parentId)

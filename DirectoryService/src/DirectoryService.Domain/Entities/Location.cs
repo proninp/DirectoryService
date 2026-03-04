@@ -11,7 +11,7 @@ public sealed class Location : BaseEntity
 
     private const int NameMaxLength = 120;
 
-    private List<Department> _departments = [];
+    private List<DepartmentLocation> _departmentLocations = [];
 
     public string Name { get; private set; }
 
@@ -19,7 +19,7 @@ public sealed class Location : BaseEntity
 
     public Timezone Timezone { get; private set; }
 
-    public IReadOnlyList<Department> Departments => _departments;
+    public IReadOnlyList<DepartmentLocation> DepartmentLocations => _departmentLocations;
 
     private Location(string name, Address? address, Timezone timezone)
         : base(Guid.NewGuid())
@@ -57,14 +57,22 @@ public sealed class Location : BaseEntity
 
     public void UpdateTimezone(Timezone timezone) => Timezone = timezone;
 
-    internal void AddDepartment(Department department)
+    internal Result AddDepartment(Guid departmentId)
     {
-        if (_departments.All(d => d.Id != department.Id))
-            _departments.Add(department);
+        if (_departmentLocations.All(dl => dl.DepartmentId != departmentId))
+        {
+            _departmentLocations.Add(new DepartmentLocation(Id, departmentId));
+            return Result.Success();
+        }
+
+        return Result.Failure("The department '" + departmentId + "' has already been added to the location.");
     }
 
-    internal void RemoveDepartment(Guid departmentId)
+    internal Result RemoveDepartment(Guid departmentId)
     {
-        _departments.RemoveAll(d => d.Id == departmentId);
+        var removed = _departmentLocations.RemoveAll(dl => dl.DepartmentId == departmentId);
+        return removed > 0
+            ? Result.Success()
+            : Result.Failure("There are no departments for the location with the given id: " + departmentId);
     }
 }

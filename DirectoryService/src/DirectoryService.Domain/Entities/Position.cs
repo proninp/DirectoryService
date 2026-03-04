@@ -12,13 +12,13 @@ public sealed class Position : BaseEntity
 
     private const int DescriptionMaxLength = 1000;
 
-    private List<Department> _departments = [];
+    private List<DepartmentPosition> _departmentPositions = [];
 
     public string Name { get; private set; }
 
     public string? Description { get; private set; }
 
-    public IReadOnlyCollection<Department> Departments => _departments;
+    public IReadOnlyCollection<DepartmentPosition> DepartmentPositions => _departmentPositions;
 
     private Position(string name, string? description)
         : base(Guid.NewGuid())
@@ -67,5 +67,24 @@ public sealed class Position : BaseEntity
 
         Description = newDescription;
         return Result.Success();
+    }
+
+    internal Result AddDepartment(Guid departmentId)
+    {
+        if (_departmentPositions.All(dp => dp.DepartmentId != departmentId))
+        {
+            _departmentPositions.Add(new DepartmentPosition(Id, departmentId));
+            return Result.Success();
+        }
+
+        return Result.Failure("The department '" + departmentId + "' has already been added to the position.");
+    }
+
+    internal Result RemoveDepartment(Guid departmentId)
+    {
+        var removed = _departmentPositions.RemoveAll(dp => dp.DepartmentId == departmentId);
+        return removed > 0
+            ? Result.Success()
+            : Result.Failure("There are no departments for the position with the given id: " + departmentId);
     }
 }
