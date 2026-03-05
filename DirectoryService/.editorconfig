@@ -249,6 +249,7 @@ dotnet_diagnostic.sa1309.severity = none
 dotnet_diagnostic.SA1101.severity = none
 dotnet_diagnostic.SA1600.severity = none
 dotnet_diagnostic.SA1503.severity = none
+dotnet_diagnostic.SA1202.severity = none
 dotnet_diagnostic.SA1206.severity = none
 dotnet_diagnostic.SA1313.severity = none
 dotnet_diagnostic.SA1010.severity = none
@@ -269,10 +270,19 @@ dotnet_diagnostic.SA1623.severity = none
 dotnet_diagnostic.SA1118.severity = none
 dotnet_diagnostic.eSA1128.severity = none
 dotnet_diagnostic.SA1401.severity = none
+dotnet_diagnostic.SA1407.severity = none
 dotnet_diagnostic.SA1413.severity = none
 dotnet_diagnostic.SA1111.severity = none
+
 [*.cs]
 dotnet_diagnostic.SA1516.severity = none
+
+#Microsoft Code Quality analyzers
+dotnet_diagnostic.CA1036.severity = none
+dotnet_diagnostic.CA1040.severity = none
+dotnet_diagnostic.CA1062.severity = none
+dotnet_diagnostic.CA2007.severity = none
+dotnet_diagnostic.CA2225.severity = none
 
 # Отключаем или меняем уровень серьезности предупреждения SA1310, чтобы не конфликтовало с новыми правилами.
 dotnet_diagnostic.SA1310.severity = none
@@ -304,22 +314,6 @@ dotnet_naming_symbols.private_static_fields.required_modifiers = static
 
 dotnet_naming_style.underscore_prefix_style.capitalization = camel_case
 dotnet_naming_style.underscore_prefix_style.required_prefix = _
-
-# Определяем символы для приватных констант
-dotnet_naming_symbols.private_constants.applicable_kinds = field
-dotnet_naming_symbols.private_constants.applicable_accessibilities = private
-dotnet_naming_symbols.private_constants.required_modifiers = const
-
-# Задаём стиль именования:
-#   - all_upper: все символы в верхнем регистре
-#   - word_separator = _: использовать подчеркивание для разделения слов
-dotnet_naming_style.private_constants_style.capitalization = all_upper
-dotnet_naming_style.private_constants_style.word_separator = _
-
-# Применяем стиль к символам:
-dotnet_naming_rule.private_constants_rule.symbols = private_constants
-dotnet_naming_rule.private_constants_rule.style = private_constants_style
-dotnet_naming_rule.private_constants_rule.severity = suggestion
 
 dotnet_naming_style.first_word_upper_case_style.capitalization = first_word_upper ### Первое слово должно начинаться с заглавной буквы
 
