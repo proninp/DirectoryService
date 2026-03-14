@@ -14,11 +14,14 @@ public sealed class Position : BaseEntity
 
     private List<DepartmentPosition> _departmentPositions = [];
 
-    public string Name { get; private set; }
+    public string Name { get; private set; } = null!;
 
     public string? Description { get; private set; }
 
     public IReadOnlyCollection<DepartmentPosition> DepartmentPositions => _departmentPositions;
+
+    // EF Core Constructor
+    private Position() { }
 
     private Position(string name, string? description)
         : base(Guid.NewGuid())

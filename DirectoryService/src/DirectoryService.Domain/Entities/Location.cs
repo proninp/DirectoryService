@@ -13,13 +13,16 @@ public sealed class Location : BaseEntity
 
     private List<DepartmentLocation> _departmentLocations = [];
 
-    public string Name { get; private set; }
+    public string Name { get; private set; } = null!;
 
     public Address? Address { get; private set; }
 
-    public Timezone Timezone { get; private set; }
+    public Timezone Timezone { get; private set; } = null!;
 
     public IReadOnlyList<DepartmentLocation> DepartmentLocations => _departmentLocations;
+
+    // EF Core Constructor
+    private Location() { }
 
     private Location(string name, Address? address, Timezone timezone)
         : base(Guid.NewGuid())

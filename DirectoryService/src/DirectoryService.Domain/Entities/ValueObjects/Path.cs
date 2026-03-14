@@ -12,7 +12,10 @@ public sealed record Path
 
     private const char Separator = '/';
 
-    public string Value { get; }
+    public string Value { get; } = null!;
+
+    // EF Core Constructor
+    private Path() { }
 
     private Path(string value) => Value = value;
 

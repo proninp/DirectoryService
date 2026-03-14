@@ -8,6 +8,9 @@ public sealed class DepartmentLocation : BaseEntity
 
     public Guid LocationId { get; private set; }
 
+    // EF Core Constructor
+    private DepartmentLocation() { }
+
     public DepartmentLocation(Guid departmentId, Guid locationId)
         : base(Guid.NewGuid())
     {

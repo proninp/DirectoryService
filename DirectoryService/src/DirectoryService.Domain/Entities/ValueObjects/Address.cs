@@ -37,21 +37,24 @@ public sealed record Address
 
     private const int PostalBoxMaxLength = 20;
 
-    public string PostalCode { get; }
+    public string PostalCode { get; } = null!;
 
-    public string Country { get; }
+    public string Country { get; } = null!;
 
-    public string City { get; }
+    public string City { get; } = null!;
 
-    public string Street { get; }
+    public string Street { get; } = null!;
 
-    public string House { get; }
+    public string House { get; } = null!;
 
     public string? Block { get; }
 
     public string? Room { get; }
 
     public string? PostalBox { get; }
+
+    // EF Core Constructor
+    private Address() { }
 
     private Address(string postalCode, string country, string city, string street, string house,
         string? block = null, string? room = null, string? postalBox = null

@@ -10,7 +10,10 @@ public sealed record Identifier
 
     private const int MaxLength = 150;
 
-    public string Value { get; }
+    public string Value { get; } = null!;
+
+    // EF Core Constructor
+    private Identifier() { }
 
     private Identifier(string value)
     {
