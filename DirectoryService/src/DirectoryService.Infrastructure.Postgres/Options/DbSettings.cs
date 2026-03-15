@@ -1,4 +1,4 @@
-﻿namespace DirectorySevice.Infrastructure.Postgres.Options;
+﻿namespace DirectoryService.Infrastructure.Postgres.Options;
 
 public sealed class DbSettings
 {

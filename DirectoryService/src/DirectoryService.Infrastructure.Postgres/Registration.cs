@@ -1,10 +1,10 @@
-﻿using DirectorySevice.Infrastructure.Postgres.Options;
+﻿using DirectoryService.Infrastructure.Postgres.Options;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace DirectorySevice.Infrastructure.Postgres;
+namespace DirectoryService.Infrastructure.Postgres;
 
 public static class Registration
 {

@@ -1,7 +1,7 @@
 ﻿using DirectoryService.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace DirectorySevice.Infrastructure.Postgres;
+namespace DirectoryService.Infrastructure.Postgres;
 
 public class DirectoryServiceDbContext(DbContextOptions<DirectoryServiceDbContext> options) : DbContext(options)
 {

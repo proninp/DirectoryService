@@ -1,5 +1,5 @@
 using DirectoryService.App.Extensions;
-using DirectorySevice.Infrastructure.Postgres;
+using DirectoryService.Infrastructure.Postgres;
 
 var builder = WebApplication.CreateBuilder(args);
 
