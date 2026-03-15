@@ -2,20 +2,16 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace DirectorySevice.Infrastructure.Postgres.Configurations;
+namespace DirectoryService.Infrastructure.Postgres.Configurations;
 
-public sealed class DepartmentConfiguration : IEntityTypeConfiguration<Department>
+public sealed class DepartmentConfiguration : BaseEntityConfiguration<Department>
 {
-    public void Configure(EntityTypeBuilder<Department> builder)
+    public override void Configure(EntityTypeBuilder<Department> builder)
     {
-        builder.ToTable("departments");
-        builder
-            .HasKey(d => d.Id)
-            .HasName("pk_department");
+        base.Configure(builder);
 
         builder
-            .Property(d => d.Id)
-            .HasColumnName("id");
+            .ToTable(TableName);
 
         builder
             .Property(d => d.Name)
@@ -34,6 +30,17 @@ public sealed class DepartmentConfiguration : IEntityTypeConfiguration<Departmen
             );
 
         builder
+            .HasOne(d => d.Parent)
+            .WithMany(p => p.Children)
+            .HasForeignKey(d => d.ParentId)
+            .HasConstraintName("fk_department_parent");
+
+        builder
+            .Property(d => d.ParentId)
+            .HasColumnName("parent_id")
+            .IsRequired(false);
+
+        builder
             .ComplexProperty(d => d.Path, pb =>
                 {
                     pb.Property(p => p.Value)
@@ -41,5 +48,11 @@ public sealed class DepartmentConfiguration : IEntityTypeConfiguration<Departmen
                         .HasColumnName("path");
                 }
             );
+
+        builder
+            .Property(d => d.Depth)
+            .HasColumnName("depth");
     }
+
+    protected override string TableName => "departments";
 }
