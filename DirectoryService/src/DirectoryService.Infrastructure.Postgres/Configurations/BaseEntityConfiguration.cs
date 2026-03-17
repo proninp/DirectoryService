@@ -9,6 +9,9 @@ public abstract class BaseEntityConfiguration<TEntity> : IEntityTypeConfiguratio
 {
     public virtual void Configure(EntityTypeBuilder<TEntity> builder)
     {
+        builder
+            .ToTable(TableName);
+
         builder.HasKey(d => d.Id)
             .HasName($"pk_{TableName}");
 

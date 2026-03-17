@@ -11,9 +11,6 @@ public sealed class DepartmentConfiguration : BaseEntityConfiguration<Department
         base.Configure(builder);
 
         builder
-            .ToTable(TableName);
-
-        builder
             .Property(d => d.Name)
             .IsRequired()
             .HasMaxLength(150)
