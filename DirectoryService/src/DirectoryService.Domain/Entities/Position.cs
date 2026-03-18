@@ -8,9 +8,9 @@ public sealed class Position : BaseEntity
 {
     private const int NameMinLength = 3;
 
-    private const int NameMaxLength = 100;
+    public const int NameMaxLength = 100;
 
-    private const int DescriptionMaxLength = 1000;
+    public const int DescriptionMaxLength = 1000;
 
     private List<DepartmentPosition> _departmentPositions = [];
 

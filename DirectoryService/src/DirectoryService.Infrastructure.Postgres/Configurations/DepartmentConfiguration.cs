@@ -49,6 +49,18 @@ public sealed class DepartmentConfiguration : BaseEntityConfiguration<Department
         builder
             .Property(d => d.Depth)
             .HasColumnName("depth");
+
+        builder
+            .Navigation(d => d.Children)
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
+
+        builder
+            .Navigation(d => d.DepartmentLocations)
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
+
+        builder
+            .Navigation(d => d.DepartmentPositions)
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 
     protected override string TableName => "departments";

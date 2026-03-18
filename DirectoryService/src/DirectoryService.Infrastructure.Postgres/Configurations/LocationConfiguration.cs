@@ -71,6 +71,10 @@ public sealed class LocationConfiguration : BaseEntityConfiguration<Location>
                     .IsRequired();
             }
         );
+
+        builder
+            .Navigation(l => l.DepartmentLocations)
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 
     protected override string TableName => "locations";
