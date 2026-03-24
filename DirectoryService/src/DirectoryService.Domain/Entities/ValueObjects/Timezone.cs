@@ -2,7 +2,10 @@
 
 public sealed record Timezone
 {
-    public string Value { get; init; }
+    public string Value { get; } = null!;
+
+    // EF Core Constructor
+    private Timezone() { }
 
     public Timezone(string value)
     {

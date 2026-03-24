@@ -7,51 +7,54 @@ public sealed record Address
 {
     private const int PostalCodeMinLength = 2;
 
-    private const int PostalCodeMaxLength = 10;
+    public const int PostalCodeMaxLength = 10;
 
     private const int CountryMinLength = 2;
 
-    private const int CountryMaxLength = 50;
+    public const int CountryMaxLength = 50;
 
     private const int CityMinLength = 3;
 
-    private const int CityMaxLength = 50;
+    public const int CityMaxLength = 50;
 
     private const int StreetMinLength = 3;
 
-    private const int StreetMaxLength = 100;
+    public const int StreetMaxLength = 100;
 
     private const int HouseMinLength = 1;
 
-    private const int HouseMaxLength = 50;
+    public const int HouseMaxLength = 50;
 
     private const int BlockMinLength = 1;
 
-    private const int BlockMaxLength = 10;
+    public const int BlockMaxLength = 10;
 
     private const int RoomMinLength = 1;
 
-    private const int RoomMaxLength = 10;
+    public const int RoomMaxLength = 10;
 
     private const int PostalBoxMinLength = 1;
 
-    private const int PostalBoxMaxLength = 20;
+    public const int PostalBoxMaxLength = 20;
 
-    public string PostalCode { get; }
+    public string PostalCode { get; } = null!;
 
-    public string Country { get; }
+    public string Country { get; } = null!;
 
-    public string City { get; }
+    public string City { get; } = null!;
 
-    public string Street { get; }
+    public string Street { get; } = null!;
 
-    public string House { get; }
+    public string House { get; } = null!;
 
     public string? Block { get; }
 
     public string? Room { get; }
 
     public string? PostalBox { get; }
+
+    // EF Core Constructor
+    private Address() { }
 
     private Address(string postalCode, string country, string city, string street, string house,
         string? block = null, string? room = null, string? postalBox = null

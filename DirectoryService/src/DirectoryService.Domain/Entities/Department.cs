@@ -14,13 +14,13 @@ public sealed class Department : BaseEntity
 
     private List<DepartmentPosition> _departmentPositions = [];
 
-    public string Name { get; private set; }
+    public string Name { get; private set; } = null!;
 
-    public Identifier Identifier { get; private set; }
+    public Identifier Identifier { get; private set; } = null!;
 
     public Guid? ParentId { get; private set; }
 
-    public Path Path { get; private set; }
+    public Path Path { get; private set; } = null!;
 
     public int Depth { get; private set; }
 
@@ -31,6 +31,9 @@ public sealed class Department : BaseEntity
     public IReadOnlyList<DepartmentLocation> DepartmentLocations => _departmentLocations;
 
     public IReadOnlyList<DepartmentPosition> DepartmentPositions => _departmentPositions;
+
+    // EF Core Constructor
+    private Department() { }
 
     private Department(
         string name, Identifier identifier, Path path, int depth, Guid? parentId
