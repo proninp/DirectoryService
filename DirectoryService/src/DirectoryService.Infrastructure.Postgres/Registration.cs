@@ -15,7 +15,7 @@ public static class Registration
     )
     {
         services.Configure<DbSettings>(configuration.GetSection(nameof(DbSettings)));
-        services.AddDbContext<DirectoryServiceDbContext>((provider, options) =>
+        services.AddDbContextPool<DirectoryServiceDbContext>((provider, options) =>
             {
                 var dbSettings = provider.GetRequiredService<IOptions<DbSettings>>().Value;
                 options.UseNpgsql(dbSettings.ConnectionString);
