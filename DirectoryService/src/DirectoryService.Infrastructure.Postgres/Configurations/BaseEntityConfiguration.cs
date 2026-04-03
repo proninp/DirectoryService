@@ -16,10 +16,19 @@ public abstract class BaseEntityConfiguration<TEntity> : IEntityTypeConfiguratio
             .HasName($"pk_{TableName}");
 
         builder.Property(d => d.Id).HasColumnName("id");
-        builder.Property(e => e.CreatedAt).HasColumnName("created_at");
-        builder.Property(e => e.UpdatedAt).HasColumnName("updated_at");
-        builder.Property(e => e.DeletedAt).HasColumnName("deleted_at");
-        builder.Property(e => e.IsActive).HasColumnName("is_active");
+        builder.Property(e => e.CreatedAt)
+            .IsRequired()
+            .HasDefaultValueSql("timezone('utc', now())")
+            .HasColumnName("created_at");
+        builder.Property(e => e.UpdatedAt)
+            .HasColumnName("updated_at");
+        builder.Property(e => e.DeletedAt)
+            .HasColumnName("deleted_at");
+        builder.Property(e => e.IsActive)
+            .IsRequired()
+            .HasColumnName("is_active");
+
+        builder.HasQueryFilter(d => d.IsActive);
     }
 
     protected abstract string TableName { get; }
