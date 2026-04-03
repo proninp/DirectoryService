@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace DirectoryService.Infrastructure.Postgres;
@@ -20,9 +21,16 @@ public static class Registration
                 var dbSettings = provider.GetRequiredService<IOptions<DbSettings>>().Value;
                 options.UseNpgsql(dbSettings.ConnectionString);
                 if (isUseSensitiveLogging)
+                {
+                    options.EnableDetailedErrors();
                     options.EnableSensitiveDataLogging();
+                    options.UseLoggerFactory(CreateLoggerFactory());
+                }
             }
         );
         return services;
     }
+
+    private static ILoggerFactory CreateLoggerFactory() =>
+        LoggerFactory.Create(builder => builder.AddConsole());
 }
