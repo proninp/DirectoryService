@@ -1,10 +1,10 @@
 ﻿namespace DirectoryService.App;
 
-public static class ApiEndpoints
+internal static class ApiEndpoints
 {
     private const string ApiBase = "api";
 
-    public static class Locations
+    internal static class Locations
     {
         private const string Base = $"{ApiBase}/locations";
 
