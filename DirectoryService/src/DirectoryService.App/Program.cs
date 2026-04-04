@@ -6,7 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
-builder.Services.AddDatabase(builder.Configuration, builder.Environment.IsDevelopment());
+builder.Services.AddDatabaseConfiguration(builder.Configuration);
 
 builder.Services.AddApiVersioningSupport();
 
