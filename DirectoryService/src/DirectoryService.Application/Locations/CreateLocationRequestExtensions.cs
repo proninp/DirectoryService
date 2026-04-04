@@ -6,17 +6,17 @@ namespace DirectoryService.Application.Locations;
 
 public static class CreateLocationRequestExtensions
 {
-    public static Result<Address> ToAddress(this CreateLocationRequest request)
+    public static Result<Address> ToAddress(this CreateLocationAddressRequest addressRequest)
     {
         return Address.Create(
-            request.PostalCode,
-            request.Country,
-            request.City,
-            request.Street,
-            request.House,
-            request.Block,
-            request.Room,
-            request.PostalBox
+            addressRequest.PostalCode,
+            addressRequest.Country,
+            addressRequest.City,
+            addressRequest.Street,
+            addressRequest.House,
+            addressRequest.Block,
+            addressRequest.Room,
+            addressRequest.PostalBox
         );
     }
 }

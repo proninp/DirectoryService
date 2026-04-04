@@ -4,13 +4,13 @@ namespace DirectoryService.Application.Locations;
 
 public interface ILocationRepository
 {
-    Task<Location> GetLocation(Guid id);
+    Task<Location> GetLocation(Guid id, CancellationToken cancellationToken = default);
 
-    Task<IEnumerable<Location>> GetLocations();
+    Task<IEnumerable<Location>> GetLocations(CancellationToken cancellationToken = default);
 
-    Task<Guid> CreateLocation(Location location);
+    Task<Guid> Create(Location location, CancellationToken cancellationToken = default);
 
-    Task UpdateLocation(Location location);
+    Task Update(Location location, CancellationToken cancellationToken = default);
 
-    Task<bool> DeleteLocation(Location location);
+    Task<bool> Delete(Location location, CancellationToken cancellationToken = default);
 }
