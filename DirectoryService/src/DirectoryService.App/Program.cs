@@ -14,6 +14,8 @@ builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerConfiguration();
 
+builder.Host.AddLogging(builder.Configuration);
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
