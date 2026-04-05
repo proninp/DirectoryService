@@ -1,4 +1,6 @@
-﻿using DirectoryService.Infrastructure.Postgres.Options;
+﻿using DirectoryService.Application.Locations;
+using DirectoryService.Infrastructure.Postgres.Options;
+using DirectoryService.Infrastructure.Postgres.Repositories;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -12,6 +14,11 @@ public static class Registration
     )
     {
         services.Configure<DbSettings>(configuration.GetSection(nameof(DbSettings)));
+
+        services.AddDbContext<DirectoryServiceDbContext>();
+
+        services.AddScoped<ILocationRepository, LocationRepository>();
+
         return services;
     }
 }

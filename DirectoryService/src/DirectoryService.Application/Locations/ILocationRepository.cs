@@ -4,7 +4,7 @@ namespace DirectoryService.Application.Locations;
 
 public interface ILocationRepository
 {
-    Task<Location> GetLocation(Guid id, CancellationToken cancellationToken = default);
+    Task<Location?> GetLocation(Guid id, CancellationToken cancellationToken = default);
 
     Task<IEnumerable<Location>> GetLocations(CancellationToken cancellationToken = default);
 
