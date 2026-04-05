@@ -298,3 +298,5 @@ secrets/
 
 .env.local
 .env.production.local
+
+**/[Ll]ogs/
