@@ -1,4 +1,5 @@
 using DirectoryService.App.Extensions;
+using DirectoryService.Application;
 using DirectoryService.Infrastructure.Postgres;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,6 +8,7 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
 builder.Services.AddDatabaseConfiguration(builder.Configuration);
+builder.Services.AddApplication();
 
 builder.Services.AddApiVersioningSupport();
 

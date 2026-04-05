@@ -7,7 +7,7 @@ namespace DirectoryService.App.Controllers;
 
 [ApiController]
 [ApiVersion(1.0)]
-internal class LocationsController : ControllerBase
+public sealed class LocationsController : ControllerBase
 {
     [HttpPost(ApiEndpoints.Locations.Create)]
     [ProducesResponseType(typeof(Guid), StatusCodes.Status201Created)]
