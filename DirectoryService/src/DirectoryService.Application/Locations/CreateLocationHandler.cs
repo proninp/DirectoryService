@@ -16,8 +16,7 @@ public sealed class CreateLocationHandler : ICreateLocationHandler
 
     public async Task<Result<Guid>> Handle(
         CreateLocationRequest request,
-        CancellationToken cancellationToken
-    )
+        CancellationToken cancellationToken)
     {
         var addressResult = request.AddressRequest.ToAddress();
         if (addressResult.IsFailure)
@@ -26,7 +25,9 @@ public sealed class CreateLocationHandler : ICreateLocationHandler
         }
 
         var location = Location.Create(
-            request.Name, addressResult.Value, new Timezone(request.Timezone)
+            request.Name,
+            addressResult.Value,
+            new Timezone(request.Timezone)
         );
 
         if (location.IsFailure)
@@ -34,7 +35,7 @@ public sealed class CreateLocationHandler : ICreateLocationHandler
             return Result.Failure<Guid>(location.Error);
         }
 
-        var id = await _locationRepository.Create(location.Value, cancellationToken);
+        var id = await _locationRepository.Add(location.Value, cancellationToken);
 
         return Result.Success(id);
     }
