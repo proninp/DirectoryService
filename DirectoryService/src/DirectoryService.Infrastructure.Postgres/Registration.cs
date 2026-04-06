@@ -1,28 +1,24 @@
-﻿using DirectoryService.Infrastructure.Postgres.Options;
-using Microsoft.EntityFrameworkCore;
+﻿using DirectoryService.Application.Locations;
+using DirectoryService.Infrastructure.Postgres.Options;
+using DirectoryService.Infrastructure.Postgres.Repositories;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 
 namespace DirectoryService.Infrastructure.Postgres;
 
 public static class Registration
 {
-    public static IServiceCollection AddDatabase(
+    public static IServiceCollection AddDatabaseConfiguration(
         this IServiceCollection services,
-        IConfiguration configuration,
-        bool isUseSensitiveLogging = false
+        IConfiguration configuration
     )
     {
         services.Configure<DbSettings>(configuration.GetSection(nameof(DbSettings)));
-        services.AddDbContextPool<DirectoryServiceDbContext>((provider, options) =>
-            {
-                var dbSettings = provider.GetRequiredService<IOptions<DbSettings>>().Value;
-                options.UseNpgsql(dbSettings.ConnectionString);
-                if (isUseSensitiveLogging)
-                    options.EnableSensitiveDataLogging();
-            }
-        );
+
+        services.AddDbContext<DirectoryServiceDbContext>();
+
+        services.AddScoped<ILocationRepository, LocationRepository>();
+
         return services;
     }
 }

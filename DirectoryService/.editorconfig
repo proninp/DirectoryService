@@ -6,7 +6,6 @@ root = true
 insert_final_newline = false
 indent_style = space
 indent_size = 4
-charset = utf-8-bom
 end_of_line = crlf
 trim_trailing_whitespace = false
 
@@ -281,6 +280,7 @@ dotnet_diagnostic.SA1516.severity = none
 dotnet_diagnostic.CA1036.severity = none
 dotnet_diagnostic.CA1040.severity = none
 dotnet_diagnostic.CA1062.severity = none
+dotnet_diagnostic.CA1515.severity = none
 dotnet_diagnostic.CA1861.severity = none
 dotnet_diagnostic.CA2007.severity = none
 dotnet_diagnostic.CA2225.severity = none
@@ -351,5 +351,3 @@ dotnet_naming_rule.types_members_must_be_capitalized.severity = warning
 
 resharper_csharp_keep_existing_initializer_arrangement = true
 resharper_wrap_before_primary_constructor_declaration_rpar = true
-resharper_csharp_wrap_before_invocation_rpar = true
-resharper_csharp_wrap_before_declaration_rpar = true
