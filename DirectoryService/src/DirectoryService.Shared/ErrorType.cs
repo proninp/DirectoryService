@@ -2,6 +2,7 @@
 
 public enum ErrorType
 {
+    None,
     Validation,
     NotFound,
     Failure,

@@ -4,30 +4,47 @@ namespace DirectoryService.Shared;
 
 public record Error
 {
-    public string Code { get; }
-    public string Message { get; }
-    public ErrorType Type { get; }
-    public string? InvalidField { get; }
+    public IReadOnlyList<ErrorMessage> ErrorMessages { get; } = [];
 
-    private Error(string code, string message, ErrorType type, string? invalidField = null)
+    public ErrorType Type { get; }
+
+    private Error(IEnumerable<ErrorMessage> errorMessages, ErrorType type)
     {
-        Code = code;
-        Message = message;
+        ErrorMessages = errorMessages.ToArray();
         Type = type;
-        InvalidField = invalidField;
     }
 
+    private Error(ErrorMessage errorMessage, ErrorType type)
+        : this([errorMessage], type)
+    {
+    }
+
+    public static Error None() =>
+        new(new ErrorMessage(string.Empty, string.Empty), ErrorType.None);
+
     public static Error NotFound(string? code, string message) =>
-        new(code ?? "record.not.found", message, ErrorType.NotFound);
+        new(new ErrorMessage(code ?? "record.not.found", message), ErrorType.NotFound);
 
     public static Error Validation(string? code, string message, string? invalidField) =>
-        new(code ?? "value.is.invalid", message, ErrorType.Validation, invalidField);
+        new(new ErrorMessage(code ?? "value.is.invalid", message, invalidField), ErrorType.Validation);
 
     public static Error Conflict(string? code, string message) =>
-        new(code ?? "conflict", message, ErrorType.Conflict);
+        new(new ErrorMessage(code ?? "conflict", message), ErrorType.Conflict);
 
     public static Error Failure(string? code, string message) =>
-        new(code ?? "failure", message, ErrorType.Failure);
+        new(new ErrorMessage(code ?? "failure", message), ErrorType.Failure);
+
+    public static Error NotFound(params IEnumerable<ErrorMessage> errorMessages) =>
+        new(errorMessages, ErrorType.NotFound);
+
+    public static Error Validation(params IEnumerable<ErrorMessage> errorMessages) =>
+        new(errorMessages, ErrorType.Validation);
+
+    public static Error Conflict(params IEnumerable<ErrorMessage> errorMessages) =>
+        new(errorMessages, ErrorType.Conflict);
+
+    public static Error Failure(params IEnumerable<ErrorMessage> errorMessages) =>
+        new(errorMessages, ErrorType.Failure);
 
     public override string ToString() => JsonSerializer.Serialize(this);
 }
