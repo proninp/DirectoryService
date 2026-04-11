@@ -1,6 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using CSharpFunctionalExtensions;
 using DirectoryService.Domain.Common;
+using DirectoryService.Shared;
 
 namespace DirectoryService.Domain.Entities.ValueObjects;
 
@@ -20,7 +21,7 @@ public sealed record Identifier
         Value = value;
     }
 
-    public static Result<Identifier> Create(string identifier)
+    public static Result<Identifier, Error> Create(string identifier)
     {
         if (!string.IsNullOrEmpty(identifier))
         {
@@ -31,7 +32,7 @@ public sealed record Identifier
         var validationResult = Guard.ValidateStringField(identifier, nameof(Identifier), MinLength, MaxLength)
             .Bind(() => Guard.ValidateLatinString(identifier, nameof(Identifier)));
         if (validationResult.IsFailure)
-            return Result.Failure<Identifier>(validationResult.Error);
+            return validationResult.Error;
 
         return new Identifier(identifier);
     }

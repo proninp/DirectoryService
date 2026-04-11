@@ -2,6 +2,7 @@
 using DirectoryService.Contracts.Locations.Requests;
 using DirectoryService.Domain.Entities;
 using DirectoryService.Domain.Entities.ValueObjects;
+using DirectoryService.Shared;
 
 namespace DirectoryService.Application.Locations;
 
@@ -14,29 +15,25 @@ public sealed class CreateLocationHandler : ICreateLocationHandler
         _locationRepository = locationRepository;
     }
 
-    public async Task<Result<Guid>> Handle(
+    public async Task<Result<Guid, Error>> Handle(
         CreateLocationRequest request,
         CancellationToken cancellationToken)
     {
         var addressResult = request.AddressRequest.ToAddress();
         if (addressResult.IsFailure)
-        {
-            return Result.Failure<Guid>(addressResult.Error);
-        }
+            return addressResult.Error;
 
-        var location = Location.Create(
+        var locationResult = Location.Create(
             request.Name,
             addressResult.Value,
             new Timezone(request.Timezone)
         );
 
-        if (location.IsFailure)
-        {
-            return Result.Failure<Guid>(location.Error);
-        }
+        if (locationResult.IsFailure)
+            return locationResult.Error;
 
-        var id = await _locationRepository.Add(location.Value, cancellationToken);
+        var id = await _locationRepository.Add(locationResult.Value, cancellationToken);
 
-        return Result.Success(id);
+        return id;
     }
 }

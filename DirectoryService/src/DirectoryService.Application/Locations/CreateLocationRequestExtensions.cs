@@ -1,12 +1,13 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Contracts.Locations.Requests;
 using DirectoryService.Domain.Entities.ValueObjects;
+using DirectoryService.Shared;
 
 namespace DirectoryService.Application.Locations;
 
 public static class CreateLocationRequestExtensions
 {
-    public static Result<Address> ToAddress(this CreateLocationAddressRequest addressRequest)
+    public static Result<Address, Error> ToAddress(this CreateLocationAddressRequest addressRequest)
     {
         return Address.Create(
             addressRequest.PostalCode,

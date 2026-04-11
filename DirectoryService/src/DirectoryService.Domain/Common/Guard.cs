@@ -1,32 +1,35 @@
 ﻿using System.Text.RegularExpressions;
 using CSharpFunctionalExtensions;
+using DirectoryService.Shared;
 
 namespace DirectoryService.Domain.Common;
 
-public static class Guard
+internal static class Guard
 {
     private static readonly Regex LatinOnlyRegex = new("^[A-Za-z]+$", RegexOptions.Compiled);
 
-    public static Result ValidateStringField(string fieldValue, string fieldName, int minLength, int maxLength)
+    public static UnitResult<Error> ValidateStringField(string fieldValue, string fieldName, int minLength,
+        int maxLength)
     {
         if (string.IsNullOrWhiteSpace(fieldValue))
         {
-            return Result.Failure($"{fieldName} is required.");
+            return UnitResult.Failure(GeneralError.ValueIsRequired(fieldName));
         }
 
         if (fieldValue.Length < minLength)
-            return Result.Failure($"{fieldName} must be at least {minLength} characters.");
+            return UnitResult.Failure(GeneralError.InvalidFieldLength(fieldName, minLength: minLength));
 
         if (maxLength > 0 && fieldValue.Length > maxLength)
-            return Result.Failure($"{fieldName} must not exceed {maxLength} characters.");
+            return UnitResult.Failure(GeneralError.InvalidFieldLength(fieldName, maxLength: maxLength));
 
-        return Result.Success();
+        return UnitResult.Success<Error>();
     }
 
-    public static Result ValidateLatinString(string fieldValue, string fieldName)
+    public static UnitResult<Error> ValidateLatinString(string fieldValue, string fieldName)
     {
         return !LatinOnlyRegex.IsMatch(fieldValue)
-            ? Result.Failure($"{fieldName} must contain only latin letters")
-            : Result.Success();
+            ? UnitResult.Failure(
+                GeneralError.ValueIsInvalid(fieldName, $"{fieldName} must contain only latin letters"))
+            : UnitResult.Success<Error>();
     }
 }

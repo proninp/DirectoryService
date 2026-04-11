@@ -1,8 +1,9 @@
 ﻿using System.Text.Json;
+using CSharpFunctionalExtensions;
 
 namespace DirectoryService.Shared;
 
-public record Error
+public record Error : ICombine
 {
     public IReadOnlyList<ErrorMessage> ErrorMessages { get; } = [];
 
@@ -10,7 +11,7 @@ public record Error
 
     private Error(IEnumerable<ErrorMessage> errorMessages, ErrorType type)
     {
-        ErrorMessages = errorMessages.ToArray();
+        ErrorMessages = [.. errorMessages];
         Type = type;
     }
 
@@ -47,4 +48,10 @@ public record Error
         new(errorMessages, ErrorType.Failure);
 
     public override string ToString() => JsonSerializer.Serialize(this);
+
+    public ICombine Combine(ICombine value)
+    {
+        var other = (Error)value;
+        return new Error(ErrorMessages.Union(other.ErrorMessages), Type);
+    }
 }

@@ -1,5 +1,6 @@
 using CSharpFunctionalExtensions;
 using DirectoryService.Domain.Common;
+using DirectoryService.Shared;
 
 namespace DirectoryService.Domain.Entities.ValueObjects;
 
@@ -70,7 +71,7 @@ public sealed record Address
         PostalBox = postalBox;
     }
 
-    public static Result<Address> Create(string postalCode, string country, string city, string street, string house,
+    public static Result<Address, Error> Create(string postalCode, string country, string city, string street, string house,
         string? block = null, string? room = null, string? postalBox = null
     )
     {
@@ -81,20 +82,18 @@ public sealed record Address
             Guard.ValidateStringField(street, nameof(street), StreetMinLength, StreetMaxLength),
             Guard.ValidateStringField(house, nameof(house), HouseMinLength, HouseMaxLength),
             string.IsNullOrEmpty(block)
-                ? Result.Success()
+                ? UnitResult.Success<Error>()
                 : Guard.ValidateStringField(block, nameof(block), BlockMinLength, BlockMaxLength),
             string.IsNullOrEmpty(room)
-                ? Result.Success()
+                ? UnitResult.Success<Error>()
                 : Guard.ValidateStringField(room, nameof(room), RoomMinLength, RoomMaxLength),
             string.IsNullOrEmpty(postalBox)
-                ? Result.Success()
+                ? UnitResult.Success<Error>()
                 : Guard.ValidateStringField(postalBox, nameof(postalBox), PostalBoxMinLength, PostalBoxMaxLength)
         );
 
         if (validationResult.IsFailure)
-        {
-            return Result.Failure<Address>(validationResult.Error);
-        }
+            return validationResult.Error;
 
         return new Address(postalCode, country, city, street, house, block, room, postalBox);
     }

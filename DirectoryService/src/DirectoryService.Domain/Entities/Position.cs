@@ -1,6 +1,7 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Domain.Common;
 using DirectoryService.Domain.Entities.Abstractions;
+using DirectoryService.Shared;
 
 namespace DirectoryService.Domain.Entities;
 
@@ -12,7 +13,7 @@ public sealed class Position : BaseEntity
 
     public const int DescriptionMaxLength = 1000;
 
-    private List<DepartmentPosition> _departmentPositions = [];
+    private readonly List<DepartmentPosition> _departmentPositions = [];
 
     public string Name { get; private set; } = null!;
 
@@ -30,64 +31,64 @@ public sealed class Position : BaseEntity
         Description = description;
     }
 
-    public static Result<Position> Create(string name, string? description)
+    public static Result<Position, Error> Create(string name, string? description)
     {
         var validationResult = Result.Combine(
             Guard.ValidateStringField(name, nameof(Name), NameMinLength, NameMaxLength),
             string.IsNullOrEmpty(description)
-                ? Result.Success()
+                ? UnitResult.Success<Error>()
                 : Guard.ValidateStringField(description, nameof(Description), 0, DescriptionMaxLength)
         );
 
         if (validationResult.IsFailure)
-            return Result.Failure<Position>(validationResult.Error);
+            return Result.Failure<Position, Error>(validationResult.Error);
 
         return new Position(name, description);
     }
 
-    public Result Rename(string newName)
+    public UnitResult<Error> Rename(string newName)
     {
         var validation = Guard.ValidateStringField(newName, nameof(Name), NameMinLength, NameMaxLength);
         if (validation.IsFailure)
-        {
-            return Result.Failure(validation.Error);
-        }
+            return UnitResult.Failure(validation.Error);
 
         Name = newName;
-        return Result.Success();
+        return UnitResult.Success<Error>();
     }
 
-    public Result Describe(string? newDescription)
+    public UnitResult<Error> Describe(string? newDescription)
     {
         if (newDescription is not null)
         {
-            var validation = Guard.ValidateStringField(newDescription, nameof(Description), 0, DescriptionMaxLength);
+            var validation =
+                Guard.ValidateStringField(newDescription, nameof(Description), 0, DescriptionMaxLength);
             if (validation.IsFailure)
-            {
-                return Result.Failure(validation.Error);
-            }
+                return UnitResult.Failure(validation.Error);
         }
 
         Description = newDescription;
-        return Result.Success();
+        return UnitResult.Success<Error>();
     }
 
-    internal Result AddDepartment(Guid departmentId)
+    internal UnitResult<Error> AddDepartment(Guid departmentId)
     {
         if (_departmentPositions.All(dp => dp.DepartmentId != departmentId))
         {
             _departmentPositions.Add(new DepartmentPosition(Id, departmentId));
-            return Result.Success();
+            return UnitResult.Success<Error>();
         }
 
-        return Result.Failure("The department '" + departmentId + "' has already been added to the position.");
+        return GeneralError.AlreadyExists(
+            departmentId, $"The department '{departmentId}' has already been added to the position.");
     }
 
-    internal Result RemoveDepartment(Guid departmentId)
+    internal UnitResult<Error> RemoveDepartment(Guid departmentId)
     {
         var removed = _departmentPositions.RemoveAll(dp => dp.DepartmentId == departmentId);
         return removed > 0
-            ? Result.Success()
-            : Result.Failure("There are no departments for the position with the given id: " + departmentId);
+            ? UnitResult.Success<Error>()
+            : GeneralError.NotFound(
+                id: departmentId,
+                message: $"There are no departments for the position with the given id: {departmentId}");
     }
 }
