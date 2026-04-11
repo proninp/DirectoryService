@@ -1,4 +1,5 @@
 ﻿using Asp.Versioning;
+using DirectoryService.App.EndpointResults;
 using DirectoryService.Application.Locations;
 using DirectoryService.Contracts.Locations.Requests;
 using DirectoryService.Contracts.Locations.Responses;
@@ -21,7 +22,7 @@ public sealed class LocationsController : ControllerBase
         var result = await handler.Handle(request, cancellationToken);
 
         return result.IsFailure
-            ? BadRequest(result.Error)
+            ? result.Error.ToObjectResult()
             : CreatedAtAction(nameof(Get), new { id = result.Value }, result.Value);
     }
 
