@@ -15,7 +15,7 @@ public sealed class CreateLocationHandler : ICreateLocationHandler
         _locationRepository = locationRepository;
     }
 
-    public async Task<Result<Guid, Error>> Handle(
+    public async Task<Result<Guid, Errors>> Handle(
         CreateLocationRequest request,
         CancellationToken cancellationToken)
     {

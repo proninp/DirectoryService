@@ -1,31 +1,38 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Shared;
 using Microsoft.AspNetCore.Mvc;
+using IResult = Microsoft.AspNetCore.Http.IResult;
 
 namespace DirectoryService.App.EndpointResults;
 
-public sealed class EndpointResult<TValue> : IActionResult
+public sealed class EndpointResult<TValue> : IResult
 {
-    private readonly Result<TValue, Error> _result;
+    private readonly IResult _result;
 
-    public EndpointResult(Result<TValue, Error> result)
+    public EndpointResult(Result<TValue, Errors> result)
     {
-        _result = result;
+        _result = result.IsSuccess
+            ? new SuccessResult<TValue>(result.Value)
+            : new ErrorResult(result.Error);
     }
 
-    public Task ExecuteResultAsync(ActionContext context)
+    public Task ExecuteAsync(HttpContext httpContext) => _result.ExecuteAsync(httpContext);
+
+    public static implicit operator EndpointResult<TValue>(Result<TValue, Errors> result) => new(result);
+}
+
+public sealed class EndpointResult : IResult
+{
+    private readonly IResult _result;
+
+    public EndpointResult(UnitResult<Errors> result)
     {
-        ArgumentNullException.ThrowIfNull(context);
-
-        var actionResult = _result.IsSuccess
-            ? new OkObjectResult(_result.Value)
-            : _result.Error.ToObjectResult();
-
-        return actionResult.ExecuteResultAsync(context);
+        _result = result.IsSuccess
+            ? Results.Ok()
+            : new ErrorResult(result.Error);
     }
 
-    public static implicit operator EndpointResult<TValue>(Result<TValue, Error> result)
-    {
-        return new EndpointResult<TValue>(result);
-    }
+    public Task ExecuteAsync(HttpContext httpContext) => _result.ExecuteAsync(httpContext);
+
+    public static implicit operator EndpointResult(UnitResult<Errors> result) => new(result);
 }

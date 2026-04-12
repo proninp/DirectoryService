@@ -1,19 +1,18 @@
 ﻿using System.Net;
 using DirectoryService.Shared;
-using Microsoft.AspNetCore.Mvc;
 
 namespace DirectoryService.App.EndpointResults;
 
 public static class EndpointResultErrorExtensions
 {
-    public static ObjectResult ToObjectResult(this Error error)
+    public static HttpStatusCode ToHttpStatusCode(this ErrorType errorType)
     {
-        return error.Type switch
+        return errorType switch
         {
-            ErrorType.NotFound => new NotFoundObjectResult(error),
-            ErrorType.Validation => new BadRequestObjectResult(error),
-            ErrorType.Conflict => new ConflictObjectResult(error),
-            _ => new ObjectResult(error) { StatusCode = (int)HttpStatusCode.InternalServerError }
+            ErrorType.NotFound => HttpStatusCode.NotFound,
+            ErrorType.Validation => HttpStatusCode.BadRequest,
+            ErrorType.Conflict => HttpStatusCode.Conflict,
+            _ => HttpStatusCode.InternalServerError
         };
     }
 }
