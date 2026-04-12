@@ -277,6 +277,7 @@ dotnet_diagnostic.SA1111.severity = none
 dotnet_diagnostic.SA1516.severity = none
 
 #Microsoft Code Quality analyzers
+dotnet_diagnostic.CA1000.severity = none
 dotnet_diagnostic.CA1031.severity = none
 dotnet_diagnostic.CA1036.severity = none
 dotnet_diagnostic.CA1040.severity = none
@@ -298,16 +299,6 @@ dotnet_naming_symbols.public_constants.applicable_accessibilities = public
 dotnet_naming_symbols.public_constants.required_modifiers = const
 
 # Задаём стиль именования:
-#   - all_upper: все символы в верхнем регистре
-#   - word_separator = _: использовать подчеркивание для разделения слов
-dotnet_naming_style.public_constants_style.capitalization = all_upper
-dotnet_naming_style.public_constants_style.word_separator = _
-
-# Применяем стиль к символам:
-dotnet_naming_rule.public_constants_rule.symbols = public_constants
-dotnet_naming_rule.public_constants_rule.style = public_constants_style
-dotnet_naming_rule.public_constants_rule.severity = suggestion
-
 # Настройка правил именования для приватных статических полей
 dotnet_naming_rule.private_static_fields_should_have_underscore.symbols = private_static_fields
 dotnet_naming_rule.private_static_fields_should_have_underscore.style = underscore_prefix_style

@@ -13,17 +13,14 @@ public sealed class LocationsController : ControllerBase
 {
     [HttpPost(ApiEndpoints.Locations.Create)]
     [ProducesResponseType(typeof(Guid), StatusCodes.Status201Created)]
-    public async Task<IActionResult> Create(
+    public async Task<EndpointResult<Guid>> Create(
         [FromServices] ICreateLocationHandler handler,
         [FromBody] CreateLocationRequest request,
         CancellationToken cancellationToken
     )
     {
         var result = await handler.Handle(request, cancellationToken);
-
-        return result.IsFailure
-            ? result.Error.ToObjectResult()
-            : CreatedAtAction(nameof(Get), new { id = result.Value }, result.Value);
+        return result;
     }
 
     [HttpGet(ApiEndpoints.Locations.Get)]

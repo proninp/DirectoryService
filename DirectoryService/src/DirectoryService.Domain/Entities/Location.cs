@@ -33,17 +33,17 @@ public sealed class Location : BaseEntity
         Timezone = timezone;
     }
 
-    public static Result<Location, Error> Create(string name, Address? address, Timezone timezone)
+    public static Result<Location, Errors> Create(string name, Address? address, Timezone timezone)
     {
         var validationResult = Guard.ValidateStringField(name, nameof(Name), NameMinLength, NameMaxLength);
 
         if (validationResult.IsFailure)
-            return Result.Failure<Location, Error>(validationResult.Error);
+            return Result.Failure<Location, Errors>(validationResult.Error);
 
         return new Location(name, address, timezone);
     }
 
-    public UnitResult<Error> Rename(string name)
+    public UnitResult<Errors> Rename(string name)
     {
         var validation = Guard.ValidateStringField(name, nameof(Name), NameMinLength, NameMaxLength);
         if (validation.IsFailure)
@@ -52,7 +52,7 @@ public sealed class Location : BaseEntity
         }
 
         Name = name;
-        return UnitResult.Success<Error>();
+        return UnitResult.Success<Errors>();
     }
 
     public void UpdateAddress(Address? address) => Address = address;

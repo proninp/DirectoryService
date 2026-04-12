@@ -71,7 +71,7 @@ public sealed record Address
         PostalBox = postalBox;
     }
 
-    public static Result<Address, Error> Create(string postalCode, string country, string city, string street, string house,
+    public static Result<Address, Errors> Create(string postalCode, string country, string city, string street, string house,
         string? block = null, string? room = null, string? postalBox = null
     )
     {
@@ -82,13 +82,13 @@ public sealed record Address
             Guard.ValidateStringField(street, nameof(street), StreetMinLength, StreetMaxLength),
             Guard.ValidateStringField(house, nameof(house), HouseMinLength, HouseMaxLength),
             string.IsNullOrEmpty(block)
-                ? UnitResult.Success<Error>()
+                ? UnitResult.Success<Errors>()
                 : Guard.ValidateStringField(block, nameof(block), BlockMinLength, BlockMaxLength),
             string.IsNullOrEmpty(room)
-                ? UnitResult.Success<Error>()
+                ? UnitResult.Success<Errors>()
                 : Guard.ValidateStringField(room, nameof(room), RoomMinLength, RoomMaxLength),
             string.IsNullOrEmpty(postalBox)
-                ? UnitResult.Success<Error>()
+                ? UnitResult.Success<Errors>()
                 : Guard.ValidateStringField(postalBox, nameof(postalBox), PostalBoxMinLength, PostalBoxMaxLength)
         );
 

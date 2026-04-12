@@ -48,7 +48,7 @@ public sealed class Department : BaseEntity
         Depth = depth;
     }
 
-    public static Result<Department, Error> Create(
+    public static Result<Department, Errors> Create(
         string name, Identifier identifier, Path path, int depth, Guid? parentId
     )
     {
@@ -58,13 +58,13 @@ public sealed class Department : BaseEntity
         );
 
         if (validationResult.IsFailure)
-            return Result.Failure<Department, Error>(validationResult.Error);
+            return Result.Failure<Department, Errors>(validationResult.Error);
 
         var department = new Department(name, identifier, path, depth, parentId);
-        return Result.Success<Department, Error>(department);
+        return Result.Success<Department, Errors>(department);
     }
 
-    public UnitResult<Error> Rename(string newName)
+    public UnitResult<Errors> Rename(string newName)
     {
         var nameValidation = Guard.ValidateStringField(newName, nameof(Name), 3, 150);
         if (nameValidation.IsFailure)
@@ -73,16 +73,16 @@ public sealed class Department : BaseEntity
         }
 
         Name = newName;
-        return UnitResult.Success<Error>();
+        return UnitResult.Success<Errors>();
     }
 
-    public UnitResult<Error> UpdateIdentifier(Identifier identifier)
+    public UnitResult<Errors> UpdateIdentifier(Identifier identifier)
     {
         Identifier = identifier;
-        return UnitResult.Success<Error>();
+        return UnitResult.Success<Errors>();
     }
 
-    public UnitResult<Error> MoveTo(Guid? newParentId, Path newPath, int newDepth)
+    public UnitResult<Errors> MoveTo(Guid? newParentId, Path newPath, int newDepth)
     {
         var validationResult = ValidateDepth(newDepth, newParentId);
         if (validationResult.IsFailure)
@@ -93,74 +93,85 @@ public sealed class Department : BaseEntity
         ParentId = newParentId;
         Path = newPath;
         Depth = newDepth;
-        return UnitResult.Success<Error>();
+        return UnitResult.Success<Errors>();
     }
 
-    public UnitResult<Error> AddLocation(Guid locationId)
+    public UnitResult<Errors> AddLocation(Guid locationId)
     {
         if (_departmentLocations.All(dl => dl.LocationId != locationId))
         {
             _departmentLocations.Add(new DepartmentLocation(Id, locationId));
-            return UnitResult.Success<Error>();
+            return UnitResult.Success<Errors>();
         }
 
         return GeneralError.AlreadyExists(
-            locationId, $"The location '{locationId}' has already been added to the department.");
+                locationId, $"The location '{locationId}' has already been added to the department.")
+            .ToErrors();
     }
 
-    public UnitResult<Error> RemoveLocation(Guid locationId)
+    public UnitResult<Errors> RemoveLocation(Guid locationId)
     {
         if (_departmentLocations.Count == 1 && _departmentLocations[0].LocationId == locationId)
-            return GeneralError.Failure(nameof(Department), message: "Department must have at least one location");
+        {
+            return GeneralError.Failure(nameof(Department), message: "Department must have at least one location")
+                .ToErrors();
+        }
 
         var removed = _departmentLocations.RemoveAll(dl => dl.LocationId == locationId);
         return removed > 0
-            ? UnitResult.Success<Error>()
-            : GeneralError.Failure($"There are no locations in the department with the given id: {locationId}");
+            ? UnitResult.Success<Errors>()
+            : GeneralError.ValueIsInvalid($"There are no locations in the department with the given id: {locationId}")
+                .ToErrors();
     }
 
-    public UnitResult<Error> AddPosition(Guid positionId)
+    public UnitResult<Errors> AddPosition(Guid positionId)
     {
         if (_departmentPositions.All(dp => dp.PositionId != positionId))
         {
             _departmentPositions.Add(new DepartmentPosition(Id, positionId));
-            return UnitResult.Success<Error>();
+            return UnitResult.Success<Errors>();
         }
 
         return GeneralError.AlreadyExists(
-            positionId, "The position '" + positionId + "' has already been added to the department.");
+                positionId, "The position '" + positionId + "' has already been added to the department.")
+            .ToErrors();
     }
 
-    public UnitResult<Error> RemovePosition(Guid positionId)
+    public UnitResult<Errors> RemovePosition(Guid positionId)
     {
         var removed = _departmentPositions.RemoveAll(dp => dp.PositionId == positionId);
         return removed > 0
-            ? UnitResult.Success<Error>()
+            ? UnitResult.Success<Errors>()
             : GeneralError.NotFound(
-                id: positionId, message: $"There are no positions in the department with the given id: {positionId}");
+                    id: positionId,
+                    message: $"There are no positions in the department with the given id: {positionId}")
+                .ToErrors();
     }
 
-    private static UnitResult<Error> ValidateDepth(int depth, Guid? parentId)
+    private static UnitResult<Errors> ValidateDepth(int depth, Guid? parentId)
     {
         const string fieldName = nameof(Depth);
         if (depth < 0)
         {
-            return UnitResult.Failure(
-                GeneralError.ValueIsInvalid(fieldName, $"{fieldName} must be greater than or equal to zero"));
+            return UnitResult.Failure<Errors>(
+                GeneralError.ValueIsInvalid(
+                    fieldName, $"{fieldName} must be greater than or equal to zero"));
         }
 
         if (depth > 0 && !parentId.HasValue)
         {
-            return UnitResult.Failure(
-                GeneralError.ValueIsInvalid(fieldName, "Department with non-zero depth must have a parent"));
+            return UnitResult.Failure<Errors>(
+                GeneralError.ValueIsInvalid(
+                    fieldName, "Department with non-zero depth must have a parent"));
         }
 
         if (depth == 0 && parentId.HasValue)
         {
-            return UnitResult.Failure(
-                GeneralError.ValueIsInvalid(fieldName, "Department with zero depth cannot have a parent"));
+            return UnitResult.Failure<Errors>(
+                GeneralError.ValueIsInvalid(
+                    fieldName, "Department with zero depth cannot have a parent"));
         }
 
-        return UnitResult.Success<Error>();
+        return UnitResult.Success<Errors>();
     }
 }

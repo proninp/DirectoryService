@@ -51,4 +51,10 @@ public static class GeneralError
     {
         return Error.Failure("server.failure", message ?? "Something went wrong. Unexpected server error occurs.");
     }
+
+    public static Error FailureWithNoErrors(string? message = null)
+    {
+        return Error.Failure(
+            "server.failure.no.errors", message ?? "Something went wrong. Unexpected server error occurs.");
+    }
 }

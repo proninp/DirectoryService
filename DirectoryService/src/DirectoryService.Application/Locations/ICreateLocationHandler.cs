@@ -6,5 +6,5 @@ namespace DirectoryService.Application.Locations;
 
 public interface ICreateLocationHandler
 {
-    Task<Result<Guid, Error>> Handle(CreateLocationRequest request, CancellationToken cancellationToken);
+    Task<Result<Guid, Errors>> Handle(CreateLocationRequest request, CancellationToken cancellationToken);
 }

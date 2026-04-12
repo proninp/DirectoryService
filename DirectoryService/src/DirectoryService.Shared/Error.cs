@@ -3,25 +3,25 @@ using CSharpFunctionalExtensions;
 
 namespace DirectoryService.Shared;
 
-public record Error : ICombine
+public record Error
 {
-    public IReadOnlyList<ErrorMessage> ErrorMessages { get; } = [];
+    public ErrorMessage ErrorMessage { get; }
 
-    public ErrorType Type { get; }
+    public ErrorType ErrorType { get; }
 
-    private Error(IEnumerable<ErrorMessage> errorMessages, ErrorType type)
+    private Error(string code, string message, string? invalidField = null, ErrorType errorType = ErrorType.None)
+        : this(new ErrorMessage(code, message, invalidField), errorType)
     {
-        ErrorMessages = [.. errorMessages];
-        Type = type;
     }
 
-    private Error(ErrorMessage errorMessage, ErrorType type)
-        : this([errorMessage], type)
+    private Error(ErrorMessage errorMessage, ErrorType errorType = ErrorType.None)
     {
+        ErrorMessage = errorMessage;
+        ErrorType = errorType;
     }
 
     public static Error None() =>
-        new(new ErrorMessage(string.Empty, string.Empty), ErrorType.None);
+        new(new ErrorMessage(string.Empty, string.Empty));
 
     public static Error NotFound(string? code, string message) =>
         new(new ErrorMessage(code ?? "record.not.found", message), ErrorType.NotFound);
@@ -35,23 +35,5 @@ public record Error : ICombine
     public static Error Failure(string? code, string message) =>
         new(new ErrorMessage(code ?? "failure", message), ErrorType.Failure);
 
-    public static Error NotFound(params IEnumerable<ErrorMessage> errorMessages) =>
-        new(errorMessages, ErrorType.NotFound);
-
-    public static Error Validation(params IEnumerable<ErrorMessage> errorMessages) =>
-        new(errorMessages, ErrorType.Validation);
-
-    public static Error Conflict(params IEnumerable<ErrorMessage> errorMessages) =>
-        new(errorMessages, ErrorType.Conflict);
-
-    public static Error Failure(params IEnumerable<ErrorMessage> errorMessages) =>
-        new(errorMessages, ErrorType.Failure);
-
     public override string ToString() => JsonSerializer.Serialize(this);
-
-    public ICombine Combine(ICombine value)
-    {
-        var other = (Error)value;
-        return new Error(ErrorMessages.Union(other.ErrorMessages), Type);
-    }
 }

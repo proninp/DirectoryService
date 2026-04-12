@@ -7,7 +7,7 @@ namespace DirectoryService.Application.Locations;
 
 public static class CreateLocationRequestExtensions
 {
-    public static Result<Address, Error> ToAddress(this CreateLocationAddressRequest addressRequest)
+    public static Result<Address, Errors> ToAddress(this CreateLocationAddressRequest addressRequest)
     {
         return Address.Create(
             addressRequest.PostalCode,

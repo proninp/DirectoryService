@@ -21,7 +21,7 @@ public sealed record Identifier
         Value = value;
     }
 
-    public static Result<Identifier, Error> Create(string identifier)
+    public static Result<Identifier, Errors> Create(string identifier)
     {
         if (!string.IsNullOrEmpty(identifier))
         {

@@ -31,32 +31,32 @@ public sealed class Position : BaseEntity
         Description = description;
     }
 
-    public static Result<Position, Error> Create(string name, string? description)
+    public static Result<Position, Errors> Create(string name, string? description)
     {
         var validationResult = Result.Combine(
             Guard.ValidateStringField(name, nameof(Name), NameMinLength, NameMaxLength),
             string.IsNullOrEmpty(description)
-                ? UnitResult.Success<Error>()
+                ? UnitResult.Success<Errors>()
                 : Guard.ValidateStringField(description, nameof(Description), 0, DescriptionMaxLength)
         );
 
         if (validationResult.IsFailure)
-            return Result.Failure<Position, Error>(validationResult.Error);
+            return Result.Failure<Position, Errors>(validationResult.Error);
 
         return new Position(name, description);
     }
 
-    public UnitResult<Error> Rename(string newName)
+    public UnitResult<Errors> Rename(string newName)
     {
         var validation = Guard.ValidateStringField(newName, nameof(Name), NameMinLength, NameMaxLength);
         if (validation.IsFailure)
             return UnitResult.Failure(validation.Error);
 
         Name = newName;
-        return UnitResult.Success<Error>();
+        return UnitResult.Success<Errors>();
     }
 
-    public UnitResult<Error> Describe(string? newDescription)
+    public UnitResult<Errors> Describe(string? newDescription)
     {
         if (newDescription is not null)
         {
@@ -67,28 +67,30 @@ public sealed class Position : BaseEntity
         }
 
         Description = newDescription;
-        return UnitResult.Success<Error>();
+        return UnitResult.Success<Errors>();
     }
 
-    internal UnitResult<Error> AddDepartment(Guid departmentId)
+    internal UnitResult<Errors> AddDepartment(Guid departmentId)
     {
         if (_departmentPositions.All(dp => dp.DepartmentId != departmentId))
         {
             _departmentPositions.Add(new DepartmentPosition(Id, departmentId));
-            return UnitResult.Success<Error>();
+            return UnitResult.Success<Errors>();
         }
 
         return GeneralError.AlreadyExists(
-            departmentId, $"The department '{departmentId}' has already been added to the position.");
+                departmentId, $"The department '{departmentId}' has already been added to the position.")
+            .ToErrors();
     }
 
-    internal UnitResult<Error> RemoveDepartment(Guid departmentId)
+    internal UnitResult<Errors> RemoveDepartment(Guid departmentId)
     {
         var removed = _departmentPositions.RemoveAll(dp => dp.DepartmentId == departmentId);
         return removed > 0
-            ? UnitResult.Success<Error>()
+            ? UnitResult.Success<Errors>()
             : GeneralError.NotFound(
-                id: departmentId,
-                message: $"There are no departments for the position with the given id: {departmentId}");
+                    id: departmentId,
+                    message: $"There are no departments for the position with the given id: {departmentId}")
+                .ToErrors();
     }
 }
