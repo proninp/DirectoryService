@@ -26,7 +26,8 @@ public abstract class BaseEntityConfiguration<TEntity> : IEntityTypeConfiguratio
             .HasColumnName("deleted_at");
         builder.Property(e => e.IsActive)
             .IsRequired()
-            .HasColumnName("is_active");
+            .HasColumnName("is_active")
+            .HasDefaultValue(true);
 
         builder.HasQueryFilter(d => d.IsActive);
     }
