@@ -8,6 +8,7 @@ public static class Registration
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
         services.AddScoped<ICreateLocationHandler, CreateLocationHandler>();
+        services.AddScoped<IGetLocationHandler, GetLocationHandler>();
         return services;
     }
 }

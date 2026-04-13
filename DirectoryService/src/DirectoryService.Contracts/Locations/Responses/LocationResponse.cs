@@ -1,7 +1,8 @@
 ﻿namespace DirectoryService.Contracts.Locations.Responses;
 
 public record LocationResponse(
+    Guid Id,
     string Name,
-    LocationAddressResponse AddressResponse,
+    LocationAddressResponse? AddressResponse,
     string Timezone
 );

@@ -13,21 +13,26 @@ public sealed class LocationsController : ControllerBase
 {
     [HttpPost(ApiEndpoints.Locations.Create)]
     [ProducesResponseType(typeof(Guid), StatusCodes.Status201Created)]
-    public async Task<EndpointResult<Guid>> Create(
+    public async Task<IActionResult> Create(
         [FromServices] ICreateLocationHandler handler,
         [FromBody] CreateLocationRequest request,
         CancellationToken cancellationToken
     )
     {
         var result = await handler.Handle(request, cancellationToken);
-        return result;
+        return result.IsSuccess
+            ? new SuccessCreatedResult<Guid>(nameof(Get), new { id = result.Value }, result.Value)
+            : new ErrorResult(result.Error);
     }
 
     [HttpGet(ApiEndpoints.Locations.Get)]
     [ProducesResponseType(typeof(LocationResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public Task<IActionResult> Get([FromRoute] Guid id, CancellationToken cancellationToken = default)
+    public async Task<EndpointResult<LocationResponse>> Get(
+        [FromServices] IGetLocationHandler handler,
+        [FromRoute] Guid id,
+        CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        return await handler.Handle(id, cancellationToken);
     }
 }
