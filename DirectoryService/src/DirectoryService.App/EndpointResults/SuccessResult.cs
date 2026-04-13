@@ -1,14 +1,5 @@
-﻿namespace DirectoryService.App.EndpointResults;
+﻿using Microsoft.AspNetCore.Mvc;
 
-public sealed class SuccessResult<TValue>(TValue value) : IResult
-{
-    public Task ExecuteAsync(HttpContext httpContext)
-    {
-        ArgumentNullException.ThrowIfNull(httpContext);
+namespace DirectoryService.App.EndpointResults;
 
-        var envelope = Envelope.Ok(value);
-
-        httpContext.Response.StatusCode = StatusCodes.Status200OK;
-        return httpContext.Response.WriteAsJsonAsync(envelope);
-    }
-}
+public sealed class SuccessResult<TValue>(TValue value) : OkObjectResult(Envelope.Ok(value));

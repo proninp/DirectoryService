@@ -1,13 +1,12 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Shared;
 using Microsoft.AspNetCore.Mvc;
-using IResult = Microsoft.AspNetCore.Http.IResult;
 
 namespace DirectoryService.App.EndpointResults;
 
-public sealed class EndpointResult<TValue> : IResult
+public sealed class EndpointResult<TValue> : IActionResult
 {
-    private readonly IResult _result;
+    private readonly IActionResult _result;
 
     public EndpointResult(Result<TValue, Errors> result)
     {
@@ -16,23 +15,23 @@ public sealed class EndpointResult<TValue> : IResult
             : new ErrorResult(result.Error);
     }
 
-    public Task ExecuteAsync(HttpContext httpContext) => _result.ExecuteAsync(httpContext);
+    public Task ExecuteResultAsync(ActionContext context) => _result.ExecuteResultAsync(context);
 
     public static implicit operator EndpointResult<TValue>(Result<TValue, Errors> result) => new(result);
 }
 
-public sealed class EndpointResult : IResult
+public sealed class EndpointResult : IActionResult
 {
-    private readonly IResult _result;
+    private readonly IActionResult _result;
 
     public EndpointResult(UnitResult<Errors> result)
     {
         _result = result.IsSuccess
-            ? Results.Ok()
+            ? new OkObjectResult(Envelope.Ok())
             : new ErrorResult(result.Error);
     }
 
-    public Task ExecuteAsync(HttpContext httpContext) => _result.ExecuteAsync(httpContext);
+    public Task ExecuteResultAsync(ActionContext context) => _result.ExecuteResultAsync(context);
 
     public static implicit operator EndpointResult(UnitResult<Errors> result) => new(result);
 }

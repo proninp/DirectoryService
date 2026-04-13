@@ -1,34 +1,29 @@
 ﻿using DirectoryService.Shared;
+using Microsoft.AspNetCore.Mvc;
 
 namespace DirectoryService.App.EndpointResults;
 
-public sealed class ErrorResult : IResult
+public sealed class ErrorResult : ObjectResult
 {
-    private readonly Errors _errors;
-
-    public ErrorResult(Errors errors) => _errors = errors;
-
-    public ErrorResult(Error error) => _errors = error;
-
-    public Task ExecuteAsync(HttpContext httpContext)
+    public ErrorResult(Errors errors)
+        : base(null)
     {
-        ArgumentNullException.ThrowIfNull(httpContext);
-
-        if (!_errors.Any())
+        if (!errors.Any())
         {
-            httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
-            return httpContext.Response.WriteAsJsonAsync(Envelope.Error(GeneralError.FailureWithNoErrors()));
+            StatusCode = StatusCodes.Status500InternalServerError;
+            Value = Envelope.Error(GeneralError.FailureWithNoErrors());
+            return;
         }
 
-        var distinctTypes = _errors
-            .Select(e => e.ErrorType)
-            .Distinct()
-            .ToList();
-        var statusCode = distinctTypes.Count == 1
+        var distinctTypes = errors.Select(e => e.ErrorType).Distinct().ToList();
+        StatusCode = distinctTypes.Count == 1
             ? (int)distinctTypes[0].ToHttpStatusCode()
             : StatusCodes.Status500InternalServerError;
+        Value = Envelope.Error(errors);
+    }
 
-        httpContext.Response.StatusCode = statusCode;
-        return httpContext.Response.WriteAsJsonAsync(Envelope.Error(_errors));
+    public ErrorResult(Error error)
+        : this(new Errors(error))
+    {
     }
 }
