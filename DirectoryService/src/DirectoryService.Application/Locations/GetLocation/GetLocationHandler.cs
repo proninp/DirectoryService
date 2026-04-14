@@ -7,15 +7,15 @@ using DirectoryService.Shared;
 namespace DirectoryService.Application.Locations.GetLocation;
 
 public sealed class GetLocationHandler(ILocationRepository locationRepository)
-    : ICommandHandler<LocationResponse, GetLocationCommand>
+    : IQueryHandler<LocationResponse, GetLocationQuery>
 {
     public async Task<Result<LocationResponse, Errors>> Handle(
-        GetLocationCommand command,
+        GetLocationQuery query,
         CancellationToken cancellationToken)
     {
-        var location = await locationRepository.GetById(command.Id, cancellationToken);
+        var location = await locationRepository.GetById(query.Id, cancellationToken);
         if (location is null)
-            return GeneralError.NotFound(command.Id, nameof(Location)).ToErrors();
+            return GeneralError.NotFound(query.Id, nameof(Location)).ToErrors();
 
         return location.ToResponse();
     }

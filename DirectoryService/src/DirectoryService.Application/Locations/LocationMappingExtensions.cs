@@ -33,6 +33,9 @@ public static class LocationMappingExtensions
         );
     }
 
+    public static IReadOnlyList<LocationResponse> ToResponse(this IEnumerable<Location> locations) =>
+        [.. locations.Select(l => l.ToResponse())];
+
     private static LocationAddressResponse ToAddressResponse(this Address address)
     {
         return new LocationAddressResponse(

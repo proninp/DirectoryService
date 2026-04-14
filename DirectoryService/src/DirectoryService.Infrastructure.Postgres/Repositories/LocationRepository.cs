@@ -14,8 +14,12 @@ public sealed class LocationRepository(DirectoryServiceDbContext context) : ILoc
         return location;
     }
 
-    public Task<IEnumerable<Location>> GetAll(CancellationToken cancellationToken = default) =>
-        throw new NotImplementedException();
+    public async Task<IReadOnlyList<Location>> GetAll(CancellationToken cancellationToken = default)
+    {
+        var query = context.Locations.AsNoTracking();
+        var locations = await query.ToListAsync(cancellationToken);
+        return locations;
+    }
 
     public async Task<Guid> Add(Location location, CancellationToken cancellationToken = default)
     {

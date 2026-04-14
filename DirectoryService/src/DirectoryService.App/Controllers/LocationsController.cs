@@ -32,11 +32,22 @@ public sealed class LocationsController : ControllerBase
     [ProducesResponseType(typeof(LocationResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<EndpointResult<LocationResponse>> Get(
-        [FromServices] ICommandHandler<LocationResponse, GetLocationCommand> handler,
+        [FromServices] IQueryHandler<LocationResponse, GetLocationQuery> handler,
         [FromRoute] Guid id,
         CancellationToken cancellationToken = default)
     {
-        var command = new GetLocationCommand(id);
-        return await handler.Handle(command, cancellationToken);
+        var query = new GetLocationQuery(id);
+        return await handler.Handle(query, cancellationToken);
+    }
+
+    [HttpGet(ApiEndpoints.Locations.GetAll)]
+    [ProducesResponseType(typeof(IReadOnlyList<LocationResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<EndpointResult<IReadOnlyList<LocationResponse>>> GetAll(
+        [FromServices] IQueryHandler<IReadOnlyList<LocationResponse>, GetLocationsQuery> handler,
+        CancellationToken cancellationToken = default)
+    {
+        var query = new GetLocationsQuery();
+        return await handler.Handle(query, cancellationToken);
     }
 }
