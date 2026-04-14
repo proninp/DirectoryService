@@ -2,6 +2,7 @@
 using DirectoryService.Domain.Common;
 using DirectoryService.Domain.Entities.Abstractions;
 using DirectoryService.Domain.Entities.ValueObjects;
+using DirectoryService.Shared;
 
 namespace DirectoryService.Domain.Entities;
 
@@ -11,7 +12,7 @@ public sealed class Location : BaseEntity
 
     private const int NameMaxLength = 120;
 
-    private List<DepartmentLocation> _departmentLocations = [];
+    private readonly List<DepartmentLocation> _departmentLocations = [];
 
     public string Name { get; private set; } = null!;
 
@@ -32,50 +33,50 @@ public sealed class Location : BaseEntity
         Timezone = timezone;
     }
 
-    public static Result<Location> Create(string name, Address? address, Timezone timezone)
+    public static Result<Location, Errors> Create(string name, Address? address, Timezone timezone)
     {
         var validationResult = Guard.ValidateStringField(name, nameof(Name), NameMinLength, NameMaxLength);
 
         if (validationResult.IsFailure)
-        {
-            return Result.Failure<Location>(validationResult.Error);
-        }
+            return Result.Failure<Location, Errors>(validationResult.Error);
 
         return new Location(name, address, timezone);
     }
 
-    public Result Rename(string name)
+    public UnitResult<Errors> Rename(string name)
     {
         var validation = Guard.ValidateStringField(name, nameof(Name), NameMinLength, NameMaxLength);
         if (validation.IsFailure)
         {
-            return Result.Failure(validation.Error);
+            return UnitResult.Failure(validation.Error);
         }
 
         Name = name;
-        return Result.Success();
+        return UnitResult.Success<Errors>();
     }
 
     public void UpdateAddress(Address? address) => Address = address;
 
     public void UpdateTimezone(Timezone timezone) => Timezone = timezone;
 
-    internal Result AddDepartment(Guid departmentId)
+    internal UnitResult<Error> AddDepartment(Guid departmentId)
     {
         if (_departmentLocations.All(dl => dl.DepartmentId != departmentId))
         {
             _departmentLocations.Add(new DepartmentLocation(Id, departmentId));
-            return Result.Success();
+            return UnitResult.Success<Error>();
         }
 
-        return Result.Failure("The department '" + departmentId + "' has already been added to the location.");
+        return GeneralError.AlreadyExists(
+            departmentId, $"The department '{departmentId}' has already been added to the location.");
     }
 
-    internal Result RemoveDepartment(Guid departmentId)
+    internal UnitResult<Error> RemoveDepartment(Guid departmentId)
     {
         var removed = _departmentLocations.RemoveAll(dl => dl.DepartmentId == departmentId);
         return removed > 0
-            ? Result.Success()
-            : Result.Failure("There are no departments for the location with the given id: " + departmentId);
+            ? UnitResult.Success<Error>()
+            : GeneralError.NotFound(departmentId, nameof(Department),
+                $"There are no departments for the location with the given id: {departmentId}");
     }
 }

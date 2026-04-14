@@ -7,6 +7,8 @@ public abstract class BaseEntity : IEntity<Guid>
     protected BaseEntity(Guid id)
     {
         Id = id;
+        CreatedAt = DateTime.UtcNow;
+        IsActive = true;
     }
 
     protected BaseEntity()
