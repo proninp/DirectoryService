@@ -1,12 +1,12 @@
 ﻿using CSharpFunctionalExtensions;
-using DirectoryService.Contracts.Locations.Requests;
+using DirectoryService.Application.Abstractions;
 using DirectoryService.Domain.Entities;
 using DirectoryService.Domain.Entities.ValueObjects;
 using DirectoryService.Shared;
 
-namespace DirectoryService.Application.Locations;
+namespace DirectoryService.Application.Locations.CreateLocation;
 
-public sealed class CreateLocationHandler : ICreateLocationHandler
+public sealed class CreateLocationHandler : ICommandHandler<Guid, CreateLocationCommand>
 {
     private readonly ILocationRepository _locationRepository;
 
@@ -16,17 +16,17 @@ public sealed class CreateLocationHandler : ICreateLocationHandler
     }
 
     public async Task<Result<Guid, Errors>> Handle(
-        CreateLocationRequest request,
+        CreateLocationCommand command,
         CancellationToken cancellationToken)
     {
-        var addressResult = request.AddressRequest.ToAddress();
+        var addressResult = command.Request.AddressRequest.ToAddress();
         if (addressResult.IsFailure)
             return addressResult.Error;
 
         var locationResult = Location.Create(
-            request.Name,
+            command.Request.Name,
             addressResult.Value,
-            new Timezone(request.Timezone)
+            new Timezone(command.Request.Timezone)
         );
 
         if (locationResult.IsFailure)

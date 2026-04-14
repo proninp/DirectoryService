@@ -1,6 +1,6 @@
 ﻿using DirectoryService.Domain.Entities;
 
-namespace DirectoryService.Application.Locations;
+namespace DirectoryService.Application.Abstractions;
 
 public interface ILocationRepository
 {

@@ -1,6 +1,9 @@
 ﻿using Asp.Versioning;
 using DirectoryService.App.EndpointResults;
+using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Locations;
+using DirectoryService.Application.Locations.CreateLocation;
+using DirectoryService.Application.Locations.GetLocation;
 using DirectoryService.Contracts.Locations.Requests;
 using DirectoryService.Contracts.Locations.Responses;
 using Microsoft.AspNetCore.Mvc;
@@ -14,12 +17,12 @@ public sealed class LocationsController : ControllerBase
     [HttpPost(ApiEndpoints.Locations.Create)]
     [ProducesResponseType(typeof(Guid), StatusCodes.Status201Created)]
     public async Task<IActionResult> Create(
-        [FromServices] ICreateLocationHandler handler,
+        [FromServices] ICommandHandler<Guid, CreateLocationCommand> handler,
         [FromBody] CreateLocationRequest request,
         CancellationToken cancellationToken
     )
     {
-        var result = await handler.Handle(request, cancellationToken);
+        var result = await handler.Handle(request.ToCreateCommand(), cancellationToken);
         return result.IsSuccess
             ? new SuccessCreatedResult<Guid>(nameof(Get), new { id = result.Value }, result.Value)
             : new ErrorResult(result.Error);
@@ -29,10 +32,11 @@ public sealed class LocationsController : ControllerBase
     [ProducesResponseType(typeof(LocationResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<EndpointResult<LocationResponse>> Get(
-        [FromServices] IGetLocationHandler handler,
+        [FromServices] ICommandHandler<LocationResponse, GetLocationCommand> handler,
         [FromRoute] Guid id,
         CancellationToken cancellationToken = default)
     {
-        return await handler.Handle(id, cancellationToken);
+        var command = new GetLocationCommand(id);
+        return await handler.Handle(command, cancellationToken);
     }
 }

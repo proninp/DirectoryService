@@ -1,4 +1,5 @@
-﻿using DirectoryService.Application.Locations;
+﻿using DirectoryService.Application.Abstractions;
+using DirectoryService.Application.Locations;
 using DirectoryService.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 

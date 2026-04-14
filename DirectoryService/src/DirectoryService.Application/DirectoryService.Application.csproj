@@ -4,4 +4,7 @@
     <ProjectReference Include="..\DirectoryService.Domain\DirectoryService.Domain.csproj" />
     <ProjectReference Include="..\DirectoryService.Shared\DirectoryService.Shared.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Scrutor" />
+  </ItemGroup>
 </Project>
