@@ -1,35 +1,29 @@
+using System.Globalization;
 using DirectoryService.App.Extensions;
-using DirectoryService.App.Middlewares;
-using DirectoryService.Application;
-using DirectoryService.Infrastructure.Postgres;
+using Serilog;
 
-var builder = WebApplication.CreateBuilder(args);
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Information()
+    .WriteTo.Console(formatProvider: CultureInfo.InvariantCulture)
+    .CreateBootstrapLogger();
 
-builder.Services.AddControllers();
-builder.Services.AddOpenApi();
-
-builder.Services.AddGlobalExceptionHandling();
-
-builder.Services.AddDatabaseConfiguration(builder.Configuration);
-builder.Services.AddApplication();
-
-builder.Services.AddApiVersioningSupport();
-
-builder.Services.AddEndpointsApiExplorer();
-
-builder.Services.AddSwaggerConfiguration();
-
-builder.Host.AddLogging(builder.Configuration);
-
-var app = builder.Build();
-
-if (app.Environment.IsDevelopment())
+try
 {
-    app.UseSwaggerConfiguration();
+    var builder = WebApplication.CreateBuilder(args);
+
+    builder.Services.AddAppConfiguration(builder.Configuration);
+
+    var app = builder.Build();
+
+    app.Configure();
+
+    app.Run();
 }
-
-app.UseHttpsRedirection();
-app.UseAuthorization();
-app.MapControllers();
-
-app.Run();
+catch (Exception ex)
+{
+    Log.Fatal(ex, "Application terminated unexpectedly");
+}
+finally
+{
+    Log.CloseAndFlush();
+}

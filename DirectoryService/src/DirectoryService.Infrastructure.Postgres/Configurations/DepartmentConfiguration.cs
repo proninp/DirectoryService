@@ -30,7 +30,8 @@ public sealed class DepartmentConfiguration : BaseEntityConfiguration<Department
             .HasOne(d => d.Parent)
             .WithMany(p => p.Children)
             .HasForeignKey(d => d.ParentId)
-            .HasConstraintName("fk_department_parent");
+            .HasConstraintName("fk_department_parent")
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder
             .Property(d => d.ParentId)
