@@ -40,11 +40,11 @@ public static class GeneralError
         return Error.Validation("value.is.required", $"The '{name}' field is required", name);
     }
 
-    public static Error AlreadyExists(Guid? id = null, string? message = null)
+    public static Error AlreadyExists(Guid? id = null, string? message = null, string? invalidField = null)
     {
         var errorMessage = message ??
                            (id.HasValue ? $"Record already exists with id {id}." : "Record already exists.");
-        return Error.Conflict("record.already.exists", errorMessage);
+        return Error.Conflict("record.already.exists", errorMessage, invalidField);
     }
 
     public static Error Failure(string? message = null)

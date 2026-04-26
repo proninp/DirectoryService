@@ -1,5 +1,4 @@
 ﻿using DirectoryService.Application.Abstractions;
-using DirectoryService.Application.Locations;
 using DirectoryService.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,6 +10,14 @@ public sealed class LocationRepository(DirectoryServiceDbContext context) : ILoc
     {
         var query = context.Locations.AsNoTracking();
         var location = await query.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+        return location;
+    }
+
+    public async Task<Location?> GetByName(string name, CancellationToken cancellationToken = default)
+    {
+        var query = context.Locations.AsNoTracking();
+        var location = await query.FirstOrDefaultAsync(
+            x => EF.Functions.ILike(x.Name, name), cancellationToken);
         return location;
     }
 
