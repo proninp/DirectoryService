@@ -1,17 +1,20 @@
 ﻿using Serilog;
+using Serilog.Exceptions;
 
 namespace DirectoryService.App.Extensions;
 
 internal static class LoggerRegistrationExtension
 {
-    public static IHostBuilder AddLogging(this IHostBuilder builder, IConfiguration configuration)
+    public static IServiceCollection AddLogging(this IServiceCollection services, IConfiguration configuration)
     {
-        return builder
-            .UseSerilog((_, loggerConfiguration) =>
+        return services
+            .AddSerilog((serviceProvider, loggerConfiguration) =>
                 {
-                    loggerConfiguration.ReadFrom
-                        .Configuration(configuration)
-                        .Enrich.FromLogContext();
+                    loggerConfiguration
+                        .ReadFrom.Configuration(configuration)
+                        .ReadFrom.Services(serviceProvider)
+                        .Enrich.FromLogContext()
+                        .Enrich.WithExceptionDetails();
                 }
             );
     }

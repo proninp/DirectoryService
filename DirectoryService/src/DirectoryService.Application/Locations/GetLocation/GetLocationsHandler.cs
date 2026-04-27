@@ -3,10 +3,14 @@ using DirectoryService.Application.Abstractions;
 using DirectoryService.Contracts.Locations.Responses;
 using DirectoryService.Domain.Entities;
 using DirectoryService.Shared;
+using Microsoft.Extensions.Logging;
 
 namespace DirectoryService.Application.Locations.GetLocation;
 
-public sealed class GetLocationsHandler(ILocationRepository locationRepository)
+public sealed class GetLocationsHandler(
+    ILocationRepository locationRepository,
+    ILogger<GetLocationsHandler> logger
+)
     : IQueryHandler<IReadOnlyList<LocationResponse>, GetLocationsQuery>
 {
     public async Task<Result<IReadOnlyList<LocationResponse>, Errors>> Handle(
@@ -16,11 +20,13 @@ public sealed class GetLocationsHandler(ILocationRepository locationRepository)
         var locations = await locationRepository.GetAll(cancellationToken);
         if (locations.Count == 0)
         {
+            logger.LogWarning("No locations found");
             return GeneralError.NotFound(recordName: nameof(Location), message: "No active locations were found.")
                 .ToErrors();
         }
 
         var locationsResponse = locations.ToResponse().ToList();
+        logger.LogInformation("Found {Count} active locations", locationsResponse.Count);
         return locationsResponse;
     }
 }

@@ -29,8 +29,8 @@ public record Error
     public static Error Validation(string? code, string message, string? invalidField) =>
         new(new ErrorMessage(code ?? "value.is.invalid", message, invalidField), ErrorType.Validation);
 
-    public static Error Conflict(string? code, string message) =>
-        new(new ErrorMessage(code ?? "conflict", message), ErrorType.Conflict);
+    public static Error Conflict(string? code, string message, string? invalidField = null) =>
+        new(new ErrorMessage(code ?? "conflict", message, invalidField), ErrorType.Conflict);
 
     public static Error Failure(string? code, string message) =>
         new(new ErrorMessage(code ?? "failure", message), ErrorType.Failure);

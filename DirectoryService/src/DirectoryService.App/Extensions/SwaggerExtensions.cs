@@ -1,5 +1,6 @@
-﻿using Asp.Versioning.ApiExplorer;
-using Microsoft.OpenApi;
+using Asp.Versioning.ApiExplorer;
+using Microsoft.Extensions.Options;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace DirectoryService.App.Extensions;
 
@@ -8,16 +9,8 @@ internal static class SwaggerExtensions
     public static IServiceCollection AddSwaggerConfiguration(this IServiceCollection services)
     {
         services.AddEndpointsApiExplorer();
-        services.AddSwaggerGen(options =>
-            {
-                var provider = services.BuildServiceProvider()
-                    .GetRequiredService<IApiVersionDescriptionProvider>();
-                foreach (var description in provider.ApiVersionDescriptions)
-                {
-                    options.SwaggerDoc(description.GroupName, CreateApiInfo(description));
-                }
-            }
-        );
+        services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
+        services.AddSwaggerGen();
 
         return services;
     }
@@ -40,26 +33,5 @@ internal static class SwaggerExtensions
         );
 
         return app;
-    }
-
-    private static OpenApiInfo CreateApiInfo(ApiVersionDescription description)
-    {
-        var info = new OpenApiInfo
-        {
-            Title = "Directory Service API",
-            Version = description.ApiVersion.ToString(),
-            Contact = new OpenApiContact
-            {
-                Name = "Velni",
-                Email = "stackcrawler@gmail.com"
-            }
-        };
-
-        if (description.IsDeprecated)
-        {
-            info.Description += " (Deprecated)";
-        }
-
-        return info;
     }
 }

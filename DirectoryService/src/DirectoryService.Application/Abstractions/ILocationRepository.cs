@@ -6,6 +6,8 @@ public interface ILocationRepository
 {
     Task<Location?> GetById(Guid id, CancellationToken cancellationToken = default);
 
+    Task<Location?> GetByName(string name, CancellationToken cancellationToken = default);
+
     Task<IReadOnlyList<Location>> GetAll(CancellationToken cancellationToken = default);
 
     Task<Guid> Add(Location location, CancellationToken cancellationToken = default);
