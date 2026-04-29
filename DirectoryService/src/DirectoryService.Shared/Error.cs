@@ -1,5 +1,5 @@
 ﻿using System.Text.Json;
-using CSharpFunctionalExtensions;
+using System.Text.Json.Serialization;
 
 namespace DirectoryService.Shared;
 
@@ -14,6 +14,7 @@ public record Error
     {
     }
 
+    [JsonConstructor]
     private Error(ErrorMessage errorMessage, ErrorType errorType = ErrorType.None)
     {
         ErrorMessage = errorMessage;
@@ -35,5 +36,9 @@ public record Error
     public static Error Failure(string? code, string message) =>
         new(new ErrorMessage(code ?? "failure", message), ErrorType.Failure);
 
-    public override string ToString() => JsonSerializer.Serialize(this);
+    public string Serialize() => JsonSerializer.Serialize(this, SharedJsonOptions.JsonOptions);
+
+    public static Error? Deserialize(string json) => JsonSerializer.Deserialize<Error>(json, SharedJsonOptions.JsonOptions);
+
+    public override string ToString() => Serialize();
 }

@@ -1,20 +1,28 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Application.Abstractions;
+using DirectoryService.Application.Validation;
 using DirectoryService.Domain.Entities;
 using DirectoryService.Domain.Entities.ValueObjects;
 using DirectoryService.Shared;
+using FluentValidation;
 using Microsoft.Extensions.Logging;
 
 namespace DirectoryService.Application.Locations.CreateLocation;
 
 public sealed class CreateLocationHandler : ICommandHandler<Guid, CreateLocationCommand>
 {
+    private readonly IValidator<CreateLocationCommand> _validator;
+
     private readonly ILocationRepository _locationRepository;
 
     private readonly ILogger<CreateLocationHandler> _logger;
 
-    public CreateLocationHandler(ILocationRepository locationRepository, ILogger<CreateLocationHandler> logger)
+    public CreateLocationHandler(
+        IValidator<CreateLocationCommand> validator,
+        ILocationRepository locationRepository,
+        ILogger<CreateLocationHandler> logger)
     {
+        _validator = validator;
         _locationRepository = locationRepository;
         _logger = logger;
     }
@@ -23,6 +31,10 @@ public sealed class CreateLocationHandler : ICommandHandler<Guid, CreateLocation
         CreateLocationCommand command,
         CancellationToken cancellationToken)
     {
+        var validationResult = await _validator.ValidateAsync(command, cancellationToken);
+        if (!validationResult.IsValid)
+            return validationResult.ToErrors();
+
         var addressResult = command.Request.AddressRequest.ToAddress();
         if (addressResult.IsFailure)
         {
