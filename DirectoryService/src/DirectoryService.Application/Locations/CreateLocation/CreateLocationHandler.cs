@@ -32,12 +32,24 @@ public sealed class CreateLocationHandler : ICommandHandler<Guid, CreateLocation
             return addressResult.Error;
         }
 
+        var locationWithTheSameAddress = await _locationRepository.GetByAddress(addressResult.Value, cancellationToken);
+        if (locationWithTheSameAddress is not null)
+        {
+            _logger.LogWarning(
+                "Location with the same address already exists: {LocationAddress}", addressResult.Value);
+            return Result.Failure<Guid, Errors>(GeneralError.AlreadyExists(
+                locationWithTheSameAddress.Id,
+                $"Location address already exists: '{command.Request.AddressRequest}'." +
+                $"Location: {locationWithTheSameAddress.Id}",
+                nameof(command.Request.AddressRequest)));
+        }
+
         var locationWithTheSameName =
             await _locationRepository.GetByName(command.Request.Name, cancellationToken);
 
         if (locationWithTheSameName is not null)
         {
-            _logger.LogError("Location with the same name already exists: {LocationId}", locationWithTheSameName.Id);
+            _logger.LogWarning("Location with the same name already exists: {LocationId}", locationWithTheSameName.Id);
             return Result.Failure<Guid, Errors>(GeneralError.AlreadyExists(
                 locationWithTheSameName.Id,
                 $"Location with the name '{command.Request.Name}' already exists",
