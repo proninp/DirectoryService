@@ -36,9 +36,9 @@ public record Error
     public static Error Failure(string? code, string message) =>
         new(new ErrorMessage(code ?? "failure", message), ErrorType.Failure);
 
-    public string Serialize() => JsonSerializer.Serialize(this, SharedJsonOptions.JsonOptions);
+    public string Serialize() => JsonSerializer.Serialize(this);
 
-    public static Error? Deserialize(string json) => JsonSerializer.Deserialize<Error>(json, SharedJsonOptions.JsonOptions);
+    public static Error? Deserialize(string json) => JsonSerializer.Deserialize<Error>(json);
 
     public override string ToString() => Serialize();
 }

@@ -10,8 +10,4 @@
         <ProjectReference Include="..\..\src\DirectoryService.Shared\DirectoryService.Shared.csproj"/>
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Error\" />
-    </ItemGroup>
-
 </Project>

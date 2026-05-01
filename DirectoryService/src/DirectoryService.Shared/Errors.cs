@@ -27,7 +27,7 @@ public sealed class Errors : IEnumerable<Error>, ICombine
     {
         // System.Text.Json не умеет десериализовать JSON-массив в кастомный тип IEnumerable<T>
         // без метода Add или реализации ICollection<T>
-        var list = JsonSerializer.Deserialize<List<Error>>(json, SharedJsonOptions.JsonOptions);
+        var list = JsonSerializer.Deserialize<List<Error>>(json);
         return list is null ? null : new Errors(list);
     }
 
@@ -42,5 +42,5 @@ public sealed class Errors : IEnumerable<Error>, ICombine
         return this;
     }
 
-    public string Serialize() => JsonSerializer.Serialize(this, SharedJsonOptions.JsonOptions);
+    public string Serialize() => JsonSerializer.Serialize(this);
 }
