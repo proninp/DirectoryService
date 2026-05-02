@@ -1,4 +1,8 @@
-﻿namespace DirectoryService.Domain.Entities.ValueObjects;
+﻿using System.Text.Json.Serialization;
+using CSharpFunctionalExtensions;
+using DirectoryService.Shared;
+
+namespace DirectoryService.Domain.Entities.ValueObjects;
 
 public sealed record Timezone
 {
@@ -7,29 +11,39 @@ public sealed record Timezone
     // EF Core Constructor
     private Timezone() { }
 
-    public Timezone(string value)
+    [JsonConstructor]
+    private Timezone(string value)
     {
-        if (string.IsNullOrWhiteSpace(value))
-            throw new ArgumentException("Timezone cannot be empty", nameof(value));
+        Value = value;
+    }
+
+    public static Result<Timezone, Errors> Create(string timeZone)
+    {
+        if (string.IsNullOrWhiteSpace(timeZone))
+            return Result.Failure<Timezone, Errors>(GeneralError.ValueIsRequired(nameof(Timezone)));
 
         try
         {
-            TimeZoneInfo.FindSystemTimeZoneById(value);
+            TimeZoneInfo.FindSystemTimeZoneById(timeZone);
         }
         catch (TimeZoneNotFoundException)
         {
-            throw new ArgumentException($"Invalid IANA timezone: '{value}'", nameof(value));
+            return Result.Failure<Timezone, Errors>(GeneralError.ValueIsInvalid(
+                nameof(Timezone), $"Invalid IANA timezone: '{timeZone}'"));
         }
 
-        Value = value;
+        return new Timezone(timeZone);
     }
 
     public TimeZoneInfo GetTimeZoneInfo() => TimeZoneInfo.FindSystemTimeZoneById(Value);
 
-    public DateTime ConvertFromUtc(DateTime utcDateTime)
+    public Result<DateTime, Errors> ConvertFromUtc(DateTime utcDateTime)
     {
         if (utcDateTime.Kind != DateTimeKind.Utc)
-            throw new ArgumentException("DateTime must be in UTC", nameof(utcDateTime));
+        {
+            return Result.Failure<DateTime, Errors>(
+                GeneralError.ValueIsInvalid(nameof(utcDateTime), "DateTime must be in UTC"));
+        }
 
         return TimeZoneInfo.ConvertTimeFromUtc(utcDateTime, GetTimeZoneInfo());
     }
