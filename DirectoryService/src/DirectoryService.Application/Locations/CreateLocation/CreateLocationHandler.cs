@@ -33,16 +33,15 @@ public sealed class CreateLocationHandler : ICommandHandler<Guid, CreateLocation
     {
         var validationResult = await _validator.ValidateAsync(command, cancellationToken);
         if (!validationResult.IsValid)
-            return validationResult.ToErrors();
-
-        var addressResult = command.Request.AddressRequest.ToAddress();
-        if (addressResult.IsFailure)
         {
+            var errors = validationResult.ToErrors();
             _logger.LogError(
                 "Failed to create address from request {@AddressRequest}: {@Error}",
-                command.Request.AddressRequest, addressResult.Error);
-            return addressResult.Error;
+                command.Request.AddressRequest, errors.ToString());
+            return errors;
         }
+
+        var addressResult = command.Request.AddressRequest.ToAddress();
 
         var locationWithTheSameAddress = await _locationRepository.GetByAddress(addressResult.Value, cancellationToken);
         if (locationWithTheSameAddress is not null)
@@ -51,8 +50,8 @@ public sealed class CreateLocationHandler : ICommandHandler<Guid, CreateLocation
                 "Location with the same address already exists: {LocationAddress}", addressResult.Value);
             return Result.Failure<Guid, Errors>(GeneralError.AlreadyExists(
                 locationWithTheSameAddress.Id,
-                $"Location address already exists: '{command.Request.AddressRequest}'." +
-                $"Location: {locationWithTheSameAddress.Id}",
+                $"Location address already exists: '{command.Request.AddressRequest}' for " +
+                $"location: '{locationWithTheSameAddress.Id}'",
                 nameof(command.Request.AddressRequest)));
         }
 
@@ -64,14 +63,14 @@ public sealed class CreateLocationHandler : ICommandHandler<Guid, CreateLocation
             _logger.LogWarning("Location with the same name already exists: {LocationId}", locationWithTheSameName.Id);
             return Result.Failure<Guid, Errors>(GeneralError.AlreadyExists(
                 locationWithTheSameName.Id,
-                $"Location with the name '{command.Request.Name}' already exists",
+                $"Location with the name '{command.Request.Name}' already exists.",
                 nameof(command.Request.Name)));
         }
 
         var locationResult = Location.Create(
             command.Request.Name,
             addressResult.Value,
-            new Timezone(command.Request.Timezone)
+            Timezone.Create(command.Request.Timezone).Value
         );
 
         if (locationResult.IsFailure)
