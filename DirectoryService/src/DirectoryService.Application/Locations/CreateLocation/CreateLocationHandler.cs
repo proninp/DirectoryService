@@ -33,16 +33,15 @@ public sealed class CreateLocationHandler : ICommandHandler<Guid, CreateLocation
     {
         var validationResult = await _validator.ValidateAsync(command, cancellationToken);
         if (!validationResult.IsValid)
-            return validationResult.ToErrors();
-
-        var addressResult = command.Request.AddressRequest.ToAddress();
-        if (addressResult.IsFailure)
         {
+            var errors = validationResult.ToErrors();
             _logger.LogError(
                 "Failed to create address from request {@AddressRequest}: {@Error}",
-                command.Request.AddressRequest, addressResult.Error);
-            return addressResult.Error;
+                command.Request.AddressRequest, errors.ToString());
+            return errors;
         }
+
+        var addressResult = command.Request.AddressRequest.ToAddress();
 
         var locationWithTheSameAddress = await _locationRepository.GetByAddress(addressResult.Value, cancellationToken);
         if (locationWithTheSameAddress is not null)
@@ -71,7 +70,7 @@ public sealed class CreateLocationHandler : ICommandHandler<Guid, CreateLocation
         var locationResult = Location.Create(
             command.Request.Name,
             addressResult.Value,
-            new Timezone(command.Request.Timezone)
+            Timezone.Create(command.Request.Timezone).Value
         );
 
         if (locationResult.IsFailure)
