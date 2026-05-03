@@ -300,3 +300,5 @@ secrets/
 .env.production.local
 
 **/[Ll]ogs/
+
+CLAUDE.md
