@@ -1,5 +1,6 @@
-﻿using DirectoryService.Application.Abstractions;
+using DirectoryService.Application.Abstractions;
 using DirectoryService.Domain.Entities;
+using DirectoryService.Domain.Entities.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 
 namespace DirectoryService.Infrastructure.Postgres.Repositories;
@@ -8,16 +9,27 @@ public sealed class LocationRepository(DirectoryServiceDbContext context) : ILoc
 {
     public async Task<Location?> GetById(Guid id, CancellationToken cancellationToken = default)
     {
-        var query = context.Locations.AsNoTracking();
-        var location = await query.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+        var location = await context.Locations
+            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         return location;
     }
 
     public async Task<Location?> GetByName(string name, CancellationToken cancellationToken = default)
     {
-        var query = context.Locations.AsNoTracking();
-        var location = await query.FirstOrDefaultAsync(
-            x => EF.Functions.ILike(x.Name, name), cancellationToken);
+        var location = await context.Locations
+            .FirstOrDefaultAsync(
+            l => EF.Functions.ILike(l.Name, name), cancellationToken);
+        return location;
+    }
+
+    public async Task<Location?> GetByAddress(Address address, CancellationToken cancellationToken = default)
+    {
+        var location = await context
+            .Locations
+            .FirstOrDefaultAsync(
+                l =>
+                l.Address == address,
+                cancellationToken);
         return location;
     }
 

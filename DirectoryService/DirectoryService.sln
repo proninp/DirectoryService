@@ -6,6 +6,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Directory.Build.props = Directory.Build.props
 		Directory.Packages.props = Directory.Packages.props
 		docker-compose.dev.yml = docker-compose.dev.yml
+		CLAUDE.md = CLAUDE.md
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DirectoryService.App", "src\DirectoryService.App\DirectoryService.App.csproj", "{BF8C4AA8-DBC6-46A4-8A51-B676961DAC26}"
@@ -25,6 +26,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DirectoryService.Infrastructure.Postgres", "src\DirectoryService.Infrastructure.Postgres\DirectoryService.Infrastructure.Postgres.csproj", "{7A6F144B-51DF-4839-A52B-6E160FD200AC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DirectoryService.Shared", "src\DirectoryService.Shared\DirectoryService.Shared.csproj", "{17A1EF2D-E7B5-4173-9885-756E61626161}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{A656D757-E7B6-4E0D-B5AD-52541126AFBD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DirectoryService.Shared.UnitTests", "tests\DirectoryService.Shared.UnitTests\DirectoryService.Shared.UnitTests.csproj", "{F7ADBE59-C0DF-4ED0-8C32-E4A13E9AD5FC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -64,6 +69,10 @@ Global
 		{17A1EF2D-E7B5-4173-9885-756E61626161}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{17A1EF2D-E7B5-4173-9885-756E61626161}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{17A1EF2D-E7B5-4173-9885-756E61626161}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F7ADBE59-C0DF-4ED0-8C32-E4A13E9AD5FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F7ADBE59-C0DF-4ED0-8C32-E4A13E9AD5FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F7ADBE59-C0DF-4ED0-8C32-E4A13E9AD5FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F7ADBE59-C0DF-4ED0-8C32-E4A13E9AD5FC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{BF8C4AA8-DBC6-46A4-8A51-B676961DAC26} = {EE862901-6D3C-4574-AF4F-80B42FA59C79}
@@ -74,5 +83,6 @@ Global
 		{4F699DEB-2E12-4232-962B-634499F80126} = {EE862901-6D3C-4574-AF4F-80B42FA59C79}
 		{7A6F144B-51DF-4839-A52B-6E160FD200AC} = {EE862901-6D3C-4574-AF4F-80B42FA59C79}
 		{17A1EF2D-E7B5-4173-9885-756E61626161} = {EE862901-6D3C-4574-AF4F-80B42FA59C79}
+		{F7ADBE59-C0DF-4ED0-8C32-E4A13E9AD5FC} = {A656D757-E7B6-4E0D-B5AD-52541126AFBD}
 	EndGlobalSection
 EndGlobal
