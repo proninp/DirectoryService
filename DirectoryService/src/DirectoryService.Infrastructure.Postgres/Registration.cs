@@ -1,4 +1,4 @@
-﻿using DirectoryService.Application.Abstractions.Repositories;
+﻿using DirectoryService.Application.Locations;
 using DirectoryService.Infrastructure.Postgres.Options;
 using DirectoryService.Infrastructure.Postgres.Repositories;
 using Microsoft.Extensions.Configuration;

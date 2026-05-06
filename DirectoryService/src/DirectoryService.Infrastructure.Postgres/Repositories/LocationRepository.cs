@@ -1,4 +1,4 @@
-using DirectoryService.Application.Abstractions.Repositories;
+using DirectoryService.Application.Locations;
 using DirectoryService.Domain.Entities;
 using DirectoryService.Domain.Entities.ValueObjects;
 using Microsoft.EntityFrameworkCore;

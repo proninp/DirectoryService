@@ -1,6 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Application.Abstractions;
-using DirectoryService.Application.Abstractions.Repositories;
 using DirectoryService.Contracts.Locations.Responses;
 using DirectoryService.Domain.Entities;
 using DirectoryService.Shared;

@@ -1,6 +1,6 @@
 ﻿using DirectoryService.Domain.Entities;
 
-namespace DirectoryService.Application.Abstractions.Repositories;
+namespace DirectoryService.Application.Departments;
 
 public interface IDepartmentRepository
 {

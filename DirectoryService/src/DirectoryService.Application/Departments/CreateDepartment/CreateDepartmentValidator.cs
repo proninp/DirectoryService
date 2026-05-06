@@ -1,10 +1,10 @@
-﻿using DirectoryService.Application.Departments.CreateDepartment;
+﻿using DirectoryService.Application.Validation;
 using DirectoryService.Contracts.Departments.Requests;
 using DirectoryService.Domain.Entities.ValueObjects;
 using DirectoryService.Shared;
 using FluentValidation;
 
-namespace DirectoryService.Application.Validation;
+namespace DirectoryService.Application.Departments.CreateDepartment;
 
 public sealed class CreateDepartmentValidator : AbstractValidator<CreateDepartmentCommand>
 {
