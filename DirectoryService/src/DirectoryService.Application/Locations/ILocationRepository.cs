@@ -13,6 +13,8 @@ public interface ILocationRepository
 
     Task<IReadOnlyList<Location>> GetAll(CancellationToken cancellationToken = default);
 
+    Task<bool> AllExists(IReadOnlyCollection<Guid> ids, CancellationToken cancellationToken = default);
+
     Task<Guid> Add(Location location, CancellationToken cancellationToken = default);
 
     Task Update(Location location, CancellationToken cancellationToken = default);
