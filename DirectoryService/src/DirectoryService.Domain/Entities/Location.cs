@@ -67,7 +67,7 @@ public sealed class Location : BaseEntity
             return UnitResult.Success<Error>();
         }
 
-        return GeneralError.AlreadyExists(
+        return GeneralErrors.AlreadyExists(
             departmentId, $"The department '{departmentId}' has already been added to the location.");
     }
 
@@ -76,7 +76,7 @@ public sealed class Location : BaseEntity
         var removed = _departmentLocations.RemoveAll(dl => dl.DepartmentId == departmentId);
         return removed > 0
             ? UnitResult.Success<Error>()
-            : GeneralError.NotFound(departmentId, nameof(Department),
+            : GeneralErrors.NotFound(departmentId, nameof(Department),
                 $"There are no departments for the location with the given id: {departmentId}");
     }
 }

@@ -28,7 +28,7 @@ public sealed partial class GetLocationsHandler(
         if (locations.Count == 0)
         {
             LogNoLocationsFound(logger);
-            return GeneralError.NotFound(recordName: nameof(Location), message: "No active locations were found.")
+            return GeneralErrors.NotFound(recordName: nameof(Location), message: "No active locations were found.")
                 .ToErrors();
         }
 

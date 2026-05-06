@@ -49,7 +49,7 @@ public sealed record Path
     {
         if (ancestors.Count == 0)
         {
-            return GeneralError.NotFound(
+            return GeneralErrors.NotFound(
                     recordName: nameof(Path), message: $"No path found for ancestors of {departmentIdentifier}")
                 .ToErrors();
         }

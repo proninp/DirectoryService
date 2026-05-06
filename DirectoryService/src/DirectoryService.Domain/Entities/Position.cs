@@ -78,7 +78,7 @@ public sealed class Position : BaseEntity
             return UnitResult.Success<Errors>();
         }
 
-        return GeneralError.AlreadyExists(
+        return GeneralErrors.AlreadyExists(
                 departmentId, $"The department '{departmentId}' has already been added to the position.")
             .ToErrors();
     }
@@ -88,7 +88,7 @@ public sealed class Position : BaseEntity
         var removed = _departmentPositions.RemoveAll(dp => dp.DepartmentId == departmentId);
         return removed > 0
             ? UnitResult.Success<Errors>()
-            : GeneralError.NotFound(
+            : GeneralErrors.NotFound(
                     id: departmentId,
                     message: $"There are no departments for the position with the given id: {departmentId}")
                 .ToErrors();

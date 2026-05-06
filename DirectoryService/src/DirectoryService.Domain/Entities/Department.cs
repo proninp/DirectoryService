@@ -104,7 +104,7 @@ public sealed class Department : BaseEntity
             return UnitResult.Success<Errors>();
         }
 
-        return GeneralError.AlreadyExists(
+        return GeneralErrors.AlreadyExists(
                 locationId, $"The location '{locationId}' has already been added to the department.")
             .ToErrors();
     }
@@ -113,14 +113,14 @@ public sealed class Department : BaseEntity
     {
         if (_departmentLocations.Count == 1 && _departmentLocations[0].LocationId == locationId)
         {
-            return GeneralError.Failure(nameof(Department), message: "Department must have at least one location")
+            return GeneralErrors.Failure(nameof(Department), message: "Department must have at least one location")
                 .ToErrors();
         }
 
         var removed = _departmentLocations.RemoveAll(dl => dl.LocationId == locationId);
         return removed > 0
             ? UnitResult.Success<Errors>()
-            : GeneralError.ValueIsInvalid($"There are no locations in the department with the given id: {locationId}")
+            : GeneralErrors.ValueIsInvalid($"There are no locations in the department with the given id: {locationId}")
                 .ToErrors();
     }
 
@@ -132,7 +132,7 @@ public sealed class Department : BaseEntity
             return UnitResult.Success<Errors>();
         }
 
-        return GeneralError.AlreadyExists(
+        return GeneralErrors.AlreadyExists(
                 positionId, "The position '" + positionId + "' has already been added to the department.")
             .ToErrors();
     }
@@ -142,7 +142,7 @@ public sealed class Department : BaseEntity
         var removed = _departmentPositions.RemoveAll(dp => dp.PositionId == positionId);
         return removed > 0
             ? UnitResult.Success<Errors>()
-            : GeneralError.NotFound(
+            : GeneralErrors.NotFound(
                     id: positionId,
                     message: $"There are no positions in the department with the given id: {positionId}")
                 .ToErrors();
@@ -154,21 +154,21 @@ public sealed class Department : BaseEntity
         if (depth < 0)
         {
             return UnitResult.Failure<Errors>(
-                GeneralError.ValueIsInvalid(
+                GeneralErrors.ValueIsInvalid(
                     fieldName, $"{fieldName} must be greater than or equal to zero"));
         }
 
         if (depth > 0 && !parentId.HasValue)
         {
             return UnitResult.Failure<Errors>(
-                GeneralError.ValueIsInvalid(
+                GeneralErrors.ValueIsInvalid(
                     fieldName, "Department with non-zero depth must have a parent"));
         }
 
         if (depth == 0 && parentId.HasValue)
         {
             return UnitResult.Failure<Errors>(
-                GeneralError.ValueIsInvalid(
+                GeneralErrors.ValueIsInvalid(
                     fieldName, "Department with zero depth cannot have a parent"));
         }
 

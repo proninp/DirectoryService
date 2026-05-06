@@ -53,7 +53,7 @@ public sealed partial class CreateLocationHandler : ICommandHandler<Guid, Create
         {
             _logger.LogWarning(
                 "Location with the same address already exists: {LocationAddress}", addressResult.Value);
-            return Result.Failure<Guid, Errors>(GeneralError.AlreadyExists(
+            return Result.Failure<Guid, Errors>(GeneralErrors.AlreadyExists(
                 locationWithTheSameAddress.Id,
                 $"Location address already exists: '{command.Request.AddressRequest}' for " +
                 $"location: '{locationWithTheSameAddress.Id}'",
@@ -66,7 +66,7 @@ public sealed partial class CreateLocationHandler : ICommandHandler<Guid, Create
         if (locationWithTheSameName is not null)
         {
             _logger.LogWarning("Location with the same name already exists: {LocationId}", locationWithTheSameName.Id);
-            return Result.Failure<Guid, Errors>(GeneralError.AlreadyExists(
+            return Result.Failure<Guid, Errors>(GeneralErrors.AlreadyExists(
                 locationWithTheSameName.Id,
                 $"Location with the name '{command.Request.Name}' already exists.",
                 nameof(command.Request.Name)));
