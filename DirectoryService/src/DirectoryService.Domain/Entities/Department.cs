@@ -37,31 +37,86 @@ public sealed class Department : BaseEntity
     private Department() { }
 
     private Department(
-        string name, Identifier identifier, Path path, int depth, Guid? parentId
-    )
-        : base(Guid.NewGuid())
+        Guid id,
+        string name,
+        Identifier identifier,
+        Path path,
+        int depth,
+        Guid? parentId,
+        IReadOnlyCollection<DepartmentLocation> departmentLocations)
+        : base(id)
     {
         Name = name;
         Identifier = identifier;
         ParentId = parentId;
         Path = path;
         Depth = depth;
+        _departmentLocations = [.. departmentLocations];
     }
 
     public static Result<Department, Errors> Create(
-        string name, Identifier identifier, Path path, int depth, Guid? parentId
+        string name, Identifier identifier, Department parent,
+        IReadOnlyCollection<DepartmentLocation> departmentLocations,
+        Guid? id = null
     )
     {
-        var validationResult = Result.Combine(
-            Guard.ValidateStringField(name, nameof(Name), 3, 150),
-            ValidateDepth(depth, parentId)
-        );
+        var locationsValidationResult = ValidateDepartment(name, departmentLocations);
+        if (locationsValidationResult.IsFailure)
+            return Result.Failure<Department, Errors>(locationsValidationResult.Error);
 
-        if (validationResult.IsFailure)
-            return Result.Failure<Department, Errors>(validationResult.Error);
+        var path = ValueObjects.Path.CreateForChild(parent.Path, identifier);
+        if (path.IsFailure)
+            return Result.Failure<Department, Errors>(path.Error);
 
-        var department = new Department(name, identifier, path, depth, parentId);
-        return Result.Success<Department, Errors>(department);
+        return new Department(
+            id ?? Guid.NewGuid(),
+            name,
+            identifier,
+            path.Value,
+            parent.Depth + 1,
+            parent.Id,
+            departmentLocations);
+    }
+
+    public static Result<Department, Errors> CreateParent(
+        string name, Identifier identifier,
+        IReadOnlyCollection<DepartmentLocation> departmentLocations,
+        Guid? id = null)
+    {
+        var locationsValidationResult = ValidateDepartment(name, departmentLocations);
+        if (locationsValidationResult.IsFailure)
+            return Result.Failure<Department, Errors>(locationsValidationResult.Error);
+
+        var path = Path.CreateForParent(identifier.Value);
+        if (path.IsFailure)
+            return Result.Failure<Department, Errors>(path.Error);
+
+        return new Department(
+            id ?? Guid.NewGuid(),
+            name,
+            identifier,
+            path.Value,
+            0,
+            null,
+            departmentLocations);
+    }
+
+    private static UnitResult<Errors> ValidateDepartment(
+        string name,
+        IReadOnlyCollection<DepartmentLocation> departmentLocations)
+    {
+        if (departmentLocations.Count == 0)
+        {
+            return Error.Validation(
+                "department.location", "Department locations must contain at least one location",
+                nameof(Department.DepartmentLocations)).ToErrors();
+        }
+
+        var nameValidationResult = Guard.ValidateStringField(name, nameof(Name), 3, 150);
+        if (nameValidationResult.IsFailure)
+            return UnitResult.Failure(nameValidationResult.Error);
+
+        return UnitResult.Success<Errors>();
     }
 
     public UnitResult<Errors> Rename(string newName)

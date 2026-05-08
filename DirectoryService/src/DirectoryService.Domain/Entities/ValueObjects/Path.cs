@@ -20,7 +20,7 @@ public sealed record Path
 
     private Path(string value) => Value = value;
 
-    private static Result<Path, Errors> Create(string path)
+    public static Result<Path, Errors> CreateForParent(string path)
     {
         if (!string.IsNullOrEmpty(path))
         {
@@ -40,7 +40,7 @@ public sealed record Path
     {
         var fullPath = $"{parentPath.Value}{Separator}{childIdentifier.Value}";
 
-        return Create(fullPath);
+        return CreateForParent(fullPath);
     }
 
     public static Result<Path, Errors> FromAncestors(
@@ -57,8 +57,8 @@ public sealed record Path
         return CreateForChild(ancestors[^1].Path, departmentIdentifier);
     }
 
-    public static Result<Path, Errors> Root(Identifier departmentIdentifier)
+    public static Result<Path, Errors> Root(Identifier identifier)
     {
-        return Create(departmentIdentifier.Value);
+        return CreateForParent(identifier.Value);
     }
 }
