@@ -1,8 +1,9 @@
-﻿using DirectoryService.Domain.Entities;
+﻿using DirectoryService.Application.Abstractions;
+using DirectoryService.Domain.Entities;
 
 namespace DirectoryService.Application.Departments;
 
-public interface IDepartmentRepository
+public interface IDepartmentRepository : IRepository
 {
     Task<Department?> GetById(Guid id, CancellationToken cancellationToken = default);
 

@@ -1,6 +1,5 @@
-﻿using DirectoryService.Application.Locations;
+﻿using DirectoryService.Application.Abstractions;
 using DirectoryService.Infrastructure.Postgres.Options;
-using DirectoryService.Infrastructure.Postgres.Repositories;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -17,7 +16,12 @@ public static class Registration
 
         services.AddDbContext<DirectoryServiceDbContext>();
 
-        services.AddScoped<ILocationRepository, LocationRepository>();
+        services.Scan(scan => scan
+            .FromAssemblies(typeof(Registration).Assembly)
+            .AddClasses(classes => classes
+                .AssignableTo<IRepository>())
+            .AsImplementedInterfaces()
+            .WithScopedLifetime());
 
         return services;
     }

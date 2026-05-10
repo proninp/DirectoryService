@@ -1,9 +1,10 @@
-﻿using DirectoryService.Domain.Entities;
+﻿using DirectoryService.Application.Abstractions;
+using DirectoryService.Domain.Entities;
 using DirectoryService.Domain.Entities.ValueObjects;
 
 namespace DirectoryService.Application.Locations;
 
-public interface ILocationRepository
+public interface ILocationRepository : IRepository
 {
     Task<Location?> GetById(Guid id, CancellationToken cancellationToken = default);
 
