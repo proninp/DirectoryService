@@ -48,7 +48,7 @@ public sealed class CreateDepartmentHandler : ICommandHandler<Guid, CreateDepart
         if (!allLocationsExists)
         {
             _logger.LogError(
-                "Department creation error. One ot several of locations not found: '{@LocationIds}'.",
+                "Department creation error. One or several of locations not found: '{@LocationIds}'.",
                 command.Request.LocationIds);
             return GeneralErrors.NotFound(
                     recordName: nameof(Location), message: "One or several locations not found.")
@@ -78,8 +78,8 @@ public sealed class CreateDepartmentHandler : ICommandHandler<Guid, CreateDepart
 
         var department =
             parent is null
-                ? Department.CreateParent(command.Request.Name, identifier.Value, departmentLocations)
-                : Department.Create(command.Request.Name, identifier.Value, parent, departmentLocations);
+                ? Department.CreateParent(command.Request.Name, identifier.Value, departmentLocations, departmentId)
+                : Department.Create(command.Request.Name, identifier.Value, parent, departmentLocations, departmentId);
 
         if (department.IsFailure)
         {

@@ -10,6 +10,8 @@ public sealed class DepartmentRepository(DirectoryServiceDbContext context) : ID
     {
         var department = await context
             .Departments
+            .Include(d => d.DepartmentLocations)
+            .Include(d => d.DepartmentPositions)
             .FirstOrDefaultAsync(d => d.Id == id, cancellationToken);
         return department;
     }
@@ -18,6 +20,8 @@ public sealed class DepartmentRepository(DirectoryServiceDbContext context) : ID
     {
         var department = await context
             .Departments
+            .Include(d => d.DepartmentLocations)
+            .Include(d => d.DepartmentPositions)
             .FirstOrDefaultAsync(d => d.Name == name, cancellationToken);
         return department;
     }
