@@ -1,5 +1,6 @@
 ﻿using DirectoryService.Application.Departments;
 using DirectoryService.Domain.Entities;
+using DirectoryService.Domain.Entities.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 
 namespace DirectoryService.Infrastructure.Postgres.Repositories;
@@ -24,6 +25,14 @@ public sealed class DepartmentRepository(DirectoryServiceDbContext context) : ID
             .Include(d => d.DepartmentPositions)
             .FirstOrDefaultAsync(d => d.Name == name, cancellationToken);
         return department;
+    }
+
+    public async Task<bool> ExistsByIdentifier(Identifier identifier, CancellationToken cancellationToken = default)
+    {
+        return await context
+            .Departments
+            .Where(d => d.Identifier.Equals(identifier))
+            .AnyAsync(cancellationToken);
     }
 
     public async Task<IReadOnlyList<Department>> GetAll(CancellationToken cancellationToken = default)

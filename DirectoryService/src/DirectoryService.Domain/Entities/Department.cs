@@ -54,7 +54,18 @@ public sealed class Department : BaseEntity
         _departmentLocations = [.. departmentLocations];
     }
 
-    public static Result<Department, Errors> Create(
+    public static Result<Department, Errors> Create(string name, Identifier identifier,
+        IReadOnlyCollection<DepartmentLocation> departmentLocations,
+        Department? parent = null,
+        Guid? departmentId = null)
+    {
+        var deParent = parent is null
+            ? CreateParent(name, identifier, departmentLocations, departmentId)
+            : CreateChild(name, identifier, parent, departmentLocations, departmentId);
+        return deParent;
+    }
+
+    private static Result<Department, Errors> CreateChild(
         string name, Identifier identifier, Department parent,
         IReadOnlyCollection<DepartmentLocation> departmentLocations,
         Guid? id = null
@@ -64,7 +75,7 @@ public sealed class Department : BaseEntity
         if (locationsValidationResult.IsFailure)
             return Result.Failure<Department, Errors>(locationsValidationResult.Error);
 
-        var path = ValueObjects.Path.CreateForChild(parent.Path, identifier);
+        var path = Path.CreateForChild(parent.Path, identifier);
         if (path.IsFailure)
             return Result.Failure<Department, Errors>(path.Error);
 
@@ -78,7 +89,7 @@ public sealed class Department : BaseEntity
             departmentLocations);
     }
 
-    public static Result<Department, Errors> CreateParent(
+    private static Result<Department, Errors> CreateParent(
         string name, Identifier identifier,
         IReadOnlyCollection<DepartmentLocation> departmentLocations,
         Guid? id = null)
@@ -105,6 +116,10 @@ public sealed class Department : BaseEntity
         string name,
         IReadOnlyCollection<DepartmentLocation> departmentLocations)
     {
+        var nameValidationResult = Guard.ValidateStringField(name, nameof(Name), 3, 150);
+        if (nameValidationResult.IsFailure)
+            return UnitResult.Failure(nameValidationResult.Error);
+
         if (departmentLocations.Count == 0)
         {
             return Error.Validation(
@@ -112,9 +127,32 @@ public sealed class Department : BaseEntity
                 nameof(Department.DepartmentLocations)).ToErrors();
         }
 
-        var nameValidationResult = Guard.ValidateStringField(name, nameof(Name), 3, 150);
-        if (nameValidationResult.IsFailure)
-            return UnitResult.Failure(nameValidationResult.Error);
+        return UnitResult.Success<Errors>();
+    }
+
+    private static UnitResult<Errors> ValidateDepth(int depth, Guid? parentId)
+    {
+        const string fieldName = nameof(Depth);
+        if (depth < 0)
+        {
+            return UnitResult.Failure<Errors>(
+                GeneralErrors.ValueIsInvalid(
+                    fieldName, $"{fieldName} must be greater than or equal to zero"));
+        }
+
+        if (depth > 0 && !parentId.HasValue)
+        {
+            return UnitResult.Failure<Errors>(
+                GeneralErrors.ValueIsInvalid(
+                    fieldName, "Department with non-zero depth must have a parent"));
+        }
+
+        if (depth == 0 && parentId.HasValue)
+        {
+            return UnitResult.Failure<Errors>(
+                GeneralErrors.ValueIsInvalid(
+                    fieldName, "Department with zero depth cannot have a parent"));
+        }
 
         return UnitResult.Success<Errors>();
     }
@@ -201,32 +239,5 @@ public sealed class Department : BaseEntity
                     id: positionId,
                     message: $"There are no positions in the department with the given id: {positionId}")
                 .ToErrors();
-    }
-
-    private static UnitResult<Errors> ValidateDepth(int depth, Guid? parentId)
-    {
-        const string fieldName = nameof(Depth);
-        if (depth < 0)
-        {
-            return UnitResult.Failure<Errors>(
-                GeneralErrors.ValueIsInvalid(
-                    fieldName, $"{fieldName} must be greater than or equal to zero"));
-        }
-
-        if (depth > 0 && !parentId.HasValue)
-        {
-            return UnitResult.Failure<Errors>(
-                GeneralErrors.ValueIsInvalid(
-                    fieldName, "Department with non-zero depth must have a parent"));
-        }
-
-        if (depth == 0 && parentId.HasValue)
-        {
-            return UnitResult.Failure<Errors>(
-                GeneralErrors.ValueIsInvalid(
-                    fieldName, "Department with zero depth cannot have a parent"));
-        }
-
-        return UnitResult.Success<Errors>();
     }
 }

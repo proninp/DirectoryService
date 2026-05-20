@@ -44,7 +44,8 @@ public sealed class CreateDepartmentHandler : ICommandHandler<Guid, CreateDepart
             return errors;
         }
 
-        var allLocationsExists = await _locationRepository.AllExists(command.Request.LocationIds, cancellationToken);
+        var allLocationsExists = await _locationRepository
+            .AllExists(command.Request.LocationIds, cancellationToken);
         if (!allLocationsExists)
         {
             _logger.LogError(
@@ -69,6 +70,15 @@ public sealed class CreateDepartmentHandler : ICommandHandler<Guid, CreateDepart
         }
 
         var identifier = Identifier.Create(command.Request.Identifier);
+        if (await _repository.ExistsByIdentifier(identifier.Value, cancellationToken))
+        {
+            _logger.LogWarning(
+                "Department creation error. Identifier '{Identifier}' is already exists.", identifier.Value);
+            return GeneralErrors.AlreadyExists(
+                    message: $"Identifier '{identifier.Value}' already exists.",
+                    invalidField: nameof(Department.Identifier))
+                .ToErrors();
+        }
 
         var departmentId = Guid.NewGuid();
 
@@ -76,11 +86,8 @@ public sealed class CreateDepartmentHandler : ICommandHandler<Guid, CreateDepart
             .Select(lId => new DepartmentLocation(departmentId, lId))
             .ToList();
 
-        var department =
-            parent is null
-                ? Department.CreateParent(command.Request.Name, identifier.Value, departmentLocations, departmentId)
-                : Department.Create(command.Request.Name, identifier.Value, parent, departmentLocations, departmentId);
-
+        var department = Department.Create(
+            command.Request.Name, identifier.Value, departmentLocations, parent, departmentId);
         if (department.IsFailure)
         {
             _logger.LogError("Department creation error. {Error}.", department.Error.Serialize());

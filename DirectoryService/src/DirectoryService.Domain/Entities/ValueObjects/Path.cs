@@ -36,12 +36,8 @@ public sealed record Path
         return new Path(path);
     }
 
-    public static Result<Path, Errors> CreateForChild(Path parentPath, Identifier childIdentifier)
-    {
-        var fullPath = $"{parentPath.Value}{Separator}{childIdentifier.Value}";
-
-        return CreateForParent(fullPath);
-    }
+    public static Result<Path, Errors> CreateForChild(Path parentPath, Identifier childIdentifier) =>
+        CreateForParent($"{parentPath.Value}{Separator}{childIdentifier.Value}");
 
     public static Result<Path, Errors> FromAncestors(
         IReadOnlyList<Department> ancestors,
