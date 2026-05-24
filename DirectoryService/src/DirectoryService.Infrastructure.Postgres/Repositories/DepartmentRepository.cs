@@ -35,6 +35,20 @@ public sealed class DepartmentRepository(DirectoryServiceDbContext context) : ID
             .AnyAsync(cancellationToken);
     }
 
+    public async Task<bool> AllExists(IReadOnlyCollection<Guid> ids, CancellationToken cancellationToken = default)
+    {
+        if (ids.Count == 0)
+            return true;
+
+        var uniqueIds = ids.Distinct().ToHashSet();
+
+        var existingCount = await context
+            .Departments
+            .Where(d => uniqueIds.Contains(d.Id))
+            .CountAsync(cancellationToken);
+        return existingCount == uniqueIds.Count;
+    }
+
     public async Task<IReadOnlyList<Department>> GetAll(CancellationToken cancellationToken = default)
     {
         var departments = await context

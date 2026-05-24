@@ -26,11 +26,11 @@ public sealed class GetDepartmentHandler(
         if (department == null)
         {
             logger.LogWarning(
-                "{DepartmentQueryName} query error: department was not found with id: {LocationId}.",
+                "{DepartmentQueryName} query error: department was not found with id: {DepartmentId}.",
                 nameof(GetDepartmentQuery),
                 query.Id);
             return GeneralErrors.NotFound(
-                    query.Id, nameof(Department), $"No active locations were found with id: '{query.Id}'.")
+                    query.Id, nameof(Department), $"No active departments were found with id: '{query.Id}'.")
                 .ToErrors();
         }
 

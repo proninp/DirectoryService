@@ -12,6 +12,8 @@ public interface IDepartmentRepository : IRepository
 
     Task<bool> ExistsByIdentifier(Identifier identifier, CancellationToken cancellationToken = default);
 
+    Task<bool> AllExists(IReadOnlyCollection<Guid> ids, CancellationToken cancellationToken = default);
+
     Task<IReadOnlyList<Department>> GetAll(CancellationToken cancellationToken = default);
 
     Task<Guid> Add(Department department, CancellationToken cancellationToken = default);
