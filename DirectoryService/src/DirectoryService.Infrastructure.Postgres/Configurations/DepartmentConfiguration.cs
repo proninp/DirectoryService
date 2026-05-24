@@ -16,15 +16,15 @@ public sealed class DepartmentConfiguration : BaseEntityConfiguration<Department
             .HasMaxLength(150)
             .HasColumnName("name");
 
-        builder.HasIndex(d => new { d.Identifier.Value })
-            .IsUnique();
-
-        builder.ComplexProperty(d => d.Identifier, identifier =>
+        builder.OwnsOne(d => d.Identifier, identifier =>
         {
             identifier.Property(p => p.Value)
                 .IsRequired()
                 .HasMaxLength(150)
                 .HasColumnName("identifier");
+
+            identifier.HasIndex(d => d.Value)
+                .IsUnique();
         });
 
         builder
