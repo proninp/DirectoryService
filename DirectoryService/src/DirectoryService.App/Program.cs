@@ -15,6 +15,8 @@ try
 
     var app = builder.Build();
 
+    app.UseExceptionHandler();
+
     app.Configure();
 
     app.Run();

@@ -31,8 +31,9 @@ public sealed class DepartmentRepository(DirectoryServiceDbContext context) : ID
     {
         return await context
             .Departments
-            .Where(d => d.Identifier.Equals(identifier))
-            .AnyAsync(cancellationToken);
+            .AnyAsync(
+                d => EF.Functions.ILike(d.Identifier.Value, identifier.Value),
+                cancellationToken);
     }
 
     public async Task<bool> AllExists(IReadOnlyCollection<Guid> ids, CancellationToken cancellationToken = default)
