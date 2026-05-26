@@ -10,21 +10,27 @@ namespace DirectoryService.Application.Locations.GetLocation;
 public sealed class GetLocationHandler(
     ILocationRepository locationRepository,
     ILogger<GetLocationHandler> logger
-)
-    : IQueryHandler<LocationResponse, GetLocationQuery>
+) : IQueryHandler<LocationResponse, GetLocationQuery>
 {
     public async Task<Result<LocationResponse, Errors>> Handle(
         GetLocationQuery query,
         CancellationToken cancellationToken)
     {
+        if (query.Id == Guid.Empty)
+        {
+            logger.LogWarning("Get Location query error: query id parameter is empty.");
+            return GeneralErrors.ValueIsRequired(nameof(query.Id)).ToErrors();
+        }
+
         var location = await locationRepository.GetById(query.Id, cancellationToken);
         if (location is null)
         {
-            logger.LogError("Location with id {LocationId} not found", query.Id);
-            return GeneralError.NotFound(query.Id, nameof(Location)).ToErrors();
+            logger.LogWarning("GetLocation query error: location was not found with id: {LocationId}.", query.Id);
+            return GeneralErrors.NotFound(
+                    query.Id, nameof(Location), $"No active locations were found with id: '{query.Id}'.")
+                .ToErrors();
         }
 
-        logger.LogInformation("Found the location with id {LocationId}", query.Id);
         return location.ToResponse();
     }
 }

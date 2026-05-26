@@ -20,7 +20,7 @@ public sealed record Path
 
     private Path(string value) => Value = value;
 
-    private static Result<Path, Errors> Create(string path)
+    public static Result<Path, Errors> CreateForParent(string path)
     {
         if (!string.IsNullOrEmpty(path))
         {
@@ -36,12 +36,8 @@ public sealed record Path
         return new Path(path);
     }
 
-    public static Result<Path, Errors> CreateForChild(Path parentPath, Identifier childIdentifier)
-    {
-        var fullPath = $"{parentPath.Value}{Separator}{childIdentifier.Value}";
-
-        return Create(fullPath);
-    }
+    public static Result<Path, Errors> CreateForChild(Path parentPath, Identifier childIdentifier) =>
+        CreateForParent($"{parentPath.Value}{Separator}{childIdentifier.Value}");
 
     public static Result<Path, Errors> FromAncestors(
         IReadOnlyList<Department> ancestors,
@@ -49,7 +45,7 @@ public sealed record Path
     {
         if (ancestors.Count == 0)
         {
-            return GeneralError.NotFound(
+            return GeneralErrors.NotFound(
                     recordName: nameof(Path), message: $"No path found for ancestors of {departmentIdentifier}")
                 .ToErrors();
         }
@@ -57,8 +53,8 @@ public sealed record Path
         return CreateForChild(ancestors[^1].Path, departmentIdentifier);
     }
 
-    public static Result<Path, Errors> Root(Identifier departmentIdentifier)
+    public static Result<Path, Errors> Root(Identifier identifier)
     {
-        return Create(departmentIdentifier.Value);
+        return CreateForParent(identifier.Value);
     }
 }

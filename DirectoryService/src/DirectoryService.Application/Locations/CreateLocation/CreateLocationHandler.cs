@@ -1,6 +1,7 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Validation;
+using DirectoryService.Contracts.Locations.Requests;
 using DirectoryService.Domain.Entities;
 using DirectoryService.Domain.Entities.ValueObjects;
 using DirectoryService.Shared;
@@ -9,7 +10,7 @@ using Microsoft.Extensions.Logging;
 
 namespace DirectoryService.Application.Locations.CreateLocation;
 
-public sealed class CreateLocationHandler : ICommandHandler<Guid, CreateLocationCommand>
+public sealed partial class CreateLocationHandler : ICommandHandler<Guid, CreateLocationCommand>
 {
     private readonly IValidator<CreateLocationCommand> _validator;
 
@@ -26,6 +27,9 @@ public sealed class CreateLocationHandler : ICommandHandler<Guid, CreateLocation
         _locationRepository = locationRepository;
         _logger = logger;
     }
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Location '{@Request}' created with id '{@Id}'")]
+    private static partial void LogLocationCreated(ILogger logger, CreateLocationRequest request, Guid id);
 
     public async Task<Result<Guid, Errors>> Handle(
         CreateLocationCommand command,
@@ -48,7 +52,7 @@ public sealed class CreateLocationHandler : ICommandHandler<Guid, CreateLocation
         {
             _logger.LogWarning(
                 "Location with the same address already exists: {LocationAddress}", addressResult.Value);
-            return Result.Failure<Guid, Errors>(GeneralError.AlreadyExists(
+            return Result.Failure<Guid, Errors>(GeneralErrors.AlreadyExists(
                 locationWithTheSameAddress.Id,
                 $"Location address already exists: '{command.Request.AddressRequest}' for " +
                 $"location: '{locationWithTheSameAddress.Id}'",
@@ -61,7 +65,7 @@ public sealed class CreateLocationHandler : ICommandHandler<Guid, CreateLocation
         if (locationWithTheSameName is not null)
         {
             _logger.LogWarning("Location with the same name already exists: {LocationId}", locationWithTheSameName.Id);
-            return Result.Failure<Guid, Errors>(GeneralError.AlreadyExists(
+            return Result.Failure<Guid, Errors>(GeneralErrors.AlreadyExists(
                 locationWithTheSameName.Id,
                 $"Location with the name '{command.Request.Name}' already exists.",
                 nameof(command.Request.Name)));
@@ -82,7 +86,7 @@ public sealed class CreateLocationHandler : ICommandHandler<Guid, CreateLocation
         }
 
         var id = await _locationRepository.Add(locationResult.Value, cancellationToken);
-        _logger.LogInformation("Location {@Location} created with id {@Id}", command.Request, id);
+        LogLocationCreated(_logger, command.Request, id);
 
         return id;
     }

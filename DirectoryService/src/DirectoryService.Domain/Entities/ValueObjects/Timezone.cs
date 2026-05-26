@@ -20,7 +20,7 @@ public sealed record Timezone
     public static Result<Timezone, Errors> Create(string timeZone)
     {
         if (string.IsNullOrWhiteSpace(timeZone))
-            return Result.Failure<Timezone, Errors>(GeneralError.ValueIsRequired(nameof(Timezone)));
+            return Result.Failure<Timezone, Errors>(GeneralErrors.ValueIsRequired(nameof(Timezone)));
 
         try
         {
@@ -28,7 +28,7 @@ public sealed record Timezone
         }
         catch (TimeZoneNotFoundException)
         {
-            return Result.Failure<Timezone, Errors>(GeneralError.ValueIsInvalid(
+            return Result.Failure<Timezone, Errors>(GeneralErrors.ValueIsInvalid(
                 nameof(Timezone), $"Invalid IANA timezone: '{timeZone}'"));
         }
 
@@ -42,7 +42,7 @@ public sealed record Timezone
         if (utcDateTime.Kind != DateTimeKind.Utc)
         {
             return Result.Failure<DateTime, Errors>(
-                GeneralError.ValueIsInvalid(nameof(utcDateTime), "DateTime must be in UTC"));
+                GeneralErrors.ValueIsInvalid(nameof(utcDateTime), "DateTime must be in UTC"));
         }
 
         return TimeZoneInfo.ConvertTimeFromUtc(utcDateTime, GetTimeZoneInfo());

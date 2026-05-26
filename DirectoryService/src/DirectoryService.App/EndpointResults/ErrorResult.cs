@@ -11,7 +11,7 @@ public sealed class ErrorResult : ObjectResult
         if (!errors.Any())
         {
             StatusCode = StatusCodes.Status500InternalServerError;
-            Value = Envelope.Error(GeneralError.FailureWithNoErrors());
+            Value = Envelope.Error(GeneralErrors.FailureWithNoErrors());
             return;
         }
 

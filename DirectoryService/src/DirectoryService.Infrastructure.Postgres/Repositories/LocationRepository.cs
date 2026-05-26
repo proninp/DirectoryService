@@ -1,4 +1,4 @@
-using DirectoryService.Application.Abstractions;
+using DirectoryService.Application.Locations;
 using DirectoryService.Domain.Entities;
 using DirectoryService.Domain.Entities.ValueObjects;
 using Microsoft.EntityFrameworkCore;
@@ -18,7 +18,7 @@ public sealed class LocationRepository(DirectoryServiceDbContext context) : ILoc
     {
         var location = await context.Locations
             .FirstOrDefaultAsync(
-            l => EF.Functions.ILike(l.Name, name), cancellationToken);
+                l => EF.Functions.ILike(l.Name, name), cancellationToken);
         return location;
     }
 
@@ -28,7 +28,7 @@ public sealed class LocationRepository(DirectoryServiceDbContext context) : ILoc
             .Locations
             .FirstOrDefaultAsync(
                 l =>
-                l.Address == address,
+                    l.Address == address,
                 cancellationToken);
         return location;
     }
@@ -40,6 +40,17 @@ public sealed class LocationRepository(DirectoryServiceDbContext context) : ILoc
         return locations;
     }
 
+    public async Task<bool> AllExists(IReadOnlyCollection<Guid> ids, CancellationToken cancellationToken = default)
+    {
+        if (ids.Count == 0)
+            return true;
+        var existingCount = await context.Locations
+            .Where(l => ids.Contains(l.Id))
+            .CountAsync(cancellationToken);
+
+        return existingCount == ids.Count;
+    }
+
     public async Task<Guid> Add(Location location, CancellationToken cancellationToken = default)
     {
         context.Locations.Add(location);
@@ -47,9 +58,16 @@ public sealed class LocationRepository(DirectoryServiceDbContext context) : ILoc
         return location.Id;
     }
 
-    public Task Update(Location location, CancellationToken cancellationToken = default) =>
-        throw new NotImplementedException();
+    public async Task Update(Location location, CancellationToken cancellationToken = default)
+    {
+        context.Locations.Update(location);
+        await context.SaveChangesAsync(cancellationToken);
+    }
 
-    public Task<bool> Delete(Location location, CancellationToken cancellationToken = default) =>
-        throw new NotImplementedException();
+    public async Task<bool> Delete(Location location, CancellationToken cancellationToken = default)
+    {
+        context.Locations.Remove(location);
+        var result = await context.SaveChangesAsync(cancellationToken);
+        return result > 0;
+    }
 }

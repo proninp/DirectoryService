@@ -24,14 +24,20 @@ public sealed class Position : BaseEntity
     // EF Core Constructor
     private Position() { }
 
-    private Position(string name, string? description)
-        : base(Guid.NewGuid())
+    private Position(
+        Guid id,
+        string name,
+        string? description,
+        IReadOnlyCollection<DepartmentPosition> departmentPositions)
+        : base(id)
     {
         Name = name;
         Description = description;
+        _departmentPositions = [..departmentPositions];
     }
 
-    public static Result<Position, Errors> Create(string name, string? description)
+    public static Result<Position, Errors> Create(Guid id, string name, string? description,
+        IReadOnlyCollection<DepartmentPosition>? departmentPositions = null)
     {
         var validationResult = Result.Combine(
             Guard.ValidateStringField(name, nameof(Name), NameMinLength, NameMaxLength),
@@ -43,7 +49,7 @@ public sealed class Position : BaseEntity
         if (validationResult.IsFailure)
             return Result.Failure<Position, Errors>(validationResult.Error);
 
-        return new Position(name, description);
+        return new Position(id, name, description, departmentPositions ?? []);
     }
 
     public UnitResult<Errors> Rename(string newName)
@@ -78,7 +84,7 @@ public sealed class Position : BaseEntity
             return UnitResult.Success<Errors>();
         }
 
-        return GeneralError.AlreadyExists(
+        return GeneralErrors.AlreadyExists(
                 departmentId, $"The department '{departmentId}' has already been added to the position.")
             .ToErrors();
     }
@@ -88,7 +94,7 @@ public sealed class Position : BaseEntity
         var removed = _departmentPositions.RemoveAll(dp => dp.DepartmentId == departmentId);
         return removed > 0
             ? UnitResult.Success<Errors>()
-            : GeneralError.NotFound(
+            : GeneralErrors.NotFound(
                     id: departmentId,
                     message: $"There are no departments for the position with the given id: {departmentId}")
                 .ToErrors();

@@ -14,4 +14,26 @@ internal static class ApiEndpoints
         public const string Update = $"{Base}/{{id:guid}}";
         public const string Delete = $"{Base}/{{id:guid}}";
     }
+
+    internal static class Departments
+    {
+        private const string Base = $"{ApiBase}/departments";
+
+        public const string Create = Base;
+        public const string Get = $"{Base}/{{id:guid}}";
+        public const string GetAll = Base;
+        public const string Update = $"{Base}/{{id:guid}}";
+        public const string Delete = $"{Base}/{{id:guid}}";
+    }
+
+    internal static class Positions
+    {
+        private const string Base = $"{ApiBase}/pisitions";
+
+        public const string Create = Base;
+        public const string Get = $"{Base}/{{id:guid}}";
+        public const string GetAll = Base;
+        public const string Update = $"{Base}/{{id:guid}}";
+        public const string Delete = $"{Base}/{{id:guid}}";
+    }
 }
