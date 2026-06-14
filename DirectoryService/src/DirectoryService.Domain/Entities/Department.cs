@@ -17,7 +17,7 @@ public sealed class Department : BaseEntity
 
     public string Name { get; private set; } = null!;
 
-    public Identifier Identifier { get; private set; } = null!;
+    public Slug Slug { get; private set; } = null!;
 
     public Guid? ParentId { get; private set; }
 
@@ -39,7 +39,7 @@ public sealed class Department : BaseEntity
     private Department(
         Guid id,
         string name,
-        Identifier identifier,
+        Slug slug,
         Path path,
         int depth,
         Guid? parentId,
@@ -47,26 +47,26 @@ public sealed class Department : BaseEntity
         : base(id)
     {
         Name = name;
-        Identifier = identifier;
+        Slug = slug;
         ParentId = parentId;
         Path = path;
         Depth = depth;
         _departmentLocations = [.. departmentLocations];
     }
 
-    public static Result<Department, Errors> Create(string name, Identifier identifier,
+    public static Result<Department, Errors> Create(string name, Slug slug,
         IReadOnlyCollection<DepartmentLocation> departmentLocations,
         Department? parent = null,
         Guid? departmentId = null)
     {
         var deParent = parent is null
-            ? CreateParent(name, identifier, departmentLocations, departmentId)
-            : CreateChild(name, identifier, parent, departmentLocations, departmentId);
+            ? CreateParent(name, slug, departmentLocations, departmentId)
+            : CreateChild(name, slug, parent, departmentLocations, departmentId);
         return deParent;
     }
 
     private static Result<Department, Errors> CreateChild(
-        string name, Identifier identifier, Department parent,
+        string name, Slug slug, Department parent,
         IReadOnlyCollection<DepartmentLocation> departmentLocations,
         Guid? id = null
     )
@@ -75,14 +75,14 @@ public sealed class Department : BaseEntity
         if (locationsValidationResult.IsFailure)
             return Result.Failure<Department, Errors>(locationsValidationResult.Error);
 
-        var path = Path.CreateForChild(parent.Path, identifier);
+        var path = Path.CreateForChild(parent.Path, slug);
         if (path.IsFailure)
             return Result.Failure<Department, Errors>(path.Error);
 
         return new Department(
             id ?? Guid.NewGuid(),
             name,
-            identifier,
+            slug,
             path.Value,
             parent.Depth + 1,
             parent.Id,
@@ -90,7 +90,7 @@ public sealed class Department : BaseEntity
     }
 
     private static Result<Department, Errors> CreateParent(
-        string name, Identifier identifier,
+        string name, Slug slug,
         IReadOnlyCollection<DepartmentLocation> departmentLocations,
         Guid? id = null)
     {
@@ -98,14 +98,14 @@ public sealed class Department : BaseEntity
         if (locationsValidationResult.IsFailure)
             return Result.Failure<Department, Errors>(locationsValidationResult.Error);
 
-        var path = Path.CreateForParent(identifier.Value);
+        var path = Path.CreateForParent(slug.Value);
         if (path.IsFailure)
             return Result.Failure<Department, Errors>(path.Error);
 
         return new Department(
             id ?? Guid.NewGuid(),
             name,
-            identifier,
+            slug,
             path.Value,
             0,
             null,
@@ -169,9 +169,9 @@ public sealed class Department : BaseEntity
         return UnitResult.Success<Errors>();
     }
 
-    public UnitResult<Errors> UpdateIdentifier(Identifier identifier)
+    public UnitResult<Errors> UpdateSlug(Slug slug)
     {
-        Identifier = identifier;
+        Slug = slug;
         return UnitResult.Success<Errors>();
     }
 

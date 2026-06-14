@@ -10,7 +10,7 @@ public static class DepartmentMappingExtensions
         return new DepartmentResponse(
             department.Id,
             department.Name,
-            department.Identifier.Value,
+            department.Slug.Value,
             department.ParentId,
             department.Path.Value,
             department.Depth,

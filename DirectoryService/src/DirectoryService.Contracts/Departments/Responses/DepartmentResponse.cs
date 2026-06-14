@@ -3,7 +3,7 @@
 public record DepartmentResponse(
     Guid Id,
     string Name,
-    string Identifier,
+    string Slug,
     Guid? ParentId,
     string Path,
     int Depth,

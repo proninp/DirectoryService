@@ -18,8 +18,8 @@ public sealed class CreateDepartmentValidator : AbstractValidator<CreateDepartme
             .NotNull()
             .WithError(GeneralErrors.ValueIsRequired(nameof(CreateDepartmentRequest.Name)));
 
-        RuleFor(command => command.Request.Identifier)
-            .MustBeValueObject(Identifier.Create);
+        RuleFor(command => command.Request.Slug)
+            .MustBeValueObject(Slug.Create);
 
         RuleFor(x => x.Request.ParentId)
             .Must(id => id == null || id.Value != Guid.Empty)

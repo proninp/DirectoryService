@@ -17,9 +17,8 @@ public static class Registration
         services.AddDbContext<DirectoryServiceDbContext>();
 
         services.Scan(scan => scan
-            .FromAssemblies(typeof(Registration).Assembly)
-            .AddClasses(classes => classes
-                .AssignableTo<IRepository>())
+            .FromAssemblyOf<DirectoryServiceDbContext>()
+            .AddClasses(classes => classes.AssignableTo<IRepository>())
             .AsImplementedInterfaces()
             .WithScopedLifetime());
 
