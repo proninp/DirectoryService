@@ -3,6 +3,7 @@ using DirectoryService.App.EndpointResults;
 using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Departments.CreateDepartment;
 using DirectoryService.Application.Departments.GetDepartment;
+using DirectoryService.Application.Departments.UpdateDepartment;
 using DirectoryService.Contracts.Departments.Requests;
 using DirectoryService.Contracts.Departments.Responses;
 using Microsoft.AspNetCore.Mvc;
@@ -36,5 +37,15 @@ public sealed class DepartmentsController : ControllerBase
     {
         var query = new GetDepartmentQuery(id);
         return await handler.Handle(query, cancellationToken);
+    }
+
+    [HttpPatch(ApiEndpoints.Departments.Update)]
+    [ProducesResponseType(typeof(Guid), StatusCodes.Status200OK)]
+    public async Task<EndpointResult<Guid>> Update(
+        [FromServices] ICommandHandler<Guid, UpdateDepartmentCommand> handler,
+        [FromBody] UpdateDepartmentRequest request,
+        CancellationToken cancellationToken)
+    {
+        return await handler.Handle(request.ToUpdateCommand(), cancellationToken);
     }
 }
