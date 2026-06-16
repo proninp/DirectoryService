@@ -9,7 +9,7 @@ internal static class ValidationExtensions
     {
         return validationResult.Errors
             .SelectMany(error =>
-                Errors.Deserialize(error.ErrorMessage) ?? Enumerable.Empty<Error>())
+                Errors.Deserialize(error.ErrorMessage)?.AsEnumerable() ?? [])
             .ToList();
     }
 }

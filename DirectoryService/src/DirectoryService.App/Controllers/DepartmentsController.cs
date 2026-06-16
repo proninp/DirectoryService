@@ -40,9 +40,9 @@ public sealed class DepartmentsController : ControllerBase
     }
 
     [HttpPatch(ApiEndpoints.Departments.Update)]
-    [ProducesResponseType(typeof(Guid), StatusCodes.Status200OK)]
-    public async Task<EndpointResult<Guid>> Update(
-        [FromServices] ICommandHandler<Guid, UpdateDepartmentCommand> handler,
+    [ProducesResponseType(typeof(DepartmentResponse), StatusCodes.Status200OK)]
+    public async Task<EndpointResult<DepartmentResponse>> Update(
+        [FromServices] ICommandHandler<DepartmentResponse, UpdateDepartmentCommand> handler,
         [FromBody] UpdateDepartmentRequest request,
         CancellationToken cancellationToken)
     {
