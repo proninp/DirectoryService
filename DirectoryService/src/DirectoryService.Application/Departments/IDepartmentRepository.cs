@@ -18,7 +18,5 @@ public interface IDepartmentRepository : IRepository
 
     Task<Guid> Add(Department department, CancellationToken cancellationToken = default);
 
-    Task Update(Department department, CancellationToken cancellationToken = default);
-
     Task<bool> Delete(Department department, CancellationToken cancellationToken = default);
 }

@@ -1,27 +1,22 @@
 ﻿namespace DirectoryService.Domain.Entities.Abstractions;
 
-public abstract class BaseEntity : IEntity<Guid>
+public abstract class BaseEntity() : IEntity<Guid>
 {
     public Guid Id { get; init; }
 
     protected BaseEntity(Guid id)
+        : this()
     {
         Id = id;
-        CreatedAt = DateTime.UtcNow;
-        IsActive = true;
     }
 
-    protected BaseEntity()
-    {
-    }
-
-    public DateTime CreatedAt { get; init; }
+    public DateTime CreatedAt { get; } = DateTime.UtcNow;
 
     public DateTime? UpdatedAt { get; set; }
 
     public DateTime? DeletedAt { get; private set; }
 
-    public bool IsActive { get; private set; }
+    public bool IsActive { get; private set; } = true;
 
     public override bool Equals(object? obj)
     {

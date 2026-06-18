@@ -159,6 +159,9 @@ public sealed class Department : BaseEntity
 
     public UnitResult<Errors> Rename(string newName)
     {
+        if (string.Equals(Name, newName, StringComparison.Ordinal))
+            return UnitResult.Success<Errors>();
+
         var nameValidation = Guard.ValidateStringField(newName, nameof(Name), 3, 150);
         if (nameValidation.IsFailure)
         {
@@ -211,10 +214,14 @@ public sealed class Department : BaseEntity
         }
 
         var removed = _departmentLocations.RemoveAll(dl => dl.LocationId == locationId);
-        return removed > 0
-            ? UnitResult.Success<Errors>()
-            : GeneralErrors.ValueIsInvalid($"There are no locations in the department with the given id: {locationId}")
+        if (removed <= 0)
+        {
+            return GeneralErrors
+                .ValueIsInvalid($"There are no locations in the department with the given id: {locationId}")
                 .ToErrors();
+        }
+
+        return UnitResult.Success<Errors>();
     }
 
     public UnitResult<Errors> AddPosition(Guid positionId)
@@ -233,11 +240,14 @@ public sealed class Department : BaseEntity
     public UnitResult<Errors> RemovePosition(Guid positionId)
     {
         var removed = _departmentPositions.RemoveAll(dp => dp.PositionId == positionId);
-        return removed > 0
-            ? UnitResult.Success<Errors>()
-            : GeneralErrors.NotFound(
+        if (removed <= 0)
+        {
+            return GeneralErrors.NotFound(
                     id: positionId,
                     message: $"There are no positions in the department with the given id: {positionId}")
                 .ToErrors();
+        }
+
+        return UnitResult.Success<Errors>();
     }
 }

@@ -65,12 +65,6 @@ public sealed class DepartmentRepository(DirectoryServiceDbContext context) : ID
         return department.Id;
     }
 
-    public async Task Update(Department department, CancellationToken cancellationToken = default)
-    {
-        context.Update(department);
-        await context.SaveChangesAsync(cancellationToken);
-    }
-
     public async Task<bool> Delete(Department department, CancellationToken cancellationToken = default)
     {
         context.Departments.Remove(department);

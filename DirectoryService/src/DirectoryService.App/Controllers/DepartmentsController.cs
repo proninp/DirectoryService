@@ -43,9 +43,10 @@ public sealed class DepartmentsController : ControllerBase
     [ProducesResponseType(typeof(DepartmentResponse), StatusCodes.Status200OK)]
     public async Task<EndpointResult<DepartmentResponse>> Update(
         [FromServices] ICommandHandler<DepartmentResponse, UpdateDepartmentCommand> handler,
+        [FromRoute] Guid id,
         [FromBody] UpdateDepartmentRequest request,
         CancellationToken cancellationToken)
     {
-        return await handler.Handle(request.ToUpdateCommand(), cancellationToken);
+        return await handler.Handle(request.ToCommand(id), cancellationToken);
     }
 }

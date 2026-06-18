@@ -12,7 +12,6 @@ public sealed class DepartmentLocation : BaseEntity
     private DepartmentLocation() { }
 
     public DepartmentLocation(Guid departmentId, Guid locationId)
-        : base(Guid.NewGuid())
     {
         DepartmentId = departmentId;
         LocationId = locationId;
