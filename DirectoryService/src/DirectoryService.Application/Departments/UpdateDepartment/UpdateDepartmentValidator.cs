@@ -14,9 +14,9 @@ public sealed class UpdateDepartmentValidator : AbstractValidator<UpdateDepartme
             .WithError(GeneralErrors.ValueIsRequired(nameof(UpdateDepartmentRequest)))
             .DependentRules(() =>
             {
-                RuleFor(command => command.Request.Id)
+                RuleFor(command => command.Id)
                     .Must(id => id != Guid.Empty)
-                    .WithError(GeneralErrors.ValueIsRequired(nameof(UpdateDepartmentRequest.Id)));
+                    .WithError(GeneralErrors.ValueIsRequired(nameof(UpdateDepartmentCommand.Id)));
 
                 RuleFor(command => command.Request)
                     .Must(r =>

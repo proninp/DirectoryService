@@ -16,17 +16,21 @@ public sealed class UpdateDepartmentHandler : ICommandHandler<DepartmentResponse
 
     private readonly IDepartmentRepository _repository;
 
+    private readonly IUnitOfWork _unitOfWork;
+
     private readonly ILocationRepository _locationRepository;
 
     private readonly ILogger<UpdateDepartmentHandler> _logger;
 
     public UpdateDepartmentHandler(
         IValidator<UpdateDepartmentCommand> validator,
+        IUnitOfWork unitOfWork,
         IDepartmentRepository repository,
         ILocationRepository locationRepository,
         ILogger<UpdateDepartmentHandler> logger)
     {
         _validator = validator;
+        _unitOfWork = unitOfWork;
         _repository = repository;
         _locationRepository = locationRepository;
         _logger = logger;
@@ -46,14 +50,14 @@ public sealed class UpdateDepartmentHandler : ICommandHandler<DepartmentResponse
             return errors;
         }
 
-        var department = await _repository.GetById(request.Id, cancellationToken);
+        var department = await _repository.GetById(command.Id, cancellationToken);
         if (department is null)
         {
             _logger.LogError(
                 "Update department error. Department was not found by id: '{@DepartmentId}'.",
-                request.Id);
+                command.Id);
             return GeneralErrors.NotFound(
-                    recordName: nameof(Department), message: $"Department {request.Id} not found.")
+                    recordName: nameof(Department), message: $"Department {command.Id} not found.")
                 .ToErrors();
         }
 
@@ -64,7 +68,7 @@ public sealed class UpdateDepartmentHandler : ICommandHandler<DepartmentResponse
             {
                 _logger.LogError(
                     "Department rename error. Cannot rename the department {@DepartmentId} with a new name: '{@DepartmentName}'.",
-                    request.Id, request.Name);
+                    command.Id, request.Name);
                 return renameResult.Error;
             }
         }
@@ -114,7 +118,7 @@ public sealed class UpdateDepartmentHandler : ICommandHandler<DepartmentResponse
             }
         }
 
-        await _repository.Update(department, cancellationToken);
+        await _unitOfWork.CommitAsync(cancellationToken);
         return department.ToResponse();
     }
 }

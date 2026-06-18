@@ -4,6 +4,7 @@ using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Locations;
 using DirectoryService.Application.Locations.CreateLocation;
 using DirectoryService.Application.Locations.GetLocation;
+using DirectoryService.Application.Locations.UpdateLocation;
 using DirectoryService.Contracts.Locations.Requests;
 using DirectoryService.Contracts.Locations.Responses;
 using Microsoft.AspNetCore.Mvc;
@@ -49,5 +50,19 @@ public sealed class LocationsController : ControllerBase
     {
         var query = new GetLocationsQuery();
         return await handler.Handle(query, cancellationToken);
+    }
+
+    [HttpPatch(ApiEndpoints.Locations.Update)]
+    [ProducesResponseType(typeof(LocationResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<EndpointResult<LocationResponse>> Update(
+        [FromServices] ICommandHandler<LocationResponse, UpdateLocationCommand> handler,
+        [FromRoute] Guid id,
+        [FromBody] UpdateLocationRequest request,
+        CancellationToken cancellationToken
+    )
+    {
+        return await handler.Handle(request.ToCommand(id), cancellationToken);
     }
 }
