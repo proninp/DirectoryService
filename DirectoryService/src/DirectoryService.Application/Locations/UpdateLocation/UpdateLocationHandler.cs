@@ -74,22 +74,20 @@ public sealed class UpdateLocationHandler : ICommandHandler<LocationResponse, Up
         {
             var addressUpdateRequest = command.Request.AddressRequest;
 
-            var addressUpdateResult =
-                location.Address is null
-                    ? addressUpdateRequest.ToAddress()
-                    : addressUpdateRequest.WithAddress(location.Address);
+            var (_, isFailure, address, errors) = location.Address is null
+                ? addressUpdateRequest.ToAddress()
+                : addressUpdateRequest.WithAddress(location.Address);
 
-            if (addressUpdateResult.IsFailure)
+            if (isFailure)
             {
-                var errors = addressUpdateResult.Error;
                 _logger.LogError(
                     "Update location error. Failed to update address for location '{@LocationId}': {@Error}",
                     command.Id, errors);
                 return errors;
             }
 
-            if (location.Address is null || !location.Address.Equals(addressUpdateResult.Value))
-                location.UpdateAddress(addressUpdateResult.Value);
+            if (location.Address is null || !location.Address.Equals(address))
+                location.UpdateAddress(address);
         }
 
         if (command.Request.Timezone is not null)

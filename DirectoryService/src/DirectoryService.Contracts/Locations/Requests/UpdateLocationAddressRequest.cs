@@ -13,7 +13,18 @@ public record UpdateLocationAddressRequest(
     string? Block,
     string? Room,
     string? PostalBox
-);
+)
+{
+    public bool IsAnyFilled() =>
+        !string.IsNullOrWhiteSpace(PostalCode) ||
+        !string.IsNullOrWhiteSpace(Country) ||
+        !string.IsNullOrWhiteSpace(City) ||
+        !string.IsNullOrWhiteSpace(Street) ||
+        !string.IsNullOrWhiteSpace(House) ||
+        !string.IsNullOrWhiteSpace(Block) ||
+        !string.IsNullOrWhiteSpace(Room) ||
+        !string.IsNullOrWhiteSpace(PostalBox);
+}
 
 public static class UpdateLocationAddressRequestExtensions
 {

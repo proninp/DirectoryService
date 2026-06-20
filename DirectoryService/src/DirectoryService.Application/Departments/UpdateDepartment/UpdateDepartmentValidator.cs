@@ -9,6 +9,10 @@ public sealed class UpdateDepartmentValidator : AbstractValidator<UpdateDepartme
 {
     public UpdateDepartmentValidator()
     {
+        RuleFor(command => command.Id)
+            .Must(id => id != Guid.Empty)
+            .WithError(GeneralErrors.ValueIsRequired(nameof(UpdateDepartmentCommand.Id)));
+
         RuleFor(command => command.Request)
             .NotNull()
             .WithError(GeneralErrors.ValueIsRequired(nameof(UpdateDepartmentRequest)))
