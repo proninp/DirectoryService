@@ -1,7 +1,6 @@
 ﻿using Asp.Versioning;
 using DirectoryService.App.EndpointResults;
 using DirectoryService.Application.Abstractions;
-using DirectoryService.Application.Locations;
 using DirectoryService.Application.Locations.CreateLocation;
 using DirectoryService.Application.Locations.GetLocation;
 using DirectoryService.Application.Locations.UpdateLocation;

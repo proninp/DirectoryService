@@ -30,7 +30,7 @@ public static class UpdateLocationAddressRequestExtensions
             request.PostalBox);
     }
 
-    public static Result<Address, Errors> ToAddress(this UpdateLocationAddressRequest request, Address address)
+    public static Result<Address, Errors> WithAddress(this UpdateLocationAddressRequest request, Address address)
     {
         return address.With(
             request.PostalCode,
