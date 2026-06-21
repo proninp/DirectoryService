@@ -119,6 +119,7 @@ public sealed class UpdateDepartmentHandler : ICommandHandler<DepartmentResponse
         }
 
         await _unitOfWork.CommitAsync(cancellationToken);
+
         return department.ToResponse();
     }
 }
