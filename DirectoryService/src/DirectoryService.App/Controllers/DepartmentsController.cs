@@ -3,6 +3,7 @@ using DirectoryService.App.EndpointResults;
 using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Departments.CreateDepartment;
 using DirectoryService.Application.Departments.CreateDepartmentLocation;
+using DirectoryService.Application.Departments.DeleteDepartmentLocation;
 using DirectoryService.Application.Departments.GetDepartment;
 using DirectoryService.Application.Departments.UpdateDepartment;
 using DirectoryService.Contracts.Departments.Requests;
@@ -42,6 +43,7 @@ public sealed class DepartmentsController : ControllerBase
 
     [HttpPatch(ApiEndpoints.Departments.Update)]
     [ProducesResponseType(typeof(DepartmentResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<EndpointResult<DepartmentResponse>> Update(
         [FromServices] ICommandHandler<DepartmentResponse, UpdateDepartmentCommand> handler,
         [FromRoute] Guid id,
@@ -51,15 +53,31 @@ public sealed class DepartmentsController : ControllerBase
         return await handler.Handle(request.ToCommand(id), cancellationToken);
     }
 
-    [HttpPost(ApiEndpoints.Departments.UpdateLocations)]
-    [ProducesResponseType(typeof(DepartmentResponse), StatusCodes.Status200OK)]
-    public async Task<EndpointResult<DepartmentResponse>> UpdateLocation(
-        [FromServices] ICommandHandler<DepartmentResponse, CreateDepartmentLocationCommand> handler,
+    [HttpPost(ApiEndpoints.Departments.UpdateDepartmentLocation)]
+    [ProducesResponseType(typeof(DepartmentLocationResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public async Task<EndpointResult<DepartmentLocationResponse>> CreateDepartmentLocation(
+        [FromServices] ICommandHandler<DepartmentLocationResponse, CreateDepartmentLocationCommand> handler,
         [FromRoute] Guid departmentId,
         [FromRoute] Guid locationsId,
         CancellationToken cancellationToken)
     {
         var command = new CreateDepartmentLocationCommand(departmentId, locationsId);
+        return await handler.Handle(command, cancellationToken);
+    }
+
+    [HttpDelete(ApiEndpoints.Departments.UpdateDepartmentLocation)]
+    [ProducesResponseType(typeof(DepartmentLocationResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public async Task<EndpointResult<DepartmentLocationResponse>> DeleteDepartmentLocation(
+        [FromServices] ICommandHandler<DepartmentLocationResponse, DeleteDepartmentLocationCommand> handler,
+        [FromRoute] Guid departmentId,
+        [FromRoute] Guid locationsId,
+        CancellationToken cancellationToken)
+    {
+        var command = new DeleteDepartmentLocationCommand(departmentId, locationsId);
         return await handler.Handle(command, cancellationToken);
     }
 }

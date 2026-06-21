@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 namespace DirectoryService.Application.Departments.CreateDepartmentLocation;
 
 public sealed class
-    CreateDepartmentLocationHandler : ICommandHandler<DepartmentResponse, CreateDepartmentLocationCommand>
+    CreateDepartmentLocationHandler : ICommandHandler<DepartmentLocationResponse, CreateDepartmentLocationCommand>
 {
     private readonly IValidator<CreateDepartmentLocationCommand> _validator;
 
@@ -37,7 +37,7 @@ public sealed class
         _logger = logger;
     }
 
-    public async Task<Result<DepartmentResponse, Errors>> Handle(
+    public async Task<Result<DepartmentLocationResponse, Errors>> Handle(
         CreateDepartmentLocationCommand command,
         CancellationToken cancellationToken)
     {
@@ -91,8 +91,19 @@ public sealed class
 
         department.AddLocation(command.LocationId);
 
-        await _unitOfWork.CommitAsync(cancellationToken);
+        var commitResult = await _unitOfWork.TryCommitAsync(cancellationToken);
+        if (commitResult.IsFailure)
+        {
+            _logger.LogWarning(
+                "Concurrent insert detected: DepartmentLocation for " +
+                "DepartmentId {DepartmentId} and LocationId {LocationId} already exists.",
+                command.DepartmentId, command.LocationId);
+            return GeneralErrors.AlreadyExists(
+                    message:
+                    $"Department {command.DepartmentId} and Location {command.LocationId} relation already exists.")
+                .ToErrors();
+        }
 
-        return department.ToResponse();
+        return department.ToDepartmentLocationResponse();
     }
 }

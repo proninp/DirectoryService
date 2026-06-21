@@ -23,8 +23,8 @@ internal static class ApiEndpoints
         public const string Get = $"{Base}/{{id:guid}}";
         public const string GetAll = Base;
         public const string Update = $"{Base}/{{id:guid}}";
-        public const string UpdateLocations = $"{Base}/{{departmentId:guid}}/locations/{{locationId:guid}}";
         public const string Delete = $"{Base}/{{id:guid}}";
+        public const string UpdateDepartmentLocation = $"{Base}/{{departmentId:guid}}/locations/{{locationId:guid}}";
     }
 
     internal static class Positions
