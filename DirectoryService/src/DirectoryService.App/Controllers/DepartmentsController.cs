@@ -2,6 +2,7 @@
 using DirectoryService.App.EndpointResults;
 using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Departments.CreateDepartment;
+using DirectoryService.Application.Departments.CreateDepartmentLocation;
 using DirectoryService.Application.Departments.GetDepartment;
 using DirectoryService.Application.Departments.UpdateDepartment;
 using DirectoryService.Contracts.Departments.Requests;
@@ -48,5 +49,17 @@ public sealed class DepartmentsController : ControllerBase
         CancellationToken cancellationToken)
     {
         return await handler.Handle(request.ToCommand(id), cancellationToken);
+    }
+
+    [HttpPost(ApiEndpoints.Departments.UpdateLocations)]
+    [ProducesResponseType(typeof(DepartmentResponse), StatusCodes.Status200OK)]
+    public async Task<EndpointResult<DepartmentResponse>> UpdateLocation(
+        [FromServices] ICommandHandler<DepartmentResponse, CreateDepartmentLocationCommand> handler,
+        [FromRoute] Guid departmentId,
+        [FromRoute] Guid locationsId,
+        CancellationToken cancellationToken)
+    {
+        var command = new CreateDepartmentLocationCommand(departmentId, locationsId);
+        return await handler.Handle(command, cancellationToken);
     }
 }

@@ -40,7 +40,7 @@ public sealed class CreateDepartmentHandler : ICommandHandler<Guid, CreateDepart
             var errors = validationResult.ToErrors();
             _logger.LogError(
                 "Failed to create department from request {@DepartmentRequest}: {@Error}",
-                command.Request, errors.ToString());
+                command.Request, errors);
             return errors;
         }
 
@@ -48,9 +48,8 @@ public sealed class CreateDepartmentHandler : ICommandHandler<Guid, CreateDepart
             .AllExists(command.Request.LocationIds, cancellationToken);
         if (!allLocationsExists)
         {
-            _logger.LogError(
-                "Department creation error. One or several of locations not found: '{@LocationIds}'.",
-                command.Request.LocationIds);
+            _logger.LogWarning(
+                $"Department creation error. One or several of locations not found: '{command.Request.LocationIds}'.");
             return GeneralErrors.NotFound(
                     recordName: nameof(Location), message: "One or several locations not found.")
                 .ToErrors();
@@ -64,7 +63,7 @@ public sealed class CreateDepartmentHandler : ICommandHandler<Guid, CreateDepart
             parent = await _repository.GetById(parentId, cancellationToken);
             if (parent is null)
             {
-                _logger.LogError("Department creation error. Parent not found: '{@ParentId}'.", parentId);
+                _logger.LogWarning($"Department creation error. Parent not found: '{parentId}'.");
                 return GeneralErrors.NotFound(parentId, nameof(Department)).ToErrors();
             }
         }
