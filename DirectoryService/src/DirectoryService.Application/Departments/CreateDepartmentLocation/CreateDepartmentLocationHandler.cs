@@ -57,7 +57,7 @@ public sealed class
 
         if (department is null)
         {
-            _logger.LogError(
+            _logger.LogWarning(
                 "Create department-location error. Department was not found by id: '{@DepartmentId}'.",
                 command.DepartmentId);
             return GeneralErrors.NotFound(

@@ -39,7 +39,7 @@ public sealed partial class CreateLocationHandler : ICommandHandler<Guid, Create
         if (!validationResult.IsValid)
         {
             var errors = validationResult.ToErrors();
-            _logger.LogError(
+            _logger.LogWarning(
                 "Failed to create address from request {@AddressRequest}: {@Error}",
                 command.Request.AddressRequest, errors.ToString());
             return errors;
@@ -79,7 +79,7 @@ public sealed partial class CreateLocationHandler : ICommandHandler<Guid, Create
 
         if (locationResult.IsFailure)
         {
-            _logger.LogError(
+            _logger.LogWarning(
                 "Failed to create location from request {@CreateLocationRequest}: {@Error}",
                 command.Request, locationResult.Error);
             return locationResult.Error;

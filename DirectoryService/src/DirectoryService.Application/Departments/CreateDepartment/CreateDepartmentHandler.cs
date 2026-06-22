@@ -38,7 +38,7 @@ public sealed class CreateDepartmentHandler : ICommandHandler<Guid, CreateDepart
         if (!validationResult.IsValid)
         {
             var errors = validationResult.ToErrors();
-            _logger.LogError(
+            _logger.LogWarning(
                 "Failed to create department from request {@DepartmentRequest}: {@Error}",
                 command.Request, errors);
             return errors;

@@ -41,7 +41,7 @@ public sealed class UpdateLocationHandler : ICommandHandler<LocationResponse, Up
         if (!validationResult.IsValid)
         {
             var errors = validationResult.ToErrors();
-            _logger.LogError(
+            _logger.LogWarning(
                 "Failed to update location from request {@LocationRequest}: {@Error}",
                 command.Request, errors.ToString());
             return errors;
@@ -50,7 +50,7 @@ public sealed class UpdateLocationHandler : ICommandHandler<LocationResponse, Up
         var location = await _repository.GetById(command.Id, cancellationToken);
         if (location is null)
         {
-            _logger.LogError(
+            _logger.LogWarning(
                 "Update location error. Location was not found by id: '{@LocationId}'.",
                 command.Id);
             return GeneralErrors.NotFound(
@@ -63,7 +63,7 @@ public sealed class UpdateLocationHandler : ICommandHandler<LocationResponse, Up
             var renameResult = location.Rename(command.Request.Name);
             if (renameResult.IsFailure)
             {
-                _logger.LogError(
+                _logger.LogWarning(
                     "Location rename error. Cannot rename the location '{@LocationId}' with a new name: '{@LocationName}'.",
                     command.Id, command.Request.Name);
                 return renameResult.Error;
@@ -80,7 +80,7 @@ public sealed class UpdateLocationHandler : ICommandHandler<LocationResponse, Up
 
             if (isFailure)
             {
-                _logger.LogError(
+                _logger.LogWarning(
                     "Update location error. Failed to update address for location '{@LocationId}': {@Error}",
                     command.Id, errors);
                 return errors;
@@ -96,7 +96,7 @@ public sealed class UpdateLocationHandler : ICommandHandler<LocationResponse, Up
             if (newTimeZoneResult.IsFailure)
             {
                 var errors = newTimeZoneResult.Error;
-                _logger.LogError(
+                _logger.LogWarning(
                     "Update location error. Failed to update timezone for location '{@LocationId}': {@Error}",
                     command.Id, errors);
                 return errors;
