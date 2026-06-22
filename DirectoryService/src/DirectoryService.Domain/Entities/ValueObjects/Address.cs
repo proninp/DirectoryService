@@ -71,7 +71,8 @@ public sealed record Address
         PostalBox = postalBox;
     }
 
-    public static Result<Address, Errors> Create(string postalCode, string country, string city, string street, string house,
+    public static Result<Address, Errors> Create(string postalCode, string country, string city, string street,
+        string house,
         string? block = null, string? room = null, string? postalBox = null
     )
     {
@@ -96,5 +97,22 @@ public sealed record Address
             return validationResult.Error;
 
         return new Address(postalCode, country, city, street, house, block, room, postalBox);
+    }
+
+    public Result<Address, Errors> With(string? postalCode, string? country, string? city, string? street,
+        string? house,
+        string? block, string? room, string? postalBox)
+    {
+        var address = Create(
+            postalCode ?? PostalCode,
+            country ?? Country,
+            city ?? City,
+            street ?? Street,
+            house ?? House,
+            block ?? Block,
+            room ?? Room,
+            postalBox ?? PostalBox);
+
+        return address;
     }
 }

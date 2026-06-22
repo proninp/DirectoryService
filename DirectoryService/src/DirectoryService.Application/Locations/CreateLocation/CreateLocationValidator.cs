@@ -12,20 +12,24 @@ public sealed class CreateLocationValidator : AbstractValidator<CreateLocationCo
     {
         RuleFor(c => c.Request)
             .NotNull()
-            .WithError(GeneralErrors.ValueIsRequired(nameof(CreateLocationRequest)));
+            .WithError(GeneralErrors.ValueIsRequired(nameof(CreateLocationRequest)))
+            .DependentRules(() =>
+            {
+                RuleFor(c => c.Request.AddressRequest)
+                    .NotNull()
+                    .WithError(GeneralErrors.ValueIsRequired(nameof(CreateLocationCommand.Request.AddressRequest)))
+                    .DependentRules(() =>
+                    {
+                        RuleFor(command => command.Request.AddressRequest)
+                            .MustBeValueObject(a => a.ToAddress());
+                    });
 
-        RuleFor(c => c.Request)
-            .NotNull()
-            .WithError(GeneralErrors.ValueIsRequired(nameof(CreateLocationCommand.Request.AddressRequest)));
+                RuleFor(command => command.Request.Name)
+                    .NotEmpty()
+                    .WithError(GeneralErrors.ValueIsRequired(nameof(CreateLocationCommand.Request.Name)));
 
-        RuleFor(command => command.Request.AddressRequest)
-            .MustBeValueObject(a => a.ToAddress());
-
-        RuleFor(command => command.Request.Name)
-            .NotEmpty()
-            .WithError(GeneralErrors.ValueIsRequired(nameof(CreateLocationCommand.Request.Name)));
-
-        RuleFor(command => command.Request.Timezone)
-            .MustBeValueObject(Timezone.Create);
+                RuleFor(command => command.Request.Timezone)
+                    .MustBeValueObject(Timezone.Create);
+            });
     }
 }

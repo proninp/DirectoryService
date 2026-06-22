@@ -10,10 +10,18 @@ public static class DepartmentMappingExtensions
         return new DepartmentResponse(
             department.Id,
             department.Name,
-            department.Identifier.Value,
+            department.Slug.Value,
             department.ParentId,
             department.Path.Value,
             department.Depth,
+            [.. department.DepartmentLocations.Select(dl => dl.LocationId)]);
+    }
+
+    public static DepartmentLocationResponse ToDepartmentLocationResponse(this Department department)
+    {
+        return new DepartmentLocationResponse(
+            department.Id,
+            department.Slug.Value,
             [.. department.DepartmentLocations.Select(dl => dl.LocationId)]);
     }
 }

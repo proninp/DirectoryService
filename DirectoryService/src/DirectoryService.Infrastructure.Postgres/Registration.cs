@@ -1,5 +1,6 @@
 ﻿using DirectoryService.Application.Abstractions;
 using DirectoryService.Infrastructure.Postgres.Options;
+using DirectoryService.Shared;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -14,12 +15,11 @@ public static class Registration
     {
         services.Configure<DbSettings>(configuration.GetSection(nameof(DbSettings)));
 
-        services.AddDbContext<DirectoryServiceDbContext>();
+        services.AddDbContext<IUnitOfWork, DirectoryServiceDbContext>();
 
         services.Scan(scan => scan
-            .FromAssemblies(typeof(Registration).Assembly)
-            .AddClasses(classes => classes
-                .AssignableTo<IRepository>())
+            .FromAssemblyOf<DirectoryServiceDbContext>()
+            .AddClasses(classes => classes.AssignableTo<IRepository>())
             .AsImplementedInterfaces()
             .WithScopedLifetime());
 

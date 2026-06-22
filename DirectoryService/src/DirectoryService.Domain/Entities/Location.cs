@@ -45,6 +45,9 @@ public sealed class Location : BaseEntity
 
     public UnitResult<Errors> Rename(string name)
     {
+        if (string.Equals(Name, name, StringComparison.Ordinal))
+            return UnitResult.Success<Errors>();
+
         var validation = Guard.ValidateStringField(name, nameof(Name), NameMinLength, NameMaxLength);
         if (validation.IsFailure)
         {

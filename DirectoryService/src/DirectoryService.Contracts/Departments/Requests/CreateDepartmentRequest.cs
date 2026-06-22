@@ -2,7 +2,7 @@
 
 public record CreateDepartmentRequest(
     string Name,
-    string Identifier,
+    string Slug,
     Guid? ParentId,
     IReadOnlyCollection<Guid> LocationIds
 );

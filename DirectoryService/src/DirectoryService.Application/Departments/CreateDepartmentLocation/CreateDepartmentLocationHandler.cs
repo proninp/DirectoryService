@@ -1,0 +1,109 @@
+﻿using CSharpFunctionalExtensions;
+using DirectoryService.Application.Abstractions;
+using DirectoryService.Application.Locations;
+using DirectoryService.Application.Validation;
+using DirectoryService.Contracts.Departments.Responses;
+using DirectoryService.Domain.Entities;
+using DirectoryService.Shared;
+using FluentValidation;
+using Microsoft.Extensions.Logging;
+
+namespace DirectoryService.Application.Departments.CreateDepartmentLocation;
+
+public sealed class
+    CreateDepartmentLocationHandler : ICommandHandler<DepartmentLocationResponse, CreateDepartmentLocationCommand>
+{
+    private readonly IValidator<CreateDepartmentLocationCommand> _validator;
+
+    private readonly IDepartmentRepository _departmentRepository;
+
+    private readonly ILocationRepository _locationRepository;
+
+    private readonly IUnitOfWork _unitOfWork;
+
+    private readonly ILogger<CreateDepartmentLocationHandler> _logger;
+
+    public CreateDepartmentLocationHandler(
+        IValidator<CreateDepartmentLocationCommand> validator,
+        IDepartmentRepository departmentRepository,
+        ILocationRepository locationRepository,
+        IUnitOfWork unitOfWork,
+        ILogger<CreateDepartmentLocationHandler> logger)
+    {
+        _validator = validator;
+        _departmentRepository = departmentRepository;
+        _locationRepository = locationRepository;
+        _unitOfWork = unitOfWork;
+        _logger = logger;
+    }
+
+    public async Task<Result<DepartmentLocationResponse, Errors>> Handle(
+        CreateDepartmentLocationCommand command,
+        CancellationToken cancellationToken)
+    {
+        var validationResult = await _validator.ValidateAsync(command, cancellationToken);
+
+        if (!validationResult.IsValid)
+        {
+            var errors = validationResult.ToErrors();
+            _logger.LogWarning(
+                "Create department-location failed. Validation errors for " +
+                "(DepartmentId: {DepartmentId}, LocationId: {LocationId}): {Errors}",
+                command.DepartmentId, command.LocationId, errors.ToString());
+            return errors;
+        }
+
+        var department = await _departmentRepository.GetById(command.DepartmentId, cancellationToken);
+
+        if (department is null)
+        {
+            _logger.LogWarning(
+                "Create department-location error. Department was not found by id: '{@DepartmentId}'.",
+                command.DepartmentId);
+            return GeneralErrors.NotFound(
+                    recordName: nameof(Department), message: $"Department {command.DepartmentId} not found.")
+                .ToErrors();
+        }
+
+        var departmentLocation = department.DepartmentLocations
+            .FirstOrDefault(dl => dl.LocationId == command.LocationId);
+
+        if (departmentLocation is not null)
+        {
+            _logger.LogWarning(
+                "Create department-location error. Relation already exists " +
+                $"for DepartmentId {command.DepartmentId} and LocationId {command.LocationId}.");
+            return GeneralErrors.AlreadyExists(
+                    departmentLocation.Id,
+                    $"Department {command.DepartmentId} and Location {command.LocationId} relation already exists")
+                .ToErrors();
+        }
+
+        var location = await _locationRepository.GetById(command.LocationId, cancellationToken);
+        if (location is null)
+        {
+            _logger.LogError(
+                $"Create department-location error. Location was not found by id: '{command.LocationId}'.");
+            return GeneralErrors.NotFound(
+                    recordName: nameof(Location), message: $"Location {command.LocationId} not found.")
+                .ToErrors();
+        }
+
+        department.AddLocation(command.LocationId);
+
+        var commitResult = await _unitOfWork.TryCommitAsync(cancellationToken);
+        if (commitResult.IsFailure)
+        {
+            _logger.LogWarning(
+                "Concurrent insert detected: DepartmentLocation for " +
+                "DepartmentId {DepartmentId} and LocationId {LocationId} already exists.",
+                command.DepartmentId, command.LocationId);
+            return GeneralErrors.AlreadyExists(
+                    message:
+                    $"Department {command.DepartmentId} and Location {command.LocationId} relation already exists.")
+                .ToErrors();
+        }
+
+        return department.ToDepartmentLocationResponse();
+    }
+}

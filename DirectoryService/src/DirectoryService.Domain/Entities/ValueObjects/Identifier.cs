@@ -6,7 +6,7 @@ using DirectoryService.Shared;
 
 namespace DirectoryService.Domain.Entities.ValueObjects;
 
-public sealed record Identifier
+public sealed record Slug
 {
     private const int MinLength = 3;
 
@@ -15,9 +15,9 @@ public sealed record Identifier
     public string Value { get; } = null!;
 
     // EF Core Constructor
-    private Identifier() { }
+    private Slug() { }
 
-    private Identifier(string value)
+    private Slug(string value)
     {
         Value = value;
     }
@@ -25,26 +25,26 @@ public sealed record Identifier
     public override int GetHashCode() =>
         HashCode.Combine(StringComparer.OrdinalIgnoreCase.GetHashCode(Value));
 
-    public bool Equals(Identifier? other)
+    public bool Equals(Slug? other)
     {
         if (other is null) return false;
         if (ReferenceEquals(this, other)) return true;
         return string.Equals(Value, other.Value, StringComparison.OrdinalIgnoreCase);
     }
 
-    public static Result<Identifier, Errors> Create(string identifier)
+    public static Result<Slug, Errors> Create(string slug)
     {
-        if (!string.IsNullOrEmpty(identifier))
+        if (!string.IsNullOrEmpty(slug))
         {
-            identifier = Regex.Replace(identifier.Trim(), @"\s+", " ");
-            identifier = Regex.Replace(identifier, @"[\p{P}-[.]]", "_");
+            slug = Regex.Replace(slug.Trim(), @"\s+", " ");
+            slug = Regex.Replace(slug, @"[\p{P}-[.]]", "_");
         }
 
-        var validationResult = Guard.ValidateStringField(identifier, nameof(Identifier), MinLength, MaxLength)
-            .Bind(() => Guard.ValidateLatinString(identifier, nameof(Identifier)));
+        var validationResult = Guard.ValidateStringField(slug, nameof(Slug), MinLength, MaxLength)
+            .Bind(() => Guard.ValidateLatinString(slug, nameof(Slug)));
         if (validationResult.IsFailure)
             return validationResult.Error;
 
-        return new Identifier(identifier);
+        return new Slug(slug);
     }
 }

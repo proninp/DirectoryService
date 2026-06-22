@@ -10,15 +10,13 @@ public interface IDepartmentRepository : IRepository
 
     Task<Department?> GetByName(string name, CancellationToken cancellationToken = default);
 
-    Task<bool> ExistsByIdentifier(Identifier identifier, CancellationToken cancellationToken = default);
+    Task<bool> ExistsBySlug(Slug slug, CancellationToken cancellationToken = default);
 
     Task<bool> AllExists(IReadOnlyCollection<Guid> ids, CancellationToken cancellationToken = default);
 
     Task<IReadOnlyList<Department>> GetAll(CancellationToken cancellationToken = default);
 
     Task<Guid> Add(Department department, CancellationToken cancellationToken = default);
-
-    Task Update(Department department, CancellationToken cancellationToken = default);
 
     Task<bool> Delete(Department department, CancellationToken cancellationToken = default);
 }

@@ -27,12 +27,12 @@ public sealed class DepartmentRepository(DirectoryServiceDbContext context) : ID
         return department;
     }
 
-    public async Task<bool> ExistsByIdentifier(Identifier identifier, CancellationToken cancellationToken = default)
+    public async Task<bool> ExistsBySlug(Slug slug, CancellationToken cancellationToken = default)
     {
         return await context
             .Departments
             .AnyAsync(
-                d => EF.Functions.ILike(d.Identifier.Value, identifier.Value),
+                d => EF.Functions.ILike(d.Slug.Value, slug.Value),
                 cancellationToken);
     }
 
@@ -63,12 +63,6 @@ public sealed class DepartmentRepository(DirectoryServiceDbContext context) : ID
         context.Add(department);
         await context.SaveChangesAsync(cancellationToken);
         return department.Id;
-    }
-
-    public async Task Update(Department department, CancellationToken cancellationToken = default)
-    {
-        context.Update(department);
-        await context.SaveChangesAsync(cancellationToken);
     }
 
     public async Task<bool> Delete(Department department, CancellationToken cancellationToken = default)
