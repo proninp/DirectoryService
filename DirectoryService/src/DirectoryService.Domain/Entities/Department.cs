@@ -209,7 +209,10 @@ public sealed class Department : BaseEntity
     {
         if (_departmentLocations.Count == 1 && _departmentLocations[0].LocationId == locationId)
         {
-            return GeneralErrors.Failure(nameof(Department), message: "Department must have at least one location")
+            return Error.Conflict(
+                    code: "delete.department.location.last.relation",
+                    message: $"Cannot remove the last location {locationId} from department {Id}. " +
+                             "Department must have at least one location.")
                 .ToErrors();
         }
 

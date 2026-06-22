@@ -60,10 +60,10 @@ public sealed class DepartmentsController : ControllerBase
     public async Task<EndpointResult<DepartmentLocationResponse>> CreateDepartmentLocation(
         [FromServices] ICommandHandler<DepartmentLocationResponse, CreateDepartmentLocationCommand> handler,
         [FromRoute] Guid departmentId,
-        [FromRoute] Guid locationsId,
+        [FromRoute] Guid locationId,
         CancellationToken cancellationToken)
     {
-        var command = new CreateDepartmentLocationCommand(departmentId, locationsId);
+        var command = new CreateDepartmentLocationCommand(departmentId, locationId);
         return await handler.Handle(command, cancellationToken);
     }
 
@@ -74,10 +74,10 @@ public sealed class DepartmentsController : ControllerBase
     public async Task<EndpointResult<DepartmentLocationResponse>> DeleteDepartmentLocation(
         [FromServices] ICommandHandler<DepartmentLocationResponse, DeleteDepartmentLocationCommand> handler,
         [FromRoute] Guid departmentId,
-        [FromRoute] Guid locationsId,
+        [FromRoute] Guid locationId,
         CancellationToken cancellationToken)
     {
-        var command = new DeleteDepartmentLocationCommand(departmentId, locationsId);
+        var command = new DeleteDepartmentLocationCommand(departmentId, locationId);
         return await handler.Handle(command, cancellationToken);
     }
 }
