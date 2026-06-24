@@ -1,4 +1,4 @@
-﻿namespace DirectoryService.Application.Abstractions;
+﻿namespace DirectoryService.Application.Abstractions.Database;
 
 /// <summary>
 /// Functional interface.

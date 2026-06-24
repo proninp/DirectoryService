@@ -1,4 +1,4 @@
-﻿using DirectoryService.Application.Abstractions;
+﻿using DirectoryService.Application.Abstractions.Database;
 using DirectoryService.Domain.Entities;
 using DirectoryService.Domain.Entities.ValueObjects;
 

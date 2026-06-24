@@ -1,5 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Application.Abstractions;
+using DirectoryService.Application.Abstractions.Database;
 using DirectoryService.Application.Locations;
 using DirectoryService.Application.Validation;
 using DirectoryService.Contracts.Departments.Responses;
@@ -19,7 +20,7 @@ public sealed class DeleteDepartmentLocationHandler
 
     private readonly ILocationRepository _locationRepository;
 
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly ITransactionManager _transactionManager;
 
     private readonly ILogger<DeleteDepartmentLocationHandler> _logger;
 
@@ -27,13 +28,13 @@ public sealed class DeleteDepartmentLocationHandler
         IValidator<DeleteDepartmentLocationCommand> validator,
         IDepartmentRepository departmentRepository,
         ILocationRepository locationRepository,
-        IUnitOfWork unitOfWork,
+        ITransactionManager transactionManager,
         ILogger<DeleteDepartmentLocationHandler> logger)
     {
         _validator = validator;
         _departmentRepository = departmentRepository;
         _locationRepository = locationRepository;
-        _unitOfWork = unitOfWork;
+        _transactionManager = transactionManager;
         _logger = logger;
     }
 
@@ -101,7 +102,13 @@ public sealed class DeleteDepartmentLocationHandler
             return removeResult.Error;
         }
 
-        var commitResult = await _unitOfWork.CommitAsync(cancellationToken);
+        var saveChangesResult = await _transactionManager.SaveChangesAsync(cancellationToken);
+        if (saveChangesResult.IsFailure)
+        {
+            return saveChangesResult.Error;
+        }
+
+        var commitResult = saveChangesResult.Value;
         if (commitResult == 0)
         {
             _logger.LogWarning(

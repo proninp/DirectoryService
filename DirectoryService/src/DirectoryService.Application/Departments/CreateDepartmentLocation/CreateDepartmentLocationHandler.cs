@@ -1,5 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Application.Abstractions;
+using DirectoryService.Application.Abstractions.Database;
 using DirectoryService.Application.Locations;
 using DirectoryService.Application.Validation;
 using DirectoryService.Contracts.Departments.Responses;
@@ -19,7 +20,7 @@ public sealed class
 
     private readonly ILocationRepository _locationRepository;
 
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly ITransactionManager _transactionManager;
 
     private readonly ILogger<CreateDepartmentLocationHandler> _logger;
 
@@ -27,13 +28,13 @@ public sealed class
         IValidator<CreateDepartmentLocationCommand> validator,
         IDepartmentRepository departmentRepository,
         ILocationRepository locationRepository,
-        IUnitOfWork unitOfWork,
+        ITransactionManager transactionManager,
         ILogger<CreateDepartmentLocationHandler> logger)
     {
         _validator = validator;
         _departmentRepository = departmentRepository;
         _locationRepository = locationRepository;
-        _unitOfWork = unitOfWork;
+        _transactionManager = transactionManager;
         _logger = logger;
     }
 
@@ -91,17 +92,22 @@ public sealed class
 
         department.AddLocation(command.LocationId);
 
-        var commitResult = await _unitOfWork.TryCommitAsync(cancellationToken);
-        if (commitResult.IsFailure)
+        var saveChangesResult = await _transactionManager.SaveChangesAsync(cancellationToken);
+        if (saveChangesResult.IsFailure)
         {
-            _logger.LogWarning(
-                "Concurrent insert detected: DepartmentLocation for " +
-                "DepartmentId {DepartmentId} and LocationId {LocationId} already exists.",
-                command.DepartmentId, command.LocationId);
-            return GeneralErrors.AlreadyExists(
-                    message:
-                    $"Department {command.DepartmentId} and Location {command.LocationId} relation already exists.")
-                .ToErrors();
+            if (saveChangesResult.Error.First().ErrorType == ErrorType.Conflict)
+            {
+                _logger.LogWarning(
+                    "Concurrent insert detected: DepartmentLocation for " +
+                    "DepartmentId {DepartmentId} and LocationId {LocationId} already exists.",
+                    command.DepartmentId, command.LocationId);
+                return GeneralErrors.AlreadyExists(
+                        message:
+                        $"Department {command.DepartmentId} and Location {command.LocationId} relation already exists.")
+                    .ToErrors();
+            }
+
+            return saveChangesResult.Error;
         }
 
         return department.ToDepartmentLocationResponse();

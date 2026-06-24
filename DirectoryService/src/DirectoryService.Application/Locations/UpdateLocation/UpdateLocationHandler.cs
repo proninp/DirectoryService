@@ -1,5 +1,6 @@
 using CSharpFunctionalExtensions;
 using DirectoryService.Application.Abstractions;
+using DirectoryService.Application.Abstractions.Database;
 using DirectoryService.Application.Validation;
 using DirectoryService.Contracts.Locations.Requests;
 using DirectoryService.Contracts.Locations.Responses;
@@ -17,19 +18,19 @@ public sealed class UpdateLocationHandler : ICommandHandler<LocationResponse, Up
 
     private readonly ILocationRepository _repository;
 
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly ITransactionManager _transactionManager;
 
     private readonly ILogger<UpdateLocationHandler> _logger;
 
     public UpdateLocationHandler(
         IValidator<UpdateLocationCommand> validator,
         ILocationRepository repository,
-        IUnitOfWork unitOfWork,
+        ITransactionManager transactionManager,
         ILogger<UpdateLocationHandler> logger)
     {
         _validator = validator;
         _repository = repository;
-        _unitOfWork = unitOfWork;
+        _transactionManager = transactionManager;
         _logger = logger;
     }
 
@@ -106,7 +107,12 @@ public sealed class UpdateLocationHandler : ICommandHandler<LocationResponse, Up
                 location.UpdateTimezone(newTimeZoneResult.Value);
         }
 
-        await _unitOfWork.CommitAsync(cancellationToken);
+        var saveChangesResult = await _transactionManager.SaveChangesAsync(cancellationToken);
+        if (saveChangesResult.IsFailure)
+        {
+            return saveChangesResult.Error;
+        }
+
         return location.ToResponse();
     }
 }
