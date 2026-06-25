@@ -2,6 +2,12 @@
 
 public static class GeneralErrors
 {
+    public const string ForeignKeyViolationCode = "record.reference.not.found";
+
+    public const string ConcurrencyViolationCode = "record.concurrency.conflict";
+
+    public const string UniquenessViolationCode = "record.uniqueness.conflict";
+
     public static Error ValueIsInvalid(string? name = null, string? message = null)
     {
         var label = name ?? "Value";
@@ -56,5 +62,26 @@ public static class GeneralErrors
     {
         return Error.Failure(
             "server.failure.no.errors", message ?? "Something went wrong. Unexpected server error occurs.");
+    }
+
+    public static Error ConcurrencyConflict(string? message = null)
+    {
+        return Error.Conflict(
+            ConcurrencyViolationCode,
+            message ?? "The record was modified or deleted by another process. Please reload and try again.");
+    }
+
+    public static Error UniquenessConflict(string? message = null, string? invalidField = null)
+    {
+        var errorMessage = message ?? "Record already exists.";
+        return Error.Conflict(UniquenessViolationCode, errorMessage, invalidField);
+    }
+
+    public static Error ReferenceNotFound(string? message = null, string? invalidField = null)
+    {
+        return Error.Validation(
+            ForeignKeyViolationCode,
+            message ?? "Referenced record does not exist. Please reload and try again.",
+            invalidField);
     }
 }

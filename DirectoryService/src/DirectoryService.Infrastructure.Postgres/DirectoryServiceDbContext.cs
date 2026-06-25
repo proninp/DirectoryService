@@ -1,17 +1,14 @@
-﻿using CSharpFunctionalExtensions;
-using DirectoryService.Domain.Entities;
+﻿using DirectoryService.Domain.Entities;
 using DirectoryService.Domain.Entities.Abstractions;
 using DirectoryService.Infrastructure.Postgres.Options;
-using DirectoryService.Shared;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Npgsql;
 
 namespace DirectoryService.Infrastructure.Postgres;
 
-public class DirectoryServiceDbContext : DbContext, IUnitOfWork
+public class DirectoryServiceDbContext : DbContext
 {
     private readonly DbSettings _dbSettings;
     private readonly IHostEnvironment _environment;
@@ -70,20 +67,4 @@ public class DirectoryServiceDbContext : DbContext, IUnitOfWork
 
         return await base.SaveChangesAsync(cancellationToken);
     }
-
-    public async Task<Result<int, Errors>> TryCommitAsync(CancellationToken cancellationToken = default)
-    {
-        try
-        {
-            return await SaveChangesAsync(cancellationToken);
-        }
-        catch (DbUpdateException ex) when (ex.InnerException is PostgresException pg &&
-                                           pg.SqlState == PostgresErrorCodes.UniqueViolation)
-        {
-            return GeneralErrors.AlreadyExists().ToErrors();
-        }
-    }
-
-    public async Task<int> CommitAsync(CancellationToken cancellationToken = default) =>
-        await SaveChangesAsync(cancellationToken);
 }

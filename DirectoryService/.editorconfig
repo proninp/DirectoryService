@@ -74,6 +74,7 @@ resharper_web_config_wrong_module_highlighting = warning
 # Code quality analyzers
 dotnet_analyzer_diagnostic.category-security.severity = error
 dotnet_code_quality.ca1802.api_surface = private, internal
+dotnet_code_quality.CA1826.exclude_ordefault_methods = true
 
 # name all constant fields using PascalCase
 dotnet_naming_rule.constant_fields_should_be_pascal_case.severity = suggestion
@@ -252,6 +253,7 @@ dotnet_diagnostic.SA1202.severity = none
 dotnet_diagnostic.SA1206.severity = none
 dotnet_diagnostic.SA1313.severity = none
 dotnet_diagnostic.SA1010.severity = none
+dotnet_diagnostic.SA1012.severity = none
 dotnet_diagnostic.SA1200.severity = none
 dotnet_diagnostic.SA1601.severity = none
 dotnet_diagnostic.SA1106.severity = none

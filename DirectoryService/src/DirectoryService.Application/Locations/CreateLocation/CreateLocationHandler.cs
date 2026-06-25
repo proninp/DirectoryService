@@ -1,5 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Application.Abstractions;
+using DirectoryService.Application.Abstractions.Database;
 using DirectoryService.Application.Validation;
 using DirectoryService.Contracts.Locations.Requests;
 using DirectoryService.Domain.Entities;
@@ -16,15 +17,19 @@ public sealed partial class CreateLocationHandler : ICommandHandler<Guid, Create
 
     private readonly ILocationRepository _locationRepository;
 
+    private readonly ITransactionManager _transactionManager;
+
     private readonly ILogger<CreateLocationHandler> _logger;
 
     public CreateLocationHandler(
         IValidator<CreateLocationCommand> validator,
         ILocationRepository locationRepository,
+        ITransactionManager transactionManager,
         ILogger<CreateLocationHandler> logger)
     {
         _validator = validator;
         _locationRepository = locationRepository;
+        _transactionManager = transactionManager;
         _logger = logger;
     }
 
@@ -85,7 +90,12 @@ public sealed partial class CreateLocationHandler : ICommandHandler<Guid, Create
             return locationResult.Error;
         }
 
-        var id = await _locationRepository.Add(locationResult.Value, cancellationToken);
+        var id = _locationRepository.Add(locationResult.Value);
+
+        var saveChangesResult = await _transactionManager.SaveChangesAsync(cancellationToken);
+        if (saveChangesResult.IsFailure)
+            return saveChangesResult.Error;
+
         LogLocationCreated(_logger, command.Request, id);
 
         return id;

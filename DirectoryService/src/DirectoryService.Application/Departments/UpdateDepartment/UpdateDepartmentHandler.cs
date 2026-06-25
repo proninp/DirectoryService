@@ -1,5 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Application.Abstractions;
+using DirectoryService.Application.Abstractions.Database;
 using DirectoryService.Application.Validation;
 using DirectoryService.Contracts.Departments.Responses;
 using DirectoryService.Domain.Entities;
@@ -15,18 +16,18 @@ public sealed class UpdateDepartmentHandler : ICommandHandler<DepartmentResponse
 
     private readonly IDepartmentRepository _repository;
 
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly ITransactionManager _transactionManager;
 
     private readonly ILogger<UpdateDepartmentHandler> _logger;
 
     public UpdateDepartmentHandler(
         IValidator<UpdateDepartmentCommand> validator,
-        IUnitOfWork unitOfWork,
+        ITransactionManager transactionManager,
         IDepartmentRepository repository,
         ILogger<UpdateDepartmentHandler> logger)
     {
         _validator = validator;
-        _unitOfWork = unitOfWork;
+        _transactionManager = transactionManager;
         _repository = repository;
         _logger = logger;
     }
@@ -65,7 +66,11 @@ public sealed class UpdateDepartmentHandler : ICommandHandler<DepartmentResponse
             return renameResult.Error;
         }
 
-        await _unitOfWork.CommitAsync(cancellationToken);
+        var saveChangesResult = await _transactionManager.SaveChangesAsync(cancellationToken);
+        if (saveChangesResult.IsFailure)
+        {
+            return saveChangesResult.Error;
+        }
 
         return department.ToResponse();
     }
