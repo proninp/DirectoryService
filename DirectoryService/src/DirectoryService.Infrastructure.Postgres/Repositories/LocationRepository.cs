@@ -51,23 +51,14 @@ public sealed class LocationRepository(DirectoryServiceDbContext context) : ILoc
         return existingCount == ids.Count;
     }
 
-    public async Task<Guid> Add(Location location, CancellationToken cancellationToken = default)
+    public Guid Add(Location location)
     {
         context.Locations.Add(location);
-        await context.SaveChangesAsync(cancellationToken);
         return location.Id;
     }
 
-    public async Task Update(Location location, CancellationToken cancellationToken = default)
-    {
-        context.Locations.Update(location);
-        await context.SaveChangesAsync(cancellationToken);
-    }
-
-    public async Task<bool> Delete(Location location, CancellationToken cancellationToken = default)
+    public void Delete(Location location)
     {
         context.Locations.Remove(location);
-        var result = await context.SaveChangesAsync(cancellationToken);
-        return result > 0;
     }
 }

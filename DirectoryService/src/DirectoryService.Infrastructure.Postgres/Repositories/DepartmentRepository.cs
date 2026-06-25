@@ -58,17 +58,14 @@ public sealed class DepartmentRepository(DirectoryServiceDbContext context) : ID
         return departments;
     }
 
-    public async Task<Guid> Add(Department department, CancellationToken cancellationToken = default)
+    public Guid Add(Department department)
     {
         context.Add(department);
-        await context.SaveChangesAsync(cancellationToken);
         return department.Id;
     }
 
-    public async Task<bool> Delete(Department department, CancellationToken cancellationToken = default)
+    public void Delete(Department department)
     {
         context.Departments.Remove(department);
-        var result = await context.SaveChangesAsync(cancellationToken);
-        return result > 0;
     }
 }

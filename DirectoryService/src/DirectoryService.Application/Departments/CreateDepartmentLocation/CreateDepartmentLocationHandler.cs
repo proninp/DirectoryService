@@ -95,12 +95,8 @@ public sealed class
         var saveChangesResult = await _transactionManager.SaveChangesAsync(cancellationToken);
         if (saveChangesResult.IsFailure)
         {
-            if (saveChangesResult.Error.First().ErrorType == ErrorType.Conflict)
+            if (saveChangesResult.Error.IsUniqueViolation())
             {
-                _logger.LogWarning(
-                    "Concurrent insert detected: DepartmentLocation for " +
-                    "DepartmentId {DepartmentId} and LocationId {LocationId} already exists.",
-                    command.DepartmentId, command.LocationId);
                 return GeneralErrors.AlreadyExists(
                         message:
                         $"Department {command.DepartmentId} and Location {command.LocationId} relation already exists.")

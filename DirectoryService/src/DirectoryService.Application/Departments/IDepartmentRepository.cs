@@ -16,7 +16,7 @@ public interface IDepartmentRepository : IRepository
 
     Task<IReadOnlyList<Department>> GetAll(CancellationToken cancellationToken = default);
 
-    Task<Guid> Add(Department department, CancellationToken cancellationToken = default);
+    Guid Add(Department department);
 
-    Task<bool> Delete(Department department, CancellationToken cancellationToken = default);
+    void Delete(Department department);
 }

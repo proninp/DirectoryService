@@ -16,9 +16,7 @@ public interface ILocationRepository : IRepository
 
     Task<bool> AllExists(IReadOnlyCollection<Guid> ids, CancellationToken cancellationToken = default);
 
-    Task<Guid> Add(Location location, CancellationToken cancellationToken = default);
+    Guid Add(Location location);
 
-    Task Update(Location location, CancellationToken cancellationToken = default);
-
-    Task<bool> Delete(Location location, CancellationToken cancellationToken = default);
+    void Delete(Location location);
 }

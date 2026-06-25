@@ -1,5 +1,4 @@
 ﻿using CSharpFunctionalExtensions;
-using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Abstractions.Database;
 using DirectoryService.Shared;
 using Microsoft.EntityFrameworkCore;
@@ -39,14 +38,34 @@ public sealed class TransactionManager(
         {
             return await context.SaveChangesAsync(cancellationToken);
         }
-        catch (DbUpdateException ex) when (ex.InnerException is PostgresException pg &&
-                                           pg.SqlState == PostgresErrorCodes.UniqueViolation)
+        catch (DbUpdateConcurrencyException ex)
         {
+            logger.LogError(
+                ex, "Concurrency conflict while saving changes for entities: {@Entities}",
+                ex.Entries.Select(e => e.Entity));
+            return GeneralErrors.ConcurrencyConflict().ToErrors();
+        }
+        catch (DbUpdateException ex) when (ex.InnerException is PostgresException
+                                           { SqlState: PostgresErrorCodes.UniqueViolation } pg)
+        {
+            var entry = ex.Entries.Count > 0 ? ex.Entries[0] : null;
+            logger.LogError(ex, "Unique violation: {ConstraintName}, Entity: {@Entity}",
+                pg.ConstraintName, entry?.Entity);
             return GeneralErrors.AlreadyExists().ToErrors();
+        }
+        catch (DbUpdateException ex) when (ex.InnerException is PostgresException
+                                           { SqlState: PostgresErrorCodes.ForeignKeyViolation } pg)
+        {
+            logger.LogError(
+                ex, "Foreign key constraint violated: Constraint={ConstraintName}, Table={TableName}, Detail={Detail}",
+                pg.ConstraintName, pg.TableName, pg.Detail);
+            return GeneralErrors.ReferenceNotFound(
+                message: $"Cannot complete operation: referenced record in '{pg.TableName}' does not exist or is still referenced.",
+                invalidField: pg.ConstraintName).ToErrors();
         }
         catch (Exception e)
         {
-            logger.LogError(e, "n error occurred while trying to commit the transaction");
+            logger.LogError(e, "An error occurred while trying to commit the transaction");
             return Error.Failure("commit.transaction.error", "Can not save changes for a new transaction")
                 .ToErrors();
         }
