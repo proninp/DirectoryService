@@ -1,4 +1,5 @@
 ﻿using DirectoryService.Application.Abstractions;
+using DirectoryService.Application.Decorators;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -19,6 +20,8 @@ public static class Registration
                     typeof(IQueryHandler<,>)))
             .AsSelfWithInterfaces()
             .WithScopedLifetime());
+
+        services.TryDecorate(typeof(ICommandHandler<,>), typeof(ValidationDecorator<,>));
 
         return services;
     }

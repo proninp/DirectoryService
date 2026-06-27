@@ -3,7 +3,10 @@ using DirectoryService.Contracts.Locations.Requests;
 
 namespace DirectoryService.Application.Locations.CreateLocation;
 
-public record CreateLocationCommand(CreateLocationRequest Request) : ICommand;
+public record CreateLocationCommand(CreateLocationRequest Request) : IValidationCommand
+{
+    public object LogContext => Request;
+}
 
 public static class CreateLocationCommandExtensions
 {
