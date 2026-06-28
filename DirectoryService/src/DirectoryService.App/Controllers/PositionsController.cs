@@ -11,7 +11,7 @@ namespace DirectoryService.App.Controllers;
 
 [ApiController]
 [ApiVersion(1.0)]
-public sealed class PositionController : ControllerBase
+public sealed class PositionsController : ControllerBase
 {
     [HttpPost(ApiEndpoints.Positions.Create)]
     [ProducesResponseType(typeof(Guid), StatusCodes.Status201Created)]

@@ -3,7 +3,10 @@ using DirectoryService.Contracts.Locations.Requests;
 
 namespace DirectoryService.Application.Locations.UpdateLocation;
 
-public record UpdateLocationCommand(Guid Id, UpdateLocationRequest Request) : ICommand;
+public record UpdateLocationCommand(Guid Id, UpdateLocationRequest Request) : IValidationCommand
+{
+    public object LogContext => new { Id, Request };
+}
 
 public static class UpdateLocationCommandExtensions
 {

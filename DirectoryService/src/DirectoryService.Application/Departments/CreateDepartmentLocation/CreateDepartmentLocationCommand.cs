@@ -2,4 +2,7 @@
 
 namespace DirectoryService.Application.Departments.CreateDepartmentLocation;
 
-public record CreateDepartmentLocationCommand(Guid DepartmentId, Guid LocationId) : ICommand;
+public record CreateDepartmentLocationCommand(Guid DepartmentId, Guid LocationId) : IValidationCommand
+{
+    public object? LogContext => new { DepartmentId, LocationId };
+}

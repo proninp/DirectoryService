@@ -3,7 +3,10 @@ using DirectoryService.Contracts.Departments.Requests;
 
 namespace DirectoryService.Application.Departments.CreateDepartment;
 
-public record CreateDepartmentCommand(CreateDepartmentRequest Request) : ICommand;
+public record CreateDepartmentCommand(CreateDepartmentRequest Request) : IValidationCommand
+{
+    public object LogContext => Request;
+}
 
 public static class CreateDepartmentCommandExtensions
 {

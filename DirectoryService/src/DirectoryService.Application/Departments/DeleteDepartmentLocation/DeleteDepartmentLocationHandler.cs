@@ -2,7 +2,6 @@
 using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Abstractions.Database;
 using DirectoryService.Application.Locations;
-using DirectoryService.Application.Validation;
 using DirectoryService.Contracts.Departments.Responses;
 using DirectoryService.Domain.Entities;
 using DirectoryService.Shared;
@@ -42,18 +41,6 @@ public sealed class DeleteDepartmentLocationHandler
         DeleteDepartmentLocationCommand command,
         CancellationToken cancellationToken)
     {
-        var validationResult = await _validator.ValidateAsync(command, cancellationToken);
-
-        if (!validationResult.IsValid)
-        {
-            var errors = validationResult.ToErrors();
-            _logger.LogWarning(
-                "Delete department-location failed. Validation errors for " +
-                "(DepartmentId: {DepartmentId}, LocationId: {LocationId}): {@Errors}",
-                command.DepartmentId, command.LocationId, errors);
-            return errors;
-        }
-
         var department = await _departmentRepository.GetById(command.DepartmentId, cancellationToken);
 
         if (department is null)

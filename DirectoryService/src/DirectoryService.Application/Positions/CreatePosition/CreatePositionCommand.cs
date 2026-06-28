@@ -3,7 +3,10 @@ using DirectoryService.Contracts.Positions.Requests;
 
 namespace DirectoryService.Application.Positions.CreatePosition;
 
-public record CreatePositionCommand(CreatePositionRequest Request) : ICommand;
+public record CreatePositionCommand(CreatePositionRequest Request) : IValidationCommand
+{
+    public object LogContext => Request;
+}
 
 public static class CreatePositionCommandExtensions
 {

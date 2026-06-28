@@ -1,12 +1,10 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Abstractions.Database;
-using DirectoryService.Application.Validation;
 using DirectoryService.Contracts.Locations.Requests;
 using DirectoryService.Domain.Entities;
 using DirectoryService.Domain.Entities.ValueObjects;
 using DirectoryService.Shared;
-using FluentValidation;
 using Microsoft.Extensions.Logging;
 
 namespace DirectoryService.Application.Locations.CreateLocation;
@@ -29,7 +27,7 @@ public sealed partial class CreateLocationHandler : ICommandHandler<Guid, Create
         _logger = logger;
     }
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "Location '{@Request}' created with id '{@Id}'")]
+    [LoggerMessage(Level = LogLevel.Information, Message = "Location '{@Request}' created with id '{Id}'")]
     private static partial void LogLocationCreated(ILogger logger, CreateLocationRequest request, Guid id);
 
     public async Task<Result<Guid, Errors>> Handle(
