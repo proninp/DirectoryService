@@ -54,6 +54,9 @@ public sealed class Position : BaseEntity
 
     public UnitResult<Errors> Rename(string newName)
     {
+        if (string.Equals(Name, newName, StringComparison.Ordinal))
+            return UnitResult.Success<Errors>();
+
         var validation = Guard.ValidateStringField(newName, nameof(Name), NameMinLength, NameMaxLength);
         if (validation.IsFailure)
             return UnitResult.Failure(validation.Error);
@@ -66,6 +69,9 @@ public sealed class Position : BaseEntity
     {
         if (newDescription is not null)
         {
+            if (string.Equals(Description, newDescription, StringComparison.Ordinal))
+                return UnitResult.Success<Errors>();
+
             var validation =
                 Guard.ValidateStringField(newDescription, nameof(Description), 0, DescriptionMaxLength);
             if (validation.IsFailure)

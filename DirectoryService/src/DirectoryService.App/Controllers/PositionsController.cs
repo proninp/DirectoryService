@@ -4,6 +4,7 @@ using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Positions.CreatePosition;
 using DirectoryService.Application.Positions.DeletePosition;
 using DirectoryService.Application.Positions.GetPosition;
+using DirectoryService.Application.Positions.UpdatePosition;
 using DirectoryService.Contracts.Positions.Requests;
 using DirectoryService.Contracts.Positions.Responses;
 using Microsoft.AspNetCore.Mvc;
@@ -38,6 +39,18 @@ public sealed class PositionsController : ControllerBase
         return result.IsSuccess
             ? new SuccessCreatedResult<Guid>(nameof(Get), new { id = result.Value }, result.Value)
             : new ErrorResult(result.Error);
+    }
+
+    [HttpPatch(ApiEndpoints.Positions.Update)]
+    [ProducesResponseType(typeof(PositionResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<EndpointResult<PositionResponse>> Update(
+        [FromServices] ICommandHandler<PositionResponse, UpdatePositionCommand> handler,
+        [FromRoute] Guid id,
+        [FromBody] UpdatePositionRequest request,
+        CancellationToken cancellationToken)
+    {
+        return await handler.Handle(request.ToCommand(id), cancellationToken);
     }
 
     [HttpDelete(ApiEndpoints.Positions.Delete)]
