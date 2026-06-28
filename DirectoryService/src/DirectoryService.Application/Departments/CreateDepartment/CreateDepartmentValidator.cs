@@ -16,7 +16,7 @@ public sealed class CreateDepartmentValidator : AbstractValidator<CreateDepartme
             .DependentRules(() =>
             {
                 RuleFor(command => command.Request.Name)
-                    .NotNull()
+                    .NotEmpty()
                     .WithError(GeneralErrors.ValueIsRequired(nameof(CreateDepartmentRequest.Name)));
 
                 RuleFor(command => command.Request.Slug)
@@ -28,23 +28,27 @@ public sealed class CreateDepartmentValidator : AbstractValidator<CreateDepartme
 
                 RuleFor(command => command.Request.LocationIds)
                     .NotNull()
-                    .WithError(GeneralErrors.ValueIsRequired(nameof(CreateDepartmentRequest.LocationIds)));
+                    .WithError(GeneralErrors.ValueIsRequired(nameof(CreateDepartmentRequest.LocationIds)))
+                    .DependentRules(() =>
+                    {
+                        RuleFor(command => command.Request.LocationIds)
+                            .Must(list => list is { Count: > 0 })
+                            .WithError(Error.Validation(
+                                "department.location", "Department locations must contain at least one location.",
+                                nameof(CreateDepartmentRequest.LocationIds)))
+                            .DependentRules(() =>
+                            {
+                                RuleFor(command => command.Request.LocationIds)
+                                    .Must(ids => ids.Distinct().Count() == ids.Count)
+                                    .WithError(Error.Validation(
+                                        "locationIds.must.be.unique", "Location Ids must be unique.",
+                                        nameof(CreateDepartmentRequest.LocationIds)));
 
-                RuleFor(command => command.Request.LocationIds)
-                    .Must(list => list is { Count: > 0 })
-                    .WithError(Error.Validation(
-                        "department.location", "Department locations must contain at least one location.",
-                        nameof(CreateDepartmentRequest.LocationIds)));
-
-                RuleFor(command => command.Request.LocationIds)
-                    .Must(ids => ids.Distinct().Count() == ids.Count)
-                    .WithError(Error.Validation(
-                        "locationIds.must.be.unique", "Location Ids must be unique.",
-                        nameof(CreateDepartmentRequest.LocationIds)));
-
-                RuleForEach(command => command.Request.LocationIds)
-                    .Must(id => id != Guid.Empty)
-                    .WithError(GeneralErrors.ValueIsInvalid("Location Id"));
+                                RuleForEach(command => command.Request.LocationIds)
+                                    .Must(id => id != Guid.Empty)
+                                    .WithError(GeneralErrors.ValueIsInvalid("Location Id"));
+                            });
+                    });
             });
     }
 }

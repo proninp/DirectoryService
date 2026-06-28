@@ -1,19 +1,15 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Abstractions.Database;
-using DirectoryService.Application.Validation;
 using DirectoryService.Contracts.Departments.Responses;
 using DirectoryService.Domain.Entities;
 using DirectoryService.Shared;
-using FluentValidation;
 using Microsoft.Extensions.Logging;
 
 namespace DirectoryService.Application.Departments.UpdateDepartment;
 
 public sealed class UpdateDepartmentHandler : ICommandHandler<DepartmentResponse, UpdateDepartmentCommand>
 {
-    private readonly IValidator<UpdateDepartmentCommand> _validator;
-
     private readonly IDepartmentRepository _repository;
 
     private readonly ITransactionManager _transactionManager;
@@ -21,12 +17,10 @@ public sealed class UpdateDepartmentHandler : ICommandHandler<DepartmentResponse
     private readonly ILogger<UpdateDepartmentHandler> _logger;
 
     public UpdateDepartmentHandler(
-        IValidator<UpdateDepartmentCommand> validator,
         ITransactionManager transactionManager,
         IDepartmentRepository repository,
         ILogger<UpdateDepartmentHandler> logger)
     {
-        _validator = validator;
         _transactionManager = transactionManager;
         _repository = repository;
         _logger = logger;
@@ -35,17 +29,6 @@ public sealed class UpdateDepartmentHandler : ICommandHandler<DepartmentResponse
     public async Task<Result<DepartmentResponse, Errors>> Handle(
         UpdateDepartmentCommand command, CancellationToken cancellationToken)
     {
-        var request = command.Request;
-        var validationResult = await _validator.ValidateAsync(command, cancellationToken);
-        if (!validationResult.IsValid)
-        {
-            var errors = validationResult.ToErrors();
-            _logger.LogWarning(
-                "Failed to update department from request {@DepartmentRequest}: {@Error}",
-                request, errors);
-            return errors;
-        }
-
         var department = await _repository.GetById(command.Id, cancellationToken);
         if (department is null)
         {
@@ -57,12 +40,12 @@ public sealed class UpdateDepartmentHandler : ICommandHandler<DepartmentResponse
                 .ToErrors();
         }
 
-        var renameResult = department.Rename(request.Name);
+        var renameResult = department.Rename(command.Request.Name);
         if (renameResult.IsFailure)
         {
             _logger.LogWarning(
                 "Department rename error. Cannot rename the department {DepartmentId} with a new name: '{DepartmentName}'.",
-                command.Id, request.Name);
+                command.Id, command.Request.Name);
             return renameResult.Error;
         }
 

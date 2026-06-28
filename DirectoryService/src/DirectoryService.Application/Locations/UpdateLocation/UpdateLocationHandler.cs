@@ -1,7 +1,6 @@
 using CSharpFunctionalExtensions;
 using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Abstractions.Database;
-using DirectoryService.Application.Validation;
 using DirectoryService.Contracts.Locations.Requests;
 using DirectoryService.Contracts.Locations.Responses;
 using DirectoryService.Domain.Entities;
@@ -38,16 +37,6 @@ public sealed class UpdateLocationHandler : ICommandHandler<LocationResponse, Up
         UpdateLocationCommand command,
         CancellationToken cancellationToken)
     {
-        var validationResult = await _validator.ValidateAsync(command, cancellationToken);
-        if (!validationResult.IsValid)
-        {
-            var errors = validationResult.ToErrors();
-            _logger.LogWarning(
-                "Failed to update location from request {@LocationRequest}: {@Error}",
-                command.Request, errors.ToString());
-            return errors;
-        }
-
         var location = await _repository.GetById(command.Id, cancellationToken);
         if (location is null)
         {

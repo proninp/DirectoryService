@@ -12,4 +12,12 @@ internal static class ValidationExtensions
                 Errors.Deserialize(error.ErrorMessage) ?? Enumerable.Empty<Error>())
             .ToList();
     }
+
+    public static Errors ToErrors(this IEnumerable<ValidationResult> validationResults)
+    {
+        return validationResults.SelectMany(r => r.Errors)
+            .SelectMany(error =>
+                Errors.Deserialize(error.ErrorMessage) ?? Enumerable.Empty<Error>())
+            .ToList();
+    }
 }

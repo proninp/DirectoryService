@@ -2,7 +2,6 @@
 using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Abstractions.Database;
 using DirectoryService.Application.Locations;
-using DirectoryService.Application.Validation;
 using DirectoryService.Domain.Entities;
 using DirectoryService.Domain.Entities.ValueObjects;
 using DirectoryService.Shared;
@@ -39,16 +38,6 @@ public sealed class CreateDepartmentHandler : ICommandHandler<Guid, CreateDepart
 
     public async Task<Result<Guid, Errors>> Handle(CreateDepartmentCommand command, CancellationToken cancellationToken)
     {
-        var validationResult = await _validator.ValidateAsync(command, cancellationToken);
-        if (!validationResult.IsValid)
-        {
-            var errors = validationResult.ToErrors();
-            _logger.LogWarning(
-                "Failed to create department from request {@DepartmentRequest}: {@Error}",
-                command.Request, errors);
-            return errors;
-        }
-
         var allLocationsExists = await _locationRepository
             .AllExists(command.Request.LocationIds, cancellationToken);
         if (!allLocationsExists)

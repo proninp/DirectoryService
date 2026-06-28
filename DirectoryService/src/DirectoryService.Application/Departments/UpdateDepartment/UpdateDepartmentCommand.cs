@@ -3,7 +3,10 @@ using DirectoryService.Contracts.Departments.Requests;
 
 namespace DirectoryService.Application.Departments.UpdateDepartment;
 
-public record UpdateDepartmentCommand(Guid Id, UpdateDepartmentRequest Request) : ICommand;
+public record UpdateDepartmentCommand(Guid Id, UpdateDepartmentRequest Request) : IValidationCommand
+{
+    public object LogContext => new { Id, Request };
+}
 
 public static class UpdateDepartmentCommandExtensions
 {

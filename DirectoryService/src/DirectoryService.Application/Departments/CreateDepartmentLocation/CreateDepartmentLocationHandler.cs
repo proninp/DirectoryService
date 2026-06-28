@@ -49,8 +49,8 @@ public sealed class
             var errors = validationResult.ToErrors();
             _logger.LogWarning(
                 "Create department-location failed. Validation errors for " +
-                "(DepartmentId: {DepartmentId}, LocationId: {LocationId}): {Errors}",
-                command.DepartmentId, command.LocationId, errors.ToString());
+                "(DepartmentId: {DepartmentId}, LocationId: {LocationId}): {@Errors}",
+                command.DepartmentId, command.LocationId, errors);
             return errors;
         }
 
