@@ -29,7 +29,7 @@ internal static class ApiEndpoints
 
     internal static class Positions
     {
-        private const string Base = $"{ApiBase}/pisitions";
+        private const string Base = $"{ApiBase}/positions";
 
         public const string Create = Base;
         public const string Get = $"{Base}/{{id:guid}}";

@@ -14,6 +14,14 @@ public sealed class PositionRepository(DirectoryServiceDbContext context) : IPos
             .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
     }
 
+    public async Task<Position?> GetByIdForUpdate(Guid id, CancellationToken cancellationToken = default)
+    {
+        return await context.Positions
+            .FromSql($"SELECT * FROM positions WHERE id = {id} FOR UPDATE")
+            .Include(p => p.DepartmentPositions)
+            .FirstOrDefaultAsync(cancellationToken);
+    }
+
     public async Task<Position?> GetByName(string name, CancellationToken cancellationToken = default)
     {
         return await context
@@ -38,16 +46,8 @@ public sealed class PositionRepository(DirectoryServiceDbContext context) : IPos
         return position.Id;
     }
 
-    public async Task Update(Position position, CancellationToken cancellationToken = default)
-    {
-        context.Positions.Update(position);
-        await context.SaveChangesAsync(cancellationToken);
-    }
-
-    public async Task<bool> Delete(Position position, CancellationToken cancellationToken = default)
+    public void Delete(Position position)
     {
         context.Positions.Remove(position);
-        var result = await context.SaveChangesAsync(cancellationToken);
-        return result > 0;
     }
 }
