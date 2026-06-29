@@ -33,6 +33,14 @@ public sealed class LocationRepository(DirectoryServiceDbContext context) : ILoc
         return location;
     }
 
+    public async Task<Location?> GetByIdForUpdate(Guid id, CancellationToken cancellationToken = default)
+    {
+        return await context.Locations
+            .FromSql($"SELECT * FROM locations WHERE id = {id} FOR UPDATE")
+            .Include(l => l.DepartmentLocations)
+            .FirstOrDefaultAsync(cancellationToken);
+    }
+
     public async Task<IReadOnlyList<Location>> GetAll(CancellationToken cancellationToken = default)
     {
         var query = context.Locations.AsNoTracking();
