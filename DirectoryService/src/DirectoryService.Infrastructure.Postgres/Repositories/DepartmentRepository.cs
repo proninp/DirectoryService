@@ -17,6 +17,15 @@ public sealed class DepartmentRepository(DirectoryServiceDbContext context) : ID
         return department;
     }
 
+    public async Task<Department?> GetByIdForUpdate(Guid id, CancellationToken cancellationToken = default)
+    {
+        return await context.Departments
+            .FromSql($"SELECT * FROM departments WHERE id = {id} FOR UPDATE")
+            .Include(l => l.DepartmentLocations)
+            .Include(p => p.DepartmentPositions)
+            .FirstOrDefaultAsync(cancellationToken);
+    }
+
     public async Task<Department?> GetByName(string name, CancellationToken cancellationToken = default)
     {
         var department = await context
