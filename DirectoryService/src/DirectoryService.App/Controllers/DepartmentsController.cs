@@ -6,6 +6,7 @@ using DirectoryService.Application.Departments.CreateDepartmentLocation;
 using DirectoryService.Application.Departments.CreateDepartmentPosition;
 using DirectoryService.Application.Departments.DeleteDepartment;
 using DirectoryService.Application.Departments.DeleteDepartmentLocation;
+using DirectoryService.Application.Departments.DeleteDepartmentPosition;
 using DirectoryService.Application.Departments.GetDepartment;
 using DirectoryService.Application.Departments.UpdateDepartment;
 using DirectoryService.Contracts.Departments.Requests;
@@ -94,6 +95,20 @@ public sealed class DepartmentsController : ControllerBase
         CancellationToken cancellationToken)
     {
         var command = new CreateDepartmentPositionCommand(departmentId, positionId);
+        return await handler.Handle(command, cancellationToken);
+    }
+
+    [HttpDelete(ApiEndpoints.Departments.UpdateDepartmentPosition)]
+    [ProducesResponseType(typeof(DepartmentPositionResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public async Task<EndpointResult<DepartmentPositionResponse>> DeleteDepartmentPosition(
+        [FromServices] ICommandHandler<DepartmentPositionResponse, DeleteDepartmentPositionCommand> handler,
+        [FromRoute] Guid departmentId,
+        [FromRoute] Guid positionId,
+        CancellationToken cancellationToken)
+    {
+        var command = new DeleteDepartmentPositionCommand(departmentId, positionId);
         return await handler.Handle(command, cancellationToken);
     }
 
