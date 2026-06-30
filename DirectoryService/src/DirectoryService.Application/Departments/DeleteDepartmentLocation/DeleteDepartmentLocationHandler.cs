@@ -1,11 +1,9 @@
-﻿using CSharpFunctionalExtensions;
+using CSharpFunctionalExtensions;
 using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Abstractions.Database;
-using DirectoryService.Application.Locations;
 using DirectoryService.Contracts.Departments.Responses;
 using DirectoryService.Domain.Entities;
 using DirectoryService.Shared;
-using FluentValidation;
 using Microsoft.Extensions.Logging;
 
 namespace DirectoryService.Application.Departments.DeleteDepartmentLocation;
@@ -13,26 +11,18 @@ namespace DirectoryService.Application.Departments.DeleteDepartmentLocation;
 public sealed class DeleteDepartmentLocationHandler
     : ICommandHandler<DepartmentLocationResponse, DeleteDepartmentLocationCommand>
 {
-    private readonly IValidator<DeleteDepartmentLocationCommand> _validator;
-
     private readonly IDepartmentRepository _departmentRepository;
-
-    private readonly ILocationRepository _locationRepository;
 
     private readonly ITransactionManager _transactionManager;
 
     private readonly ILogger<DeleteDepartmentLocationHandler> _logger;
 
     public DeleteDepartmentLocationHandler(
-        IValidator<DeleteDepartmentLocationCommand> validator,
         IDepartmentRepository departmentRepository,
-        ILocationRepository locationRepository,
         ITransactionManager transactionManager,
         ILogger<DeleteDepartmentLocationHandler> logger)
     {
-        _validator = validator;
         _departmentRepository = departmentRepository;
-        _locationRepository = locationRepository;
         _transactionManager = transactionManager;
         _logger = logger;
     }
@@ -45,21 +35,11 @@ public sealed class DeleteDepartmentLocationHandler
 
         if (department is null)
         {
-            _logger.LogError(
+            _logger.LogWarning(
                 "Delete department-location error. Department was not found by id: '{DepartmentId}'.",
                 command.DepartmentId);
             return GeneralErrors.NotFound(
                     recordName: nameof(Department), message: $"Department {command.DepartmentId} not found.")
-                .ToErrors();
-        }
-
-        var location = await _locationRepository.GetById(command.LocationId, cancellationToken);
-        if (location is null)
-        {
-            _logger.LogError(
-                "Delete department-location error. Location was not found by id: '{LocationId}'.", command.LocationId);
-            return GeneralErrors.NotFound(
-                    recordName: nameof(Location), message: $"Location {command.LocationId} not found.")
                 .ToErrors();
         }
 

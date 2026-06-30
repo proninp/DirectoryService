@@ -1,4 +1,4 @@
-﻿namespace DirectoryService.App;
+namespace DirectoryService.App;
 
 internal static class ApiEndpoints
 {
@@ -25,11 +25,12 @@ internal static class ApiEndpoints
         public const string Update = $"{Base}/{{id:guid}}";
         public const string Delete = $"{Base}/{{id:guid}}";
         public const string UpdateDepartmentLocation = $"{Base}/{{departmentId:guid}}/locations/{{locationId:guid}}";
+        public const string UpdateDepartmentPosition = $"{Base}/{{departmentId:guid}}/positions/{{positionId:guid}}";
     }
 
     internal static class Positions
     {
-        private const string Base = $"{ApiBase}/pisitions";
+        private const string Base = $"{ApiBase}/positions";
 
         public const string Create = Base;
         public const string Get = $"{Base}/{{id:guid}}";

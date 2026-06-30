@@ -207,15 +207,6 @@ public sealed class Department : BaseEntity
 
     public UnitResult<Errors> RemoveLocation(Guid locationId)
     {
-        if (_departmentLocations.Count == 1 && _departmentLocations[0].LocationId == locationId)
-        {
-            return Error.Conflict(
-                    code: "delete.department.location.last.relation",
-                    message: $"Cannot remove the last location {locationId} from department {Id}. " +
-                             "Department must have at least one location.")
-                .ToErrors();
-        }
-
         var removed = _departmentLocations.RemoveAll(dl => dl.LocationId == locationId);
         if (removed <= 0)
         {

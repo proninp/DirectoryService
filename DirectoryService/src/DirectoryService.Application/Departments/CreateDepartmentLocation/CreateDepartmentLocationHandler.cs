@@ -1,12 +1,10 @@
-﻿using CSharpFunctionalExtensions;
+using CSharpFunctionalExtensions;
 using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Abstractions.Database;
 using DirectoryService.Application.Locations;
-using DirectoryService.Application.Validation;
 using DirectoryService.Contracts.Departments.Responses;
 using DirectoryService.Domain.Entities;
 using DirectoryService.Shared;
-using FluentValidation;
 using Microsoft.Extensions.Logging;
 
 namespace DirectoryService.Application.Departments.CreateDepartmentLocation;
@@ -14,8 +12,6 @@ namespace DirectoryService.Application.Departments.CreateDepartmentLocation;
 public sealed class
     CreateDepartmentLocationHandler : ICommandHandler<DepartmentLocationResponse, CreateDepartmentLocationCommand>
 {
-    private readonly IValidator<CreateDepartmentLocationCommand> _validator;
-
     private readonly IDepartmentRepository _departmentRepository;
 
     private readonly ILocationRepository _locationRepository;
@@ -25,13 +21,11 @@ public sealed class
     private readonly ILogger<CreateDepartmentLocationHandler> _logger;
 
     public CreateDepartmentLocationHandler(
-        IValidator<CreateDepartmentLocationCommand> validator,
         IDepartmentRepository departmentRepository,
         ILocationRepository locationRepository,
         ITransactionManager transactionManager,
         ILogger<CreateDepartmentLocationHandler> logger)
     {
-        _validator = validator;
         _departmentRepository = departmentRepository;
         _locationRepository = locationRepository;
         _transactionManager = transactionManager;
@@ -42,18 +36,6 @@ public sealed class
         CreateDepartmentLocationCommand command,
         CancellationToken cancellationToken)
     {
-        var validationResult = await _validator.ValidateAsync(command, cancellationToken);
-
-        if (!validationResult.IsValid)
-        {
-            var errors = validationResult.ToErrors();
-            _logger.LogWarning(
-                "Create department-location failed. Validation errors for " +
-                "(DepartmentId: {DepartmentId}, LocationId: {LocationId}): {@Errors}",
-                command.DepartmentId, command.LocationId, errors);
-            return errors;
-        }
-
         var department = await _departmentRepository.GetById(command.DepartmentId, cancellationToken);
 
         if (department is null)

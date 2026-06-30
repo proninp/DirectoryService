@@ -14,16 +14,14 @@ public sealed class TransactionManager(
     ILogger<TransactionManager> logger
 ) : ITransactionManager
 {
-    private IDbContextTransaction? _currentTransaction;
-
     public async Task<Result<ITransactionScope, Errors>> BeginTransactionAsync(
         CancellationToken cancellationToken = default)
     {
         try
         {
-            _currentTransaction = await context.Database.BeginTransactionAsync(cancellationToken);
+            var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
             var transactionScopeLogger = loggerFactory.CreateLogger<TransactionScope>();
-            var transactionScope = new TransactionScope(_currentTransaction.GetDbTransaction(), transactionScopeLogger);
+            var transactionScope = new TransactionScope(transaction.GetDbTransaction(), transactionScopeLogger);
             return transactionScope;
         }
         catch (Exception e)
@@ -31,25 +29,6 @@ public sealed class TransactionManager(
             logger.LogError(e, "An error occurred while trying to start the transaction");
             return Error.Failure("begin.transaction.error", "Can not begin a new transaction")
                 .ToErrors();
-        }
-    }
-
-    public async Task<UnitResult<Errors>> RollbackAsync(CancellationToken cancellationToken)
-    {
-        if (_currentTransaction is null)
-            return UnitResult.Success<Errors>();
-
-        try
-        {
-            await _currentTransaction.RollbackAsync(cancellationToken);
-            return UnitResult.Success<Errors>();
-        }
-        catch (Exception e)
-        {
-            logger.LogError(e, "An error occurred while rolling back the transaction");
-            return UnitResult.Failure(
-                Error.Failure("rollback.transaction.error", "Can not rollback the transaction")
-                    .ToErrors());
         }
     }
 
