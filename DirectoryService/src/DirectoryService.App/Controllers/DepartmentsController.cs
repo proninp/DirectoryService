@@ -60,7 +60,7 @@ public sealed class DepartmentsController : ControllerBase
     [ProducesResponseType(typeof(DepartmentLocationResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
-    public async Task<EndpointResult<DepartmentLocationResponse>> G(
+    public async Task<EndpointResult<DepartmentLocationResponse>> CreateDepartmentLocation(
         [FromServices] ICommandHandler<DepartmentLocationResponse, CreateDepartmentLocationCommand> handler,
         [FromRoute] Guid departmentId,
         [FromRoute] Guid locationId,
