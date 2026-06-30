@@ -1,4 +1,4 @@
-﻿using DirectoryService.Contracts.Departments.Responses;
+using DirectoryService.Contracts.Departments.Responses;
 using DirectoryService.Domain.Entities;
 
 namespace DirectoryService.Application.Departments;
@@ -23,5 +23,13 @@ public static class DepartmentMappingExtensions
             department.Id,
             department.Slug.Value,
             [.. department.DepartmentLocations.Select(dl => dl.LocationId)]);
+    }
+
+    public static DepartmentPositionResponse ToDepartmentPositionResponse(this Department department)
+    {
+        return new DepartmentPositionResponse(
+            department.Id,
+            department.Slug.Value,
+            [.. department.DepartmentPositions.Select(dp => dp.PositionId)]);
     }
 }

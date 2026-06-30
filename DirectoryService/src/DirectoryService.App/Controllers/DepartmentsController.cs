@@ -1,8 +1,9 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using DirectoryService.App.EndpointResults;
 using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Departments.CreateDepartment;
 using DirectoryService.Application.Departments.CreateDepartmentLocation;
+using DirectoryService.Application.Departments.CreateDepartmentPosition;
 using DirectoryService.Application.Departments.DeleteDepartment;
 using DirectoryService.Application.Departments.DeleteDepartmentLocation;
 using DirectoryService.Application.Departments.GetDepartment;
@@ -58,7 +59,7 @@ public sealed class DepartmentsController : ControllerBase
     [ProducesResponseType(typeof(DepartmentLocationResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
-    public async Task<EndpointResult<DepartmentLocationResponse>> CreateDepartmentLocation(
+    public async Task<EndpointResult<DepartmentLocationResponse>> G(
         [FromServices] ICommandHandler<DepartmentLocationResponse, CreateDepartmentLocationCommand> handler,
         [FromRoute] Guid departmentId,
         [FromRoute] Guid locationId,
@@ -79,6 +80,20 @@ public sealed class DepartmentsController : ControllerBase
         CancellationToken cancellationToken)
     {
         var command = new DeleteDepartmentLocationCommand(departmentId, locationId);
+        return await handler.Handle(command, cancellationToken);
+    }
+
+    [HttpPost(ApiEndpoints.Departments.UpdateDepartmentPosition)]
+    [ProducesResponseType(typeof(DepartmentPositionResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public async Task<EndpointResult<DepartmentPositionResponse>> CreateDepartmentPosition(
+        [FromServices] ICommandHandler<DepartmentPositionResponse, CreateDepartmentPositionCommand> handler,
+        [FromRoute] Guid departmentId,
+        [FromRoute] Guid positionId,
+        CancellationToken cancellationToken)
+    {
+        var command = new CreateDepartmentPositionCommand(departmentId, positionId);
         return await handler.Handle(command, cancellationToken);
     }
 
