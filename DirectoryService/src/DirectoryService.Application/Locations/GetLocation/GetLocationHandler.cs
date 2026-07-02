@@ -1,5 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Application.Abstractions;
+using DirectoryService.Application.Abstractions.Database;
 using DirectoryService.Contracts.Locations.Responses;
 using DirectoryService.Domain.Entities;
 using DirectoryService.Shared;
@@ -8,7 +9,7 @@ using Microsoft.Extensions.Logging;
 namespace DirectoryService.Application.Locations.GetLocation;
 
 public sealed class GetLocationHandler(
-    ILocationRepository locationRepository,
+    IReadDbContext readDbContext,
     ILogger<GetLocationHandler> logger
 ) : IQueryHandler<LocationResponse, GetLocationQuery>
 {
@@ -22,8 +23,12 @@ public sealed class GetLocationHandler(
             return GeneralErrors.ValueIsRequired(nameof(query.Id)).ToErrors();
         }
 
-        var location = await locationRepository.GetById(query.Id, cancellationToken);
-        if (location is null)
+        var locationResponse = readDbContext.LocationsQuery
+            .Where(x => x.Id == query.Id)
+            .Select(LocationMappingExtensions.ToResponseExpression())
+            .FirstOrDefault();
+
+        if (locationResponse is null)
         {
             logger.LogWarning("GetLocation query error: location was not found with id: {LocationId}.", query.Id);
             return GeneralErrors.NotFound(
@@ -31,6 +36,6 @@ public sealed class GetLocationHandler(
                 .ToErrors();
         }
 
-        return location.ToResponse();
+        return locationResponse;
     }
 }

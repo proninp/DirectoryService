@@ -1,4 +1,5 @@
-﻿using DirectoryService.Domain.Entities;
+﻿using DirectoryService.Application.Abstractions.Database;
+using DirectoryService.Domain.Entities;
 using DirectoryService.Domain.Entities.Abstractions;
 using DirectoryService.Infrastructure.Postgres.Options;
 using Microsoft.EntityFrameworkCore;
@@ -8,7 +9,7 @@ using Microsoft.Extensions.Options;
 
 namespace DirectoryService.Infrastructure.Postgres;
 
-public class DirectoryServiceDbContext : DbContext
+public class DirectoryServiceDbContext : DbContext, IReadDbContext
 {
     private readonly DbSettings _dbSettings;
     private readonly IHostEnvironment _environment;
@@ -29,9 +30,15 @@ public class DirectoryServiceDbContext : DbContext
 
     public DbSet<Department> Departments => Set<Department>();
 
+    public IQueryable<Department> DepartmentsQuery => Departments.AsQueryable().AsNoTracking();
+
     public DbSet<Position> Positions => Set<Position>();
 
+    public IQueryable<Position> PositionsQuery => Positions.AsQueryable().AsNoTracking();
+
     public DbSet<Location> Locations => Set<Location>();
+
+    public IQueryable<Location> LocationsQuery => Locations.AsQueryable().AsNoTracking();
 
     public DbSet<DepartmentPosition> DepartmentPositions => Set<DepartmentPosition>();
 
