@@ -1,14 +1,16 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Application.Abstractions;
+using DirectoryService.Application.Abstractions.Database;
 using DirectoryService.Contracts.Locations.Responses;
 using DirectoryService.Domain.Entities;
 using DirectoryService.Shared;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace DirectoryService.Application.Locations.GetLocation;
 
 public sealed partial class GetLocationsHandler(
-    ILocationRepository locationRepository,
+    IReadDbContext context,
     ILogger<GetLocationsHandler> logger
 )
     : IQueryHandler<IReadOnlyList<LocationResponse>, GetLocationsQuery>
@@ -23,15 +25,17 @@ public sealed partial class GetLocationsHandler(
         GetLocationsQuery query,
         CancellationToken cancellationToken)
     {
-        var locations = await locationRepository.GetAll(cancellationToken);
-        if (locations.Count == 0)
+        var locationsResponse = await context
+            .LocationsQuery
+            .Select(LocationMappingExtensions.ToResponseExpression())
+            .ToListAsync(cancellationToken);
+        if (locationsResponse.Count == 0)
         {
             LogNoLocationsFound(logger);
             return GeneralErrors.NotFound(recordName: nameof(Location), message: "No active locations were found.")
                 .ToErrors();
         }
 
-        var locationsResponse = locations.ToResponse().ToList();
         LogLocationsFound(logger, locationsResponse.Count);
 
         return locationsResponse;

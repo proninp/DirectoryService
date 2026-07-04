@@ -18,6 +18,8 @@ public static class Registration
 
         services.AddDbContext<DirectoryServiceDbContext>();
 
+        services.AddScoped<IReadDbContext, DirectoryServiceDbContext>();
+
         services.AddScoped<ITransactionManager, TransactionManager>();
 
         services.Scan(scan => scan

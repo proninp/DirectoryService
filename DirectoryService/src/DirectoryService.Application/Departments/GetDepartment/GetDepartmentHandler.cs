@@ -1,14 +1,16 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Application.Abstractions;
+using DirectoryService.Application.Abstractions.Database;
 using DirectoryService.Contracts.Departments.Responses;
 using DirectoryService.Domain.Entities;
 using DirectoryService.Shared;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace DirectoryService.Application.Departments.GetDepartment;
 
 public sealed class GetDepartmentHandler(
-    IDepartmentRepository departmentRepository,
+    IReadDbContext context,
     ILogger<GetDepartmentHandler> logger
 ) : IQueryHandler<DepartmentResponse, GetDepartmentQuery>
 {
@@ -21,9 +23,12 @@ public sealed class GetDepartmentHandler(
             return GeneralErrors.ValueIsRequired(nameof(query.Id)).ToErrors();
         }
 
-        var department = await departmentRepository.GetById(query.Id, cancellationToken);
+        var departmentResponse = await context.DepartmentsQuery
+            .Where(d => d.Id == query.Id)
+            .Select(DepartmentMappingExtensions.ToResponseExpression())
+            .FirstOrDefaultAsync(cancellationToken);
 
-        if (department == null)
+        if (departmentResponse == null)
         {
             logger.LogWarning(
                 "{DepartmentQueryName} query error: department was not found with id: {DepartmentId}.",
@@ -34,6 +39,6 @@ public sealed class GetDepartmentHandler(
                 .ToErrors();
         }
 
-        return department.ToResponse();
+        return departmentResponse;
     }
 }

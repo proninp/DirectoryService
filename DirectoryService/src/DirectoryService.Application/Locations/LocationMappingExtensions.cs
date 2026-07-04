@@ -1,4 +1,5 @@
-﻿using CSharpFunctionalExtensions;
+﻿using System.Linq.Expressions;
+using CSharpFunctionalExtensions;
 using DirectoryService.Contracts.Locations.Requests;
 using DirectoryService.Contracts.Locations.Responses;
 using DirectoryService.Domain.Entities;
@@ -32,6 +33,25 @@ public static class LocationMappingExtensions
             location.Timezone.ToString()
         );
     }
+
+    public static Expression<Func<Location, LocationResponse>> ToResponseExpression() =>
+        l => new LocationResponse(
+            l.Id,
+            l.Name,
+            l.Address == null
+                ? null
+                : new LocationAddressResponse(
+                    l.Address.PostalCode,
+                    l.Address.Country,
+                    l.Address.City,
+                    l.Address.Street,
+                    l.Address.House,
+                    l.Address.Block,
+                    l.Address.Room,
+                    l.Address.PostalBox
+                ),
+            l.Timezone.Value
+        );
 
     public static IReadOnlyList<LocationResponse> ToResponse(this IEnumerable<Location> locations) =>
         [.. locations.Select(l => l.ToResponse())];

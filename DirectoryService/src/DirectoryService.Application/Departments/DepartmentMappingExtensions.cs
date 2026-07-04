@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using DirectoryService.Contracts.Departments.Responses;
 using DirectoryService.Domain.Entities;
 
@@ -16,6 +17,17 @@ public static class DepartmentMappingExtensions
             department.Depth,
             [.. department.DepartmentLocations.Select(dl => dl.LocationId)]);
     }
+
+    public static Expression<Func<Department, DepartmentResponse>> ToResponseExpression() =>
+        d => new DepartmentResponse(
+            d.Id,
+            d.Name,
+            d.Slug.Value,
+            d.ParentId,
+            d.Path.Value,
+            d.Depth,
+            d.DepartmentLocations.Select(dl => dl.LocationId).ToList()
+        );
 
     public static DepartmentLocationResponse ToDepartmentLocationResponse(this Department department)
     {
