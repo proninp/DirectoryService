@@ -1,14 +1,16 @@
 ﻿using CSharpFunctionalExtensions;
 using DirectoryService.Application.Abstractions;
+using DirectoryService.Application.Abstractions.Database;
 using DirectoryService.Contracts.Positions.Responses;
 using DirectoryService.Domain.Entities;
 using DirectoryService.Shared;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace DirectoryService.Application.Positions.GetPosition;
 
 public sealed class GetPositionHandler(
-    IPositionRepository positionRepository,
+    IReadDbContext context,
     ILogger<GetPositionHandler> logger
 ) : IQueryHandler<PositionResponse, GetPositionQuery>
 {
@@ -21,8 +23,12 @@ public sealed class GetPositionHandler(
             return GeneralErrors.ValueIsRequired(nameof(query.Id)).ToErrors();
         }
 
-        var position = await positionRepository.GetById(query.Id, cancellationToken);
-        if (position == null)
+        var positionResponse = await context.PositionsQuery
+            .Where(p => p.Id == query.Id)
+            .Select(PositionMappingExtensions.ToResponseExpression())
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (positionResponse == null)
         {
             logger.LogWarning(
                 "{PositionQueryName} query error: position was not found with id: {PositionId}.",
@@ -33,6 +39,6 @@ public sealed class GetPositionHandler(
                 .ToErrors();
         }
 
-        return position.ToResponse();
+        return positionResponse;
     }
 }

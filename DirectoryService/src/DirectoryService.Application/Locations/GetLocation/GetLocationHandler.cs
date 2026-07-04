@@ -4,6 +4,7 @@ using DirectoryService.Application.Abstractions.Database;
 using DirectoryService.Contracts.Locations.Responses;
 using DirectoryService.Domain.Entities;
 using DirectoryService.Shared;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace DirectoryService.Application.Locations.GetLocation;
@@ -23,10 +24,10 @@ public sealed class GetLocationHandler(
             return GeneralErrors.ValueIsRequired(nameof(query.Id)).ToErrors();
         }
 
-        var locationResponse = readDbContext.LocationsQuery
+        var locationResponse = await readDbContext.LocationsQuery
             .Where(x => x.Id == query.Id)
             .Select(LocationMappingExtensions.ToResponseExpression())
-            .FirstOrDefault();
+            .FirstOrDefaultAsync(cancellationToken);
 
         if (locationResponse is null)
         {
