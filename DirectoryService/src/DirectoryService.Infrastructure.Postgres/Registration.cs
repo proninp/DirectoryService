@@ -22,6 +22,9 @@ public static class Registration
 
         services.AddScoped<ITransactionManager, TransactionManager>();
 
+        services.AddScoped<IDbConnectionFactory, DbConnectionFactory>();
+        Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+
         services.Scan(scan => scan
             .FromAssemblyOf<DirectoryServiceDbContext>()
             .AddClasses(classes => classes.AssignableTo<IRepository>())
