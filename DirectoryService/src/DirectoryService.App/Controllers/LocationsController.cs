@@ -38,6 +38,16 @@ public sealed class LocationsController : ControllerBase
         return await handler.Handle(query, cancellationToken);
     }
 
+    [HttpGet(ApiEndpoints.Locations.GetTop)]
+    [ProducesResponseType(typeof(IReadOnlyList<TopLocationsResponse>), StatusCodes.Status200OK)]
+    public async Task<EndpointResult<IReadOnlyList<TopLocationsResponse>>> GetTop(
+        [FromServices] IQueryHandler<IReadOnlyList<TopLocationsResponse>, GetLocationsQuery> handler,
+        CancellationToken cancellationToken = default)
+    {
+        var query = new GetLocationsQuery();
+        return await handler.Handle(query, cancellationToken);
+    }
+
     [HttpPost(ApiEndpoints.Locations.Create)]
     [ProducesResponseType(typeof(Guid), StatusCodes.Status201Created)]
     public async Task<IActionResult> Create(
