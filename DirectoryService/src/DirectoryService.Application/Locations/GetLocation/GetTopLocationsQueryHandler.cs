@@ -27,7 +27,7 @@ public sealed class GetTopLocationsQueryHandler :
         GetLocationsQuery query,
         CancellationToken cancellationToken)
     {
-        var connection = await _dbConnectionFactory.CreateConnectionAsync(cancellationToken);
+        using var connection = await _dbConnectionFactory.CreateConnectionAsync(cancellationToken);
 
         var sql = """
                   WITH locationsWithDepartments AS (
@@ -35,8 +35,8 @@ public sealed class GetTopLocationsQueryHandler :
                            , count(dl.department_id) departments_count
                       FROM locations l
                           JOIN department_locations dl on dl.location_id = l.id
-                          LEFT JOIN departments d on d.id = dl.department_id and d.is_active = true
-                      WHERE l.is_active = true
+                          LEFT JOIN departments d on d.id = dl.department_id
+                      WHERE l.is_active = true and d.is_active = true
                       GROUP BY l.id)
                   SELECT l.id,
                          l.name,
@@ -60,13 +60,6 @@ public sealed class GetTopLocationsQueryHandler :
                 sql, cancellationToken);
 
         var result = topLocationsResponses.ToList().AsReadOnly();
-
-        if (result.Count == 0)
-        {
-            return GeneralErrors.NotFound(
-                    recordName: nameof(Location), message: "No active locations with relations to departments were found.")
-                .ToErrors();
-        }
 
         return result.ToList();
     }
