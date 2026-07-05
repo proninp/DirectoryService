@@ -61,6 +61,6 @@ public sealed class GetTopLocationsQueryHandler :
 
         var result = topLocationsResponses.ToList().AsReadOnly();
 
-        return Result.Success<IReadOnlyList<TopLocationsResponse>, Errors>(result);
+        return result.ToList();
     }
 }
