@@ -9,6 +9,10 @@ namespace DirectoryService.Domain.Entities;
 
 public sealed class Department : BaseEntity
 {
+    private const int DepartmentNameMinLength = 3;
+
+    public const int DepartmentNameMaxLength = 150;
+
     private List<Department> _children = [];
 
     private List<DepartmentLocation> _departmentLocations = [];
@@ -116,7 +120,8 @@ public sealed class Department : BaseEntity
         string name,
         IReadOnlyCollection<DepartmentLocation> departmentLocations)
     {
-        var nameValidationResult = Guard.ValidateStringField(name, nameof(Name), 3, 150);
+        var nameValidationResult = Guard.ValidateStringField(
+            name, nameof(Name), DepartmentNameMinLength, DepartmentNameMaxLength);
         if (nameValidationResult.IsFailure)
             return UnitResult.Failure(nameValidationResult.Error);
 
@@ -162,7 +167,8 @@ public sealed class Department : BaseEntity
         if (string.Equals(Name, newName, StringComparison.Ordinal))
             return UnitResult.Success<Errors>();
 
-        var nameValidation = Guard.ValidateStringField(newName, nameof(Name), 3, 150);
+        var nameValidation = Guard.ValidateStringField(
+            newName, nameof(Name), DepartmentNameMinLength, DepartmentNameMaxLength);
         if (nameValidation.IsFailure)
         {
             return UnitResult.Failure(nameValidation.Error);

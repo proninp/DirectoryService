@@ -33,9 +33,9 @@ public sealed class DepartmentsController : ControllerBase
     }
 
     [HttpGet(ApiEndpoints.Departments.GetAll)]
-    [ProducesResponseType(typeof(PagedResult<DepartmentListResponse>), StatusCodes.Status200OK)]
-    public async Task<EndpointResult<PagedResult<DepartmentListResponse>>> Get(
-        [FromServices] IQueryHandler<PagedResult<DepartmentListResponse>, GetDepartmentListQuery> handler,
+    [ProducesResponseType(typeof(PagedResult<DepartmentListItemResponse>), StatusCodes.Status200OK)]
+    public async Task<EndpointResult<PagedResult<DepartmentListItemResponse>>> Get(
+        [FromServices] IQueryHandler<PagedResult<DepartmentListItemResponse>, GetDepartmentListQuery> handler,
         [FromQuery] GetDepartmentListRequest request,
         CancellationToken cancellationToken = default)
     {

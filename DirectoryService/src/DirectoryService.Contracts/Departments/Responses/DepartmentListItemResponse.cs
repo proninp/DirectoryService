@@ -1,6 +1,6 @@
 ﻿namespace DirectoryService.Contracts.Departments.Responses;
 
-public record DepartmentListResponse(
+public record DepartmentListItemResponse(
     Guid Id,
     string Name,
     string Slug,
