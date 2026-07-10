@@ -48,7 +48,8 @@ public sealed class GetDepartmentListHandler(
         {
             filteredQuery = filteredQuery
                 .Where(d =>
-                    EF.Functions.Like(d.Name, $"%{query.Request.Search}%"));
+                    EF.Functions.Like(
+                        d.Name.ToUpperInvariant(), $"%{query.Request.Search.ToUpperInvariant()}%"));
         }
 
         if (string.IsNullOrWhiteSpace(query.Request.SortBy) ||
