@@ -11,6 +11,7 @@ using DirectoryService.Application.Departments.GetDepartment;
 using DirectoryService.Application.Departments.UpdateDepartment;
 using DirectoryService.Contracts.Departments.Requests;
 using DirectoryService.Contracts.Departments.Responses;
+using DirectoryService.Contracts.Pagination;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DirectoryService.App.Controllers;
@@ -29,6 +30,16 @@ public sealed class DepartmentsController : ControllerBase
     {
         var query = new GetDepartmentQuery(id);
         return await handler.Handle(query, cancellationToken);
+    }
+
+    [HttpGet(ApiEndpoints.Departments.GetAll)]
+    [ProducesResponseType(typeof(PagedResult<DepartmentListItemResponse>), StatusCodes.Status200OK)]
+    public async Task<EndpointResult<PagedResult<DepartmentListItemResponse>>> Get(
+        [FromServices] IQueryHandler<PagedResult<DepartmentListItemResponse>, GetDepartmentListQuery> handler,
+        [FromQuery] GetDepartmentListRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        return await handler.Handle(request.ToQuery(), cancellationToken);
     }
 
     [HttpPost(ApiEndpoints.Departments.Create)]
