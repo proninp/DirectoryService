@@ -1,6 +1,5 @@
 ﻿using DirectoryService.Application.Validation;
 using DirectoryService.Contracts.Departments.Requests;
-using DirectoryService.Contracts.Pagination;
 using DirectoryService.Domain.Entities;
 using DirectoryService.Shared;
 using FluentValidation;
@@ -37,19 +36,7 @@ public sealed class GetDepartmentListValidator : AbstractValidator<GetDepartment
                 RuleFor(query => query.Request.Pagination)
                     .NotNull()
                     .WithError(GeneralErrors.ValueIsRequired(nameof(GetDepartmentListRequest.Pagination)))
-                    .DependentRules(() =>
-                    {
-                        RuleFor(query => query.Request.Pagination.PageNumber)
-                            .GreaterThanOrEqualTo(1)
-                            .WithError(GeneralErrors.ValueIsInvalid(
-                                nameof(PagedRequest.PageNumber), "Page number must be greater than or equal to 1."));
-
-                        RuleFor(query => query.Request.Pagination.PageSize)
-                            .InclusiveBetween(PagedRequest.MinPageSize, PagedRequest.MaxPageSize)
-                            .WithError(GeneralErrors.ValueIsInvalid(
-                                nameof(PagedRequest.PageSize),
-                                $"Page size must be between {PagedRequest.MinPageSize} and {PagedRequest.MaxPageSize}."));
-                    });
+                    .SetValidator(new PageRequestValidator());
             });
     }
 }
