@@ -23,6 +23,18 @@ public sealed class GetLocationListValidator : AbstractValidator<GetLocationList
                     .WithError(GeneralErrors.InvalidFieldLength(
                         nameof(GetLocationListRequest.Search), maxLength: Location.NameMaxLength));
 
+                When(q => q.Request.MinDepartmentCount.HasValue, () =>
+                {
+                    RuleFor(q => q.Request.MinDepartmentCount)
+                        .GreaterThanOrEqualTo(0)
+                        .WithError(GeneralErrors.ValueIsInvalid(nameof(GetLocationListRequest.MinDepartmentCount)));
+                });
+
+                RuleFor(q => q.Request.MinDepartmentCount)
+                    .GreaterThan(0)
+                    .WithError(GeneralErrors.InvalidFieldLength(
+                        nameof(GetLocationListRequest.Search), maxLength: Location.NameMaxLength));
+
                 RuleFor(query => query.Request.SortBy)
                     .Must(sortBy => string.IsNullOrWhiteSpace(sortBy) ||
                                     AllowedSortBy.Contains(sortBy))
