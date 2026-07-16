@@ -43,10 +43,10 @@ public sealed class GetLocationListHandler(
             parameters.Add("search", $"%{query.Request.Search}%", DbType.String);
         }
 
-        if (query.Request.MinDepartmentCount.HasValue)
+        if (query.Request.DepartmentsCount.HasValue)
         {
             conditions.Add("coalesce(ld.departments_count, 0) >= @minDepartmentCount");
-            parameters.Add("minDepartmentCount", query.Request.MinDepartmentCount.Value, DbType.Int32);
+            parameters.Add("minDepartmentCount", query.Request.DepartmentsCount.Value, DbType.Int32);
         }
 
         parameters.Add("offset", (query.Request.Pagination.PageNumber - 1) * query.Request.Pagination.PageSize);

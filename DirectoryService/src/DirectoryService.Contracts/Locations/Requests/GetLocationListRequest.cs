@@ -4,7 +4,7 @@ namespace DirectoryService.Contracts.Locations.Requests;
 
 public record GetLocationListRequest(
     string? Search,
-    int? MinDepartmentCount,
+    int? DepartmentsCount,
     string? SortBy,
     string? SortDir,
     PagedRequest Pagination

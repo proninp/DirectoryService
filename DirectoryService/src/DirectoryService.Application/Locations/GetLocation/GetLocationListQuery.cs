@@ -10,7 +10,7 @@ public record GetLocationListQuery(GetLocationListRequest Request) : IQuery
     {
         [nameof(Location.Name)] = "l.name",
         [nameof(Location.CreatedAt)] = "l.created_at",
-        [nameof(GetLocationListQuery.Request.MinDepartmentCount)] = "departments_count",
+        [nameof(GetLocationListQuery.Request.DepartmentsCount)] = "departments_count",
     };
 }
 

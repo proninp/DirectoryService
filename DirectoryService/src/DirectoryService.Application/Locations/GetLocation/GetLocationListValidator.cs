@@ -23,11 +23,11 @@ public sealed class GetLocationListValidator : AbstractValidator<GetLocationList
                             nameof(GetLocationListRequest.Search), maxLength: Location.NameMaxLength));
                 });
 
-                When(q => q.Request.MinDepartmentCount.HasValue, () =>
+                When(q => q.Request.DepartmentsCount.HasValue, () =>
                 {
-                    RuleFor(q => q.Request.MinDepartmentCount)
+                    RuleFor(q => q.Request.DepartmentsCount)
                         .GreaterThanOrEqualTo(0)
-                        .WithError(GeneralErrors.ValueIsInvalid(nameof(GetLocationListRequest.MinDepartmentCount)));
+                        .WithError(GeneralErrors.ValueIsInvalid(nameof(GetLocationListRequest.DepartmentsCount)));
                 });
 
                 RuleFor(query => query.Request.SortBy)
