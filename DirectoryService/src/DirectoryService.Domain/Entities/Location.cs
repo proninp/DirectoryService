@@ -10,7 +10,7 @@ public sealed class Location : BaseEntity
 {
     private const int NameMinLength = 3;
 
-    private const int NameMaxLength = 120;
+    public const int NameMaxLength = 120;
 
     private readonly List<DepartmentLocation> _departmentLocations = [];
 

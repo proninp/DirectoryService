@@ -1,6 +1,5 @@
 ﻿using DirectoryService.Application.Validation;
 using DirectoryService.Contracts.Departments.Requests;
-using DirectoryService.Contracts.Pagination;
 using DirectoryService.Domain.Entities;
 using DirectoryService.Shared;
 using FluentValidation;
@@ -12,9 +11,6 @@ public sealed class GetDepartmentListValidator : AbstractValidator<GetDepartment
     private static readonly HashSet<string> AllowedSortBy = new(StringComparer.OrdinalIgnoreCase)
         { nameof(Department.Name), nameof(Department.CreatedAt) };
 
-    private static readonly HashSet<string> AllowedSortDir =
-        new(StringComparer.OrdinalIgnoreCase) { "asc", "desc" };
-
     public GetDepartmentListValidator()
     {
         RuleFor(q => q.Request)
@@ -23,9 +19,9 @@ public sealed class GetDepartmentListValidator : AbstractValidator<GetDepartment
             .DependentRules(() =>
             {
                 RuleFor(q => q.Request.Search)
-                    .MaximumLength(Department.DepartmentNameMaxLength)
+                    .MaximumLength(Department.NameMaxLength)
                     .WithError(GeneralErrors.InvalidFieldLength(
-                        nameof(GetDepartmentListRequest.Search), maxLength: Department.DepartmentNameMaxLength));
+                        nameof(GetDepartmentListRequest.Search), maxLength: Department.NameMaxLength));
 
                 RuleFor(query => query.Request.SortBy)
                     .Must(sortBy => string.IsNullOrWhiteSpace(sortBy) ||
@@ -34,25 +30,13 @@ public sealed class GetDepartmentListValidator : AbstractValidator<GetDepartment
 
                 RuleFor(query => query.Request.SortDir)
                     .Must(sortDir => string.IsNullOrWhiteSpace(sortDir) ||
-                                     AllowedSortDir.Contains(sortDir))
+                                     CustomValidators.AllowedSortDir.Contains(sortDir))
                     .WithError(GeneralErrors.ValueIsInvalid(nameof(GetDepartmentListRequest.SortDir)));
 
                 RuleFor(query => query.Request.Pagination)
                     .NotNull()
                     .WithError(GeneralErrors.ValueIsRequired(nameof(GetDepartmentListRequest.Pagination)))
-                    .DependentRules(() =>
-                    {
-                        RuleFor(query => query.Request.Pagination.PageNumber)
-                            .GreaterThanOrEqualTo(1)
-                            .WithError(GeneralErrors.ValueIsInvalid(
-                                nameof(PagedRequest.PageNumber), "Page number must be greater than or equal to 1."));
-
-                        RuleFor(query => query.Request.Pagination.PageSize)
-                            .InclusiveBetween(PagedRequest.MinPageSize, PagedRequest.MaxPageSize)
-                            .WithError(GeneralErrors.ValueIsInvalid(
-                                nameof(PagedRequest.PageSize),
-                                $"Page size must be between {PagedRequest.MinPageSize} and {PagedRequest.MaxPageSize}."));
-                    });
+                    .SetValidator(new PageRequestValidator());
             });
     }
 }

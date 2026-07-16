@@ -7,6 +7,7 @@ using DirectoryService.Application.Locations.GetLocation;
 using DirectoryService.Application.Locations.UpdateLocation;
 using DirectoryService.Contracts.Locations.Requests;
 using DirectoryService.Contracts.Locations.Responses;
+using DirectoryService.Contracts.Pagination;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DirectoryService.App.Controllers;
@@ -27,15 +28,14 @@ public sealed class LocationsController : ControllerBase
         return await handler.Handle(query, cancellationToken);
     }
 
-    [HttpGet(ApiEndpoints.Locations.GetAll)]
-    [ProducesResponseType(typeof(IReadOnlyList<LocationResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<EndpointResult<IReadOnlyList<LocationResponse>>> GetAll(
-        [FromServices] IQueryHandler<IReadOnlyList<LocationResponse>, GetLocationsQuery> handler,
+    [HttpGet(ApiEndpoints.Locations.GetList)]
+    [ProducesResponseType(typeof(PagedResult<LocationListItemResponse>), StatusCodes.Status200OK)]
+    public async Task<EndpointResult<PagedResult<LocationListItemResponse>>> Get(
+        [FromServices] IQueryHandler<PagedResult<LocationListItemResponse>, GetLocationListQuery> handler,
+        [FromQuery] GetLocationListRequest request,
         CancellationToken cancellationToken = default)
     {
-        var query = new GetLocationsQuery();
-        return await handler.Handle(query, cancellationToken);
+        return await handler.Handle(request.ToQuery(), cancellationToken);
     }
 
     [HttpGet(ApiEndpoints.Locations.GetTop)]
