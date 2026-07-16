@@ -1,5 +1,4 @@
 ﻿using System.Data;
-using System.Linq.Expressions;
 using CSharpFunctionalExtensions;
 using Dapper;
 using DirectoryService.Application.Abstractions;
@@ -7,7 +6,6 @@ using DirectoryService.Application.Abstractions.Database;
 using DirectoryService.Application.Validation;
 using DirectoryService.Contracts.Locations.Responses;
 using DirectoryService.Contracts.Pagination;
-using DirectoryService.Domain.Entities;
 using DirectoryService.Shared;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
@@ -39,7 +37,7 @@ public sealed class GetLocationListHandler(
         var parameters = new DynamicParameters();
         var conditions = new List<string>();
 
-        if (string.IsNullOrEmpty(query.Request.Search))
+        if (!string.IsNullOrEmpty(query.Request.Search))
         {
             conditions.Add("l.name ilike @search");
             parameters.Add("search", $"%{query.Request.Search}%", DbType.String);
@@ -58,17 +56,10 @@ public sealed class GetLocationListHandler(
             ? string.Concat("where ", string.Join(" and ", conditions))
             : string.Empty;
 
-        var sortBy = "l.id";
-        if (!string.IsNullOrEmpty(query.Request.SortBy))
+        if (string.IsNullOrEmpty(query.Request.SortBy) ||
+            !GetLocationListQuery.AllowedSortBy.TryGetValue(query.Request.SortBy, out var sortBy))
         {
-            if (string.Equals(nameof(Location.Name), query.Request.SortBy, StringComparison.OrdinalIgnoreCase))
-                sortBy = "l.name";
-            else if (string.Equals(nameof(Location.CreatedAt), query.Request.SortBy,
-                         StringComparison.OrdinalIgnoreCase))
-                sortBy = "l.created_at";
-            else if (string.Equals(nameof(GetLocationListQuery.Request.MinDepartmentCount), query.Request.SortBy,
-                         StringComparison.OrdinalIgnoreCase))
-                sortBy = "dl.departments_count";
+            sortBy = "l.created_at";
         }
 
         var sortDir = string.Equals(query.Request.SortDir, "desc", StringComparison.OrdinalIgnoreCase)
@@ -77,6 +68,9 @@ public sealed class GetLocationListHandler(
 
         var orderByClause = $"order by {sortBy} {sortDir}";
 
+        long? totalCount = null;
+
+        // language=SQL
         var sql = $"""
                    with ld as (
                        select dl.location_id,
@@ -95,7 +89,7 @@ public sealed class GetLocationListHandler(
                           l.room,
                           l.postal_box,
                           l.created_at,
-                          coalesce(ld.departments_count, 0),
+                          coalesce(ld.departments_count, 0) departments_count,
                           count(*) over () total_count
                    from locations l 
                    left join ld on ld.location_id = l.id
@@ -106,9 +100,22 @@ public sealed class GetLocationListHandler(
 
         using var connection = await connectionFactory.CreateConnectionAsync(cancellationToken);
 
-        var locations = await connection.QueryAsync<LocationListItemResponse>(
-            sql, param: parameters);
+        var locations = await connection
+            .QueryAsync<LocationListItemResponse, long, LocationListItemResponse>(
+                sql,
+                splitOn: "total_count",
+                map: (location, count) =>
+                {
+                    totalCount ??= count;
+                    return location;
+                },
+                param: parameters);
 
-        throw new NotImplementedException();
+        var pagedResult = new PagedResult<LocationListItemResponse>
+        {
+            TotalCount = totalCount ?? 0,
+            Items = [.. locations]
+        };
+        return pagedResult;
     }
 }

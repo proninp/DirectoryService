@@ -7,4 +7,5 @@ public record GetLocationListRequest(
     int? MinDepartmentCount,
     string? SortBy,
     string? SortDir,
-    PagedRequest Pagination);
+    PagedRequest Pagination
+);

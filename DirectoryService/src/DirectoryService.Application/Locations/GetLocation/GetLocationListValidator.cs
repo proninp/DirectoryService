@@ -8,9 +8,6 @@ namespace DirectoryService.Application.Locations.GetLocation;
 
 public sealed class GetLocationListValidator : AbstractValidator<GetLocationListQuery>
 {
-    private static readonly HashSet<string> AllowedSortBy = new(StringComparer.OrdinalIgnoreCase)
-        { nameof(Location.Name), nameof(Location.CreatedAt), nameof(GetLocationListQuery.Request.MinDepartmentCount) };
-
     public GetLocationListValidator()
     {
         RuleFor(q => q.Request)
@@ -18,10 +15,13 @@ public sealed class GetLocationListValidator : AbstractValidator<GetLocationList
             .WithError(GeneralErrors.ValueIsRequired(nameof(GetLocationListQuery.Request)))
             .DependentRules(() =>
             {
-                RuleFor(q => q.Request.Search)
-                    .MaximumLength(Location.NameMaxLength)
-                    .WithError(GeneralErrors.InvalidFieldLength(
-                        nameof(GetLocationListRequest.Search), maxLength: Location.NameMaxLength));
+                When(q => !string.IsNullOrEmpty(q.Request.Search), () =>
+                {
+                    RuleFor(q => q.Request.Search)
+                        .MaximumLength(Location.NameMaxLength)
+                        .WithError(GeneralErrors.InvalidFieldLength(
+                            nameof(GetLocationListRequest.Search), maxLength: Location.NameMaxLength));
+                });
 
                 When(q => q.Request.MinDepartmentCount.HasValue, () =>
                 {
@@ -30,14 +30,9 @@ public sealed class GetLocationListValidator : AbstractValidator<GetLocationList
                         .WithError(GeneralErrors.ValueIsInvalid(nameof(GetLocationListRequest.MinDepartmentCount)));
                 });
 
-                RuleFor(q => q.Request.MinDepartmentCount)
-                    .GreaterThan(0)
-                    .WithError(GeneralErrors.InvalidFieldLength(
-                        nameof(GetLocationListRequest.Search), maxLength: Location.NameMaxLength));
-
                 RuleFor(query => query.Request.SortBy)
                     .Must(sortBy => string.IsNullOrWhiteSpace(sortBy) ||
-                                    AllowedSortBy.Contains(sortBy))
+                                    GetLocationListQuery.AllowedSortBy.ContainsKey(sortBy))
                     .WithError(GeneralErrors.ValueIsInvalid(nameof(GetLocationListRequest.SortBy)));
 
                 RuleFor(query => query.Request.SortDir)

@@ -32,7 +32,7 @@ public sealed class DepartmentsController : ControllerBase
         return await handler.Handle(query, cancellationToken);
     }
 
-    [HttpGet(ApiEndpoints.Departments.GetAll)]
+    [HttpGet(ApiEndpoints.Departments.GetList)]
     [ProducesResponseType(typeof(PagedResult<DepartmentListItemResponse>), StatusCodes.Status200OK)]
     public async Task<EndpointResult<PagedResult<DepartmentListItemResponse>>> Get(
         [FromServices] IQueryHandler<PagedResult<DepartmentListItemResponse>, GetDepartmentListQuery> handler,

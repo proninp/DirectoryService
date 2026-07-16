@@ -28,7 +28,7 @@ public sealed class LocationsController : ControllerBase
         return await handler.Handle(query, cancellationToken);
     }
 
-    [HttpGet(ApiEndpoints.Departments.GetAll)]
+    [HttpGet(ApiEndpoints.Locations.GetList)]
     [ProducesResponseType(typeof(PagedResult<LocationListItemResponse>), StatusCodes.Status200OK)]
     public async Task<EndpointResult<PagedResult<LocationListItemResponse>>> Get(
         [FromServices] IQueryHandler<PagedResult<LocationListItemResponse>, GetLocationListQuery> handler,

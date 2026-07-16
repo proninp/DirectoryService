@@ -3,7 +3,7 @@
 public record TopLocationsResponse
 {
     public Guid Id { get; init; }
-    public string? Name { get; init; } = string.Empty;
+    public required string Name { get; init; }
     public string? PostalCode { get; init; }
     public string? Country { get; init; }
     public string? City { get; init; }
