@@ -35,10 +35,12 @@ public sealed class LocationRepository(DirectoryServiceDbContext context) : ILoc
 
     public async Task<Location?> GetByIdForUpdate(Guid id, CancellationToken cancellationToken = default)
     {
+        await context.Database.ExecuteSqlInterpolatedAsync(
+            $"SELECT 1 FROM locations WHERE id = {id} FOR UPDATE", cancellationToken);
+
         return await context.Locations
-            .FromSql($"SELECT * FROM locations WHERE id = {id} FOR UPDATE")
             .Include(l => l.DepartmentLocations)
-            .FirstOrDefaultAsync(cancellationToken);
+            .FirstOrDefaultAsync(l => l.Id == id, cancellationToken);
     }
 
     public async Task<IReadOnlyList<Location>> GetAll(CancellationToken cancellationToken = default)

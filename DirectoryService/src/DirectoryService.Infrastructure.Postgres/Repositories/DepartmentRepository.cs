@@ -19,11 +19,14 @@ public sealed class DepartmentRepository(DirectoryServiceDbContext context) : ID
 
     public async Task<Department?> GetByIdForUpdate(Guid id, CancellationToken cancellationToken = default)
     {
+        await context.Database
+            .ExecuteSqlInterpolatedAsync(
+                $"SELECT 1 FROM departments WHERE id = {id}", cancellationToken);
+
         return await context.Departments
-            .FromSql($"SELECT * FROM departments WHERE id = {id} FOR UPDATE")
-            .Include(l => l.DepartmentLocations)
-            .Include(p => p.DepartmentPositions)
-            .FirstOrDefaultAsync(cancellationToken);
+            .Include(d => d.DepartmentLocations)
+            .Include(d => d.DepartmentPositions)
+            .FirstOrDefaultAsync(d => d.Id == id, cancellationToken);
     }
 
     public async Task<Department?> GetByName(string name, CancellationToken cancellationToken = default)

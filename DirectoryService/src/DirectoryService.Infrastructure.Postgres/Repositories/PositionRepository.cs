@@ -16,10 +16,13 @@ public sealed class PositionRepository(DirectoryServiceDbContext context) : IPos
 
     public async Task<Position?> GetByIdForUpdate(Guid id, CancellationToken cancellationToken = default)
     {
+        await context.Database
+            .ExecuteSqlInterpolatedAsync(
+                $"SELECT 1 FROM positions WHERE id = {id}", cancellationToken);
+
         return await context.Positions
-            .FromSql($"SELECT * FROM positions WHERE id = {id} FOR UPDATE")
             .Include(p => p.DepartmentPositions)
-            .FirstOrDefaultAsync(cancellationToken);
+            .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
     }
 
     public async Task<Position?> GetByName(string name, CancellationToken cancellationToken = default)
