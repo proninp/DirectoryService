@@ -1,11 +1,8 @@
-﻿using DirectoryService.Application.Abstractions;
-using DirectoryService.Application.Departments.CreateDepartment;
-using DirectoryService.Infrastructure.Postgres;
-using DirectoryService.IntegrationTests.Infrastructure;
+﻿using DirectoryService.Infrastructure.Postgres;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
-namespace DirectoryService.IntegrationTests.Departments;
+namespace DirectoryService.IntegrationTests.Infrastructure;
 
 public abstract class DepartmentBaseTest : IClassFixture<TestWebFactory>, IAsyncLifetime
 {
