@@ -32,11 +32,11 @@ public sealed class GetTopLocationsQueryHandler :
         var sql = """
                   WITH locationsWithDepartments AS (
                       SELECT l.id
-                           , count(dl.department_id) departments_count
+                           , count(d.id) departments_count
                       FROM locations l
-                          JOIN department_locations dl on dl.location_id = l.id
-                          LEFT JOIN departments d on d.id = dl.department_id
-                      WHERE l.is_active = true and d.is_active = true
+                          LEFT JOIN department_locations dl on dl.location_id = l.id
+                          LEFT JOIN departments d on d.id = dl.department_id and d.is_active = true
+                      WHERE l.is_active = true
                       GROUP BY l.id)
                   SELECT l.id,
                          l.name,
@@ -51,7 +51,7 @@ public sealed class GetTopLocationsQueryHandler :
                          ld.departments_count
                   FROM locations l
                   JOIN locationsWithDepartments ld ON ld.id = l.id
-                  ORDER BY departments_count DESC, l.name
+                  ORDER BY departments_count desc, l.created_at desc
                   LIMIT 5;
                   """;
 
