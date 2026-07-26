@@ -11,4 +11,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\DirectoryService.App\DirectoryService.App.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Locations\" />
+  </ItemGroup>
 </Project>

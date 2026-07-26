@@ -1,17 +1,16 @@
-﻿using DirectoryService.Application.Abstractions.Database;
-using DirectoryService.Infrastructure.Postgres;
+﻿using DirectoryService.Infrastructure.Postgres;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace DirectoryService.IntegrationTests.Infrastructure;
 
-public abstract class DepartmentBaseTest : IClassFixture<TestWebFactory>, IAsyncLifetime
+public abstract class DirectoryBaseTest : IClassFixture<TestWebFactory>, IAsyncLifetime
 {
     protected IServiceProvider Services { get; private set; }
 
     private readonly Func<Task> _resetDatabase;
 
-    protected DepartmentBaseTest(TestWebFactory factory)
+    protected DirectoryBaseTest(TestWebFactory factory)
     {
         Services = factory.Services;
         _resetDatabase = factory.ResetDatabaseAsync;

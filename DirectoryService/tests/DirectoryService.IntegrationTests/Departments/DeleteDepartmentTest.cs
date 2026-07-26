@@ -9,9 +9,9 @@ using Xunit;
 namespace DirectoryService.IntegrationTests.Departments;
 
 #pragma warning disable CA1707
-public sealed class DeleteDepartmentTest : DepartmentBaseTest
+public sealed class DeleteDirectoryTest : DirectoryBaseTest
 {
-    public DeleteDepartmentTest(TestWebFactory factory)
+    public DeleteDirectoryTest(TestWebFactory factory)
         : base(factory)
     {
     }

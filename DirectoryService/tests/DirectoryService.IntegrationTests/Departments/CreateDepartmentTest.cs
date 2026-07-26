@@ -10,9 +10,9 @@ using Xunit;
 namespace DirectoryService.IntegrationTests.Departments;
 
 #pragma warning disable CA1707
-public class CreateDepartmentTest : DepartmentBaseTest
+public class CreateDirectoryTest : DirectoryBaseTest
 {
-    public CreateDepartmentTest(TestWebFactory factory)
+    public CreateDirectoryTest(TestWebFactory factory)
         : base(factory)
     {
     }

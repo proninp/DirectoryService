@@ -11,9 +11,9 @@ using Xunit;
 namespace DirectoryService.IntegrationTests.Departments;
 
 #pragma warning disable CA1707
-public sealed class UpdateDepartmentTest : DepartmentBaseTest
+public sealed class UpdateDirectoryTest : DirectoryBaseTest
 {
-    public UpdateDepartmentTest(TestWebFactory factory)
+    public UpdateDirectoryTest(TestWebFactory factory)
         : base(factory)
     {
     }
