@@ -1,4 +1,5 @@
-﻿using DirectoryService.Infrastructure.Postgres;
+﻿using DirectoryService.Application.Abstractions.Database;
+using DirectoryService.Infrastructure.Postgres;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
@@ -17,7 +18,7 @@ public abstract class DepartmentBaseTest : IClassFixture<TestWebFactory>, IAsync
     }
 
     protected async Task<T> ExecuteHandlerAsync<T, THabdler>(Func<THabdler, Task<T>> func)
-    where THabdler : notnull
+        where THabdler : notnull
     {
         await using var scope = Services.CreateAsyncScope();
         var sut = scope.ServiceProvider.GetRequiredService<THabdler>();
