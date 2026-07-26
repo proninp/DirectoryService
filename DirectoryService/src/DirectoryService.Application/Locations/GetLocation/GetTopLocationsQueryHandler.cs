@@ -27,33 +27,35 @@ public sealed class GetTopLocationsQueryHandler :
         GetLocationsQuery query,
         CancellationToken cancellationToken)
     {
+        const int limit = 5;
+
         using var connection = await _dbConnectionFactory.CreateConnectionAsync(cancellationToken);
 
-        var sql = """
-                  WITH locationsWithDepartments AS (
-                      SELECT l.id
-                           , count(d.id) departments_count
-                      FROM locations l
-                          LEFT JOIN department_locations dl on dl.location_id = l.id
-                          LEFT JOIN departments d on d.id = dl.department_id and d.is_active = true
-                      WHERE l.is_active = true
-                      GROUP BY l.id)
-                  SELECT l.id,
-                         l.name,
-                         l.postal_code,
-                         l.country,
-                         l.city,
-                         l.street,
-                         l.house,
-                         l.block,
-                         l.room,
-                         l.postal_box,
-                         ld.departments_count
-                  FROM locations l
-                  JOIN locationsWithDepartments ld ON ld.id = l.id
-                  ORDER BY departments_count desc, l.created_at desc
-                  LIMIT 5;
-                  """;
+        var sql = $"""
+                   WITH locationsWithDepartments AS (
+                       SELECT l.id
+                            , count(d.id) departments_count
+                       FROM locations l
+                           LEFT JOIN department_locations dl on dl.location_id = l.id
+                           LEFT JOIN departments d on d.id = dl.department_id and d.is_active = true
+                       WHERE l.is_active = true
+                       GROUP BY l.id)
+                   SELECT l.id,
+                          l.name,
+                          l.postal_code,
+                          l.country,
+                          l.city,
+                          l.street,
+                          l.house,
+                          l.block,
+                          l.room,
+                          l.postal_box,
+                          ld.departments_count
+                   FROM locations l
+                   JOIN locationsWithDepartments ld ON ld.id = l.id
+                   ORDER BY departments_count desc, l.created_at desc
+                   LIMIT {limit};
+                   """;
 
         var topLocationsResponses =
             await connection.QueryAsync<TopLocationsResponse>(

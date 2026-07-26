@@ -138,6 +138,42 @@ public sealed class TopLocationsTest : DirectoryBaseTest
         Assert.Equal(5, result.Value.Count);
     }
 
+    [Fact]
+    public async Task GetTopLocations_With_One_Location_Having_Departments_Should_Return_It_First_Then_OrderByCreatedAt_Descending()
+    {
+        // Arrange
+        var ct = CancellationToken.None;
+        var locationId1 = await CreateLocationAsync("Office 1", "001", ct);
+        var locationId2 = await CreateLocationAsync("Office 2", "002", ct);
+        var locationId3 = await CreateLocationAsync("Office 3", "003", ct);
+        var locationId4 = await CreateLocationAsync("Office 4", "004", ct);
+        var locationId5 = await CreateLocationAsync("Office 5", "005", ct);
+        var locationId6 = await CreateLocationAsync("Office 6", "006", ct);
+
+        // locationId2 is not the most recently created location, so if the query ordered
+        // purely by created_at, it would not naturally end up first.
+        await LinkDepartmentAsync(locationId2, "DEPTA", ct);
+        await LinkDepartmentAsync(locationId2, "DEPTB", ct);
+
+        // Act
+        var result = await ExecuteHandlerAsync((GetTopLocationsQueryHandler sut) =>
+            sut.Handle(new GetLocationsQuery(), ct));
+
+        // Assert
+        Assert.True(result.IsSuccess);
+        Assert.Equal(5, result.Value.Count);
+
+        Assert.Equal(locationId2, result.Value[0].Id);
+        Assert.Equal(2, result.Value[0].DepartmentsCount);
+
+        var remaining = result.Value.Skip(1).Select(l => l.Id).ToList();
+        Assert.Equal([locationId6, locationId5, locationId4, locationId3], remaining);
+        Assert.All(result.Value.Skip(1), l => Assert.Equal(0, l.DepartmentsCount));
+
+        // locationId1 is the oldest location without departments, so it is the one dropped by LIMIT 5.
+        Assert.DoesNotContain(result.Value, l => l.Id == locationId1);
+    }
+
     private async Task<Guid> CreateLocationAsync(string name, string addressSuffix, CancellationToken ct)
     {
         var addressRequest = new CreateLocationAddressRequest(
