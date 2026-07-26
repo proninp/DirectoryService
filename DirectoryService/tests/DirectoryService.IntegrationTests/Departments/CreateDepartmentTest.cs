@@ -25,7 +25,7 @@ public class CreateDepartmentTest : DepartmentBaseTest
         var locationId = await CreateLocation(ct);
 
         // Act
-        var result = await ExecuteHandlerAsync(sut =>
+        var result = await ExecuteHandlerAsync((CreateDepartmentHandler sut) =>
         {
             var command = new CreateDepartmentCommand(
                 new CreateDepartmentRequest(
@@ -74,7 +74,7 @@ public class CreateDepartmentTest : DepartmentBaseTest
         var locationId2 = await CreateLocation(ct);
 
         // Act
-        var result = await ExecuteHandlerAsync(sut =>
+        var result = await ExecuteHandlerAsync((CreateDepartmentHandler sut) =>
         {
             var command = new CreateDepartmentCommand(
                 new CreateDepartmentRequest(
@@ -106,7 +106,7 @@ public class CreateDepartmentTest : DepartmentBaseTest
         var ct = CancellationToken.None;
         var locationId = await CreateLocation(ct);
 
-        var parentResult = await ExecuteHandlerAsync(sut =>
+        var parentResult = await ExecuteHandlerAsync((CreateDepartmentHandler sut) =>
         {
             var command = new CreateDepartmentCommand(
                 new CreateDepartmentRequest("Engineering", "ENG", null, [locationId]));
@@ -116,7 +116,7 @@ public class CreateDepartmentTest : DepartmentBaseTest
         Assert.True(parentResult.IsSuccess);
 
         // Act
-        var childResult = await ExecuteHandlerAsync(sut =>
+        var childResult = await ExecuteHandlerAsync((CreateDepartmentHandler sut) =>
         {
             var command = new CreateDepartmentCommand(
                 new CreateDepartmentRequest("Backend Team", "BACKEND", parentResult.Value, [locationId]));
@@ -147,7 +147,7 @@ public class CreateDepartmentTest : DepartmentBaseTest
         var nonExistingLocationId = Guid.NewGuid();
 
         // Act
-        var result = await ExecuteHandlerAsync(sut =>
+        var result = await ExecuteHandlerAsync((CreateDepartmentHandler sut) =>
         {
             var command = new CreateDepartmentCommand(
                 new CreateDepartmentRequest(
@@ -174,7 +174,7 @@ public class CreateDepartmentTest : DepartmentBaseTest
         var nonExistingParentId = Guid.NewGuid();
 
         // Act
-        var result = await ExecuteHandlerAsync(sut =>
+        var result = await ExecuteHandlerAsync((CreateDepartmentHandler sut) =>
         {
             var command = new CreateDepartmentCommand(
                 new CreateDepartmentRequest(
@@ -199,7 +199,7 @@ public class CreateDepartmentTest : DepartmentBaseTest
         var ct = CancellationToken.None;
         var locationId = await CreateLocation(ct);
 
-        var firstResult = await ExecuteHandlerAsync(sut =>
+        var firstResult = await ExecuteHandlerAsync((CreateDepartmentHandler sut) =>
         {
             var command = new CreateDepartmentCommand(
                 new CreateDepartmentRequest("Enterprise Architecture", "ENTARCH", null, [locationId]));
@@ -212,7 +212,7 @@ public class CreateDepartmentTest : DepartmentBaseTest
         // Act
         // Slug matching is case-insensitive (ExistsBySlug uses ILIKE), so a differently-cased
         // slug for a different department name must still be rejected as a duplicate.
-        var secondResult = await ExecuteHandlerAsync(sut =>
+        var secondResult = await ExecuteHandlerAsync((CreateDepartmentHandler sut) =>
         {
             var command = new CreateDepartmentCommand(
                 new CreateDepartmentRequest("Enterprise Architecture Duplicate", "entarch", null, [locationId]));
@@ -236,7 +236,7 @@ public class CreateDepartmentTest : DepartmentBaseTest
         var ct = CancellationToken.None;
 
         // Act
-        var result = await ExecuteHandlerAsync(sut =>
+        var result = await ExecuteHandlerAsync((CreateDepartmentHandler sut) =>
         {
             var command = new CreateDepartmentCommand(
                 new CreateDepartmentRequest("No Locations Department", "NOLOC", null, []));

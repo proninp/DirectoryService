@@ -1,4 +1,5 @@
-﻿using DirectoryService.Application.Departments.CreateDepartment;
+﻿using DirectoryService.Application.Abstractions;
+using DirectoryService.Application.Departments.CreateDepartment;
 using DirectoryService.Infrastructure.Postgres;
 using DirectoryService.IntegrationTests.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
@@ -6,7 +7,7 @@ using Xunit;
 
 namespace DirectoryService.IntegrationTests.Departments;
 
-public class DepartmentBaseTest : IClassFixture<TestWebFactory>, IAsyncLifetime
+public abstract class DepartmentBaseTest : IClassFixture<TestWebFactory>, IAsyncLifetime
 {
     protected IServiceProvider Services { get; private set; }
 
@@ -18,10 +19,11 @@ public class DepartmentBaseTest : IClassFixture<TestWebFactory>, IAsyncLifetime
         _resetDatabase = factory.ResetDatabaseAsync;
     }
 
-    protected async Task<T> ExecuteHandlerAsync<T>(Func<CreateDepartmentHandler, Task<T>> func)
+    protected async Task<T> ExecuteHandlerAsync<T, THabdler>(Func<THabdler, Task<T>> func)
+    where THabdler : notnull
     {
         await using var scope = Services.CreateAsyncScope();
-        var sut = scope.ServiceProvider.GetRequiredService<CreateDepartmentHandler>();
+        var sut = scope.ServiceProvider.GetRequiredService<THabdler>();
         return await func(sut);
     }
 
