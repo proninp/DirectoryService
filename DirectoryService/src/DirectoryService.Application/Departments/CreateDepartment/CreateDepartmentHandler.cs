@@ -62,13 +62,13 @@ public sealed class CreateDepartmentHandler : ICommandHandler<Guid, CreateDepart
             }
         }
 
-        var slug = Slug.Create(command.Request.Slug);
-        if (await _repository.ExistsBySlug(slug.Value, cancellationToken))
+        var slugResult = Slug.Create(command.Request.Slug);
+        if (await _repository.ExistsBySlug(slugResult.Value, cancellationToken))
         {
             _logger.LogWarning(
-                "Department creation error. Slug '{Slug}' is already exists.", slug.Value);
+                "Department creation error. Slug '{@Slug}' is already exists.", slugResult.Value);
             return GeneralErrors.AlreadyExists(
-                    message: $"Slug '{slug.Value}' already exists.",
+                    message: $"'{slugResult.Value}' already exists.",
                     invalidField: nameof(Department.Slug))
                 .ToErrors();
         }
@@ -80,7 +80,7 @@ public sealed class CreateDepartmentHandler : ICommandHandler<Guid, CreateDepart
             .ToList();
 
         var department = Department.Create(
-            command.Request.Name, slug.Value, departmentLocations, parent, departmentId);
+            command.Request.Name, slugResult.Value, departmentLocations, parent, departmentId);
         if (department.IsFailure)
         {
             _logger.LogError("Department creation error. {Error}.", department.Error.Serialize());

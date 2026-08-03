@@ -1,3 +1,5 @@
+using DirectoryService.Application.Validation;
+using DirectoryService.Shared;
 using FluentValidation;
 
 namespace DirectoryService.Application.Positions.DeletePosition;
@@ -7,6 +9,7 @@ public sealed class DeletePositionValidator : AbstractValidator<DeletePositionCo
     public DeletePositionValidator()
     {
         RuleFor(command => command.Id)
-            .NotEmpty();
+            .NotEmpty()
+            .WithError(GeneralErrors.ValueIsRequired(nameof(DeletePositionCommand.Id)));
     }
 }
