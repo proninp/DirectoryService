@@ -49,6 +49,11 @@ public sealed class CreatePositionHandler(
 
         var position = Position.Create(
             positionId, command.Request.Name, command.Request.Description, departmentPositions);
+        if (position.IsFailure)
+        {
+            logger.LogError("Position creation error. {Error}.", position.Error.Serialize());
+            return position.Error;
+        }
 
         await positionRepository.Add(position.Value, cancellationToken);
         return positionId;
