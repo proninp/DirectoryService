@@ -20,7 +20,8 @@ public sealed class DepartmentLocationConfiguration : BaseEntityConfiguration<De
 
         builder
             .HasIndex(dl => new { dl.DepartmentId, dl.LocationId })
-            .IsUnique();
+            .IsUnique()
+            .HasFilter("is_active = true");
 
         builder
             .HasOne<Department>()

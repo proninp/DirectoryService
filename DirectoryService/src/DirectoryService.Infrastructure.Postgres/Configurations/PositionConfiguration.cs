@@ -18,7 +18,8 @@ public sealed class PositionConfiguration : BaseEntityConfiguration<Position>
 
         builder
             .HasIndex(e => e.Name)
-            .IsUnique();
+            .IsUnique()
+            .HasFilter("is_active = true");
 
         builder
             .Property(e => e.Description)
