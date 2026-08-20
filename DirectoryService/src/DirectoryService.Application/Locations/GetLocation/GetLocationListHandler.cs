@@ -52,9 +52,11 @@ public sealed class GetLocationListHandler(
         parameters.Add("offset", (query.Request.Pagination.PageNumber - 1) * query.Request.Pagination.PageSize);
         parameters.Add("page_size", query.Request.Pagination.PageSize);
 
-        var whereClause = conditions.Count > 0
-            ? string.Concat("where ", string.Join(" and ", conditions))
-            : string.Empty;
+        var whereClause = string.Concat(
+            "where l.is_active = true",
+            conditions.Count > 0
+                ? string.Concat(" and ", string.Join(" and ", conditions))
+                : string.Empty);
 
         if (string.IsNullOrEmpty(query.Request.SortBy) ||
             !GetLocationListQuery.AllowedSortBy.TryGetValue(query.Request.SortBy, out var sortBy))
@@ -76,6 +78,8 @@ public sealed class GetLocationListHandler(
                        select dl.location_id,
                               count(dl.department_id) departments_count
                        from department_locations dl
+                       join locations l on l.id = dl.location_id
+                       where l.is_active = true
                        group by dl.location_id
                    )
                    select l.id,

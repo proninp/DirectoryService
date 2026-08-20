@@ -69,7 +69,7 @@ public sealed class DeleteDepartmentHandler : ICommandHandler<Guid, DeleteDepart
                 .ToErrors();
         }
 
-        _repository.Delete(department);
+        department.Delete();
 
         var saveChangesResult = await _transactionManager.SaveChangesAsync(cancellationToken);
         if (saveChangesResult.IsFailure)

@@ -18,7 +18,7 @@ public sealed class PositionRepository(DirectoryServiceDbContext context) : IPos
     {
         await context.Database
             .ExecuteSqlInterpolatedAsync(
-                $"SELECT 1 FROM positions WHERE id = {id}", cancellationToken);
+                $"SELECT 1 FROM positions WHERE id = {id} and is_active = true FOR UPDATE", cancellationToken);
 
         return await context.Positions
             .Include(p => p.DepartmentPositions)

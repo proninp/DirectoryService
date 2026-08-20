@@ -58,7 +58,7 @@ public sealed class DeletePositionHandler : ICommandHandler<Guid, DeletePosition
                 .ToErrors();
         }
 
-        _repository.Delete(position);
+        position.Delete();
 
         var saveChangesResult = await _transactionManager.SaveChangesAsync(cancellationToken);
         if (saveChangesResult.IsFailure)

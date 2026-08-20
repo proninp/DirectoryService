@@ -58,7 +58,7 @@ public sealed class DeleteLocationHandler : ICommandHandler<Guid, DeleteLocation
                 .ToErrors();
         }
 
-        _repository.Delete(location);
+        location.Delete();
 
         var saveChangesResult = await _transactionManager.SaveChangesAsync(cancellationToken);
         if (saveChangesResult.IsFailure)
