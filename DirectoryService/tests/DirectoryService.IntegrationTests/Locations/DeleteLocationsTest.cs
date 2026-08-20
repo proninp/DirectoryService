@@ -39,6 +39,15 @@ public sealed class DeleteLocationsTest : DirectoryBaseTest
             dbContext.Locations.FirstOrDefaultAsync(l => l.Id == locationId, ct));
 
         Assert.Null(location);
+
+        var deletedLocation = await ExecuteInDbAsync(dbContext =>
+            dbContext.Locations
+                .IgnoreQueryFilters()
+                .FirstOrDefaultAsync(l => l.Id == locationId, ct));
+
+        Assert.NotNull(deletedLocation);
+        Assert.False(deletedLocation.IsActive);
+        Assert.NotNull(deletedLocation.DeletedAt);
     }
 
     [Fact]
@@ -86,6 +95,8 @@ public sealed class DeleteLocationsTest : DirectoryBaseTest
             dbContext.Locations.FirstOrDefaultAsync(l => l.Id == locationId, ct));
 
         Assert.NotNull(location);
+        Assert.True(location.IsActive);
+        Assert.Null(location.DeletedAt);
     }
 
     private async Task<Guid> CreateLocationAsync(CancellationToken ct, bool withDepartment = false)
