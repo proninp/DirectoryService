@@ -1,5 +1,6 @@
 ﻿using DirectoryService.Application.Abstractions;
 using DirectoryService.Application.Abstractions.Database;
+using DirectoryService.Infrastructure.Postgres.Cleanup;
 using DirectoryService.Infrastructure.Postgres.Options;
 using DirectoryService.Shared;
 using Microsoft.Extensions.Configuration;
@@ -30,6 +31,8 @@ public static class Registration
             .AddClasses(classes => classes.AssignableTo<IRepository>())
             .AsImplementedInterfaces()
             .WithScopedLifetime());
+
+        services.AddScoped<IDeletedRecordsCleanupService, DeletedRecordsCleanupService>();
 
         return services;
     }
