@@ -12,7 +12,6 @@ public static class ApplicationConfigurationExtensions
         services.AddLogging(configuration);
 
         services.AddControllers();
-        services.AddOpenApi();
 
         services.AddGlobalExceptionHandling();
 
