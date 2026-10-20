@@ -5,15 +5,12 @@ using DirectoryService.Application.Locations;
 using DirectoryService.Domain.Entities;
 using DirectoryService.Domain.Entities.ValueObjects;
 using DirectoryService.Shared;
-using FluentValidation;
 using Microsoft.Extensions.Logging;
 
 namespace DirectoryService.Application.Departments.CreateDepartment;
 
 public sealed class CreateDepartmentHandler : ICommandHandler<Guid, CreateDepartmentCommand>
 {
-    private readonly IValidator<CreateDepartmentCommand> _validator;
-
     private readonly IDepartmentRepository _repository;
 
     private readonly ILocationRepository _locationRepository;
@@ -23,13 +20,11 @@ public sealed class CreateDepartmentHandler : ICommandHandler<Guid, CreateDepart
     private readonly ILogger<CreateDepartmentHandler> _logger;
 
     public CreateDepartmentHandler(
-        IValidator<CreateDepartmentCommand> validator,
         IDepartmentRepository repository,
         ILocationRepository locationRepository,
         ITransactionManager transactionManager,
         ILogger<CreateDepartmentHandler> logger)
     {
-        _validator = validator;
         _repository = repository;
         _locationRepository = locationRepository;
         _transactionManager = transactionManager;
