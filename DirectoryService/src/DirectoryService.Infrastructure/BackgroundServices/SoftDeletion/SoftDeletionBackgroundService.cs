@@ -41,7 +41,7 @@ public sealed class SoftDeletionBackgroundService : BackgroundService
 
             try
             {
-                using var scope = _serviceScopeFactory.CreateScope();
+                await using var scope = _serviceScopeFactory.CreateAsyncScope();
                 var deletedRecordsHandler = scope.ServiceProvider
                     .GetRequiredService<ICommandHandler<PurgeDeletedRecordsResult, PurgeDeletedRecordsCommand>>();
                 var command = new PurgeDeletedRecordsCommand(
