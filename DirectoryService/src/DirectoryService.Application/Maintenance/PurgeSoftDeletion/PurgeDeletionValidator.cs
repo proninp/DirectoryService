@@ -1,4 +1,5 @@
-﻿using DirectoryService.Shared;
+﻿using DirectoryService.Application.Validation;
+using DirectoryService.Shared;
 using FluentValidation;
 
 namespace DirectoryService.Application.Maintenance.PurgeSoftDeletion;
@@ -9,14 +10,12 @@ public sealed class PurgeDeletionValidator : AbstractValidator<PurgeDeletedRecor
     {
         RuleFor(c => c.BatchSize)
             .GreaterThan(0)
-            .WithMessage(GeneralErrors.ValueIsInvalid(nameof(PurgeDeletedRecordsCommand.BatchSize))
-                .ToString())
+            .WithError(GeneralErrors.ValueIsInvalid(nameof(PurgeDeletedRecordsCommand.BatchSize)))
             .DependentRules(() =>
             {
                 RuleFor(c => c.DeleteOlderThan)
                     .LessThan(_ => timeProvider.GetUtcNow().UtcDateTime)
-                    .WithMessage(GeneralErrors.ValueIsInvalid(nameof(PurgeDeletedRecordsCommand.DeleteOlderThan))
-                        .ToString());
+                    .WithError(GeneralErrors.ValueIsInvalid(nameof(PurgeDeletedRecordsCommand.DeleteOlderThan)));
             });
     }
 }
