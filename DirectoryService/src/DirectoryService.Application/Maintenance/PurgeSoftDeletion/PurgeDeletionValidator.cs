@@ -5,7 +5,7 @@ namespace DirectoryService.Application.Maintenance.PurgeSoftDeletion;
 
 public sealed class PurgeDeletionValidator : AbstractValidator<PurgeDeletedRecordsCommand>
 {
-    public PurgeDeletionValidator()
+    public PurgeDeletionValidator(TimeProvider timeProvider)
     {
         RuleFor(c => c.BatchSize)
             .GreaterThan(0)
@@ -13,10 +13,9 @@ public sealed class PurgeDeletionValidator : AbstractValidator<PurgeDeletedRecor
                 .ToString())
             .DependentRules(() =>
             {
-                RuleFor(c => c.DeleteOlderThen)
-                    .NotNull()
-                    .LessThan(DateTime.UtcNow)
-                    .WithMessage(GeneralErrors.ValueIsInvalid(nameof(PurgeDeletedRecordsCommand.DeleteOlderThen))
+                RuleFor(c => c.DeleteOlderThan)
+                    .LessThan(_ => timeProvider.GetUtcNow().UtcDateTime)
+                    .WithMessage(GeneralErrors.ValueIsInvalid(nameof(PurgeDeletedRecordsCommand.DeleteOlderThan))
                         .ToString());
             });
     }

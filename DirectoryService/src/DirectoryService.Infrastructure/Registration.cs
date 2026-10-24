@@ -9,8 +9,10 @@ public static class Registration
     public static IServiceCollection AddSoftDeletionCleanup(
         this IServiceCollection services, IConfiguration configuration)
     {
-        services.Configure<SoftDeletionCleanupRetention>(
-            configuration.GetSection(nameof(SoftDeletionCleanupRetention)));
+        services.AddOptions<SoftDeletionCleanupRetention>()
+            .Bind(configuration.GetSection(nameof(SoftDeletionCleanupRetention)))
+            .ValidateOnStart();
+
         services.AddHostedService<SoftDeletionBackgroundService>();
 
         return services;

@@ -2,7 +2,7 @@
 
 namespace DirectoryService.Application.Maintenance.PurgeSoftDeletion;
 
-public record PurgeDeletedRecordsCommand(DateTime DeleteOlderThen, int BatchSize) : IValidationCommand
+public record PurgeDeletedRecordsCommand(DateTime DeleteOlderThan, int BatchSize) : IValidationCommand
 {
-    public object? LogContext => new { DeleteOlderThen, BatchSize };
+    public object? LogContext => new { DeleteOlderThen = DeleteOlderThan, BatchSize };
 }

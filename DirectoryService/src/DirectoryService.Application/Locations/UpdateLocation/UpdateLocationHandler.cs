@@ -13,7 +13,6 @@ namespace DirectoryService.Application.Locations.UpdateLocation;
 
 public sealed class UpdateLocationHandler : ICommandHandler<LocationResponse, UpdateLocationCommand>
 {
-    private readonly IValidator<UpdateLocationCommand> _validator;
 
     private readonly ILocationRepository _repository;
 
@@ -27,7 +26,6 @@ public sealed class UpdateLocationHandler : ICommandHandler<LocationResponse, Up
         ITransactionManager transactionManager,
         ILogger<UpdateLocationHandler> logger)
     {
-        _validator = validator;
         _repository = repository;
         _transactionManager = transactionManager;
         _logger = logger;

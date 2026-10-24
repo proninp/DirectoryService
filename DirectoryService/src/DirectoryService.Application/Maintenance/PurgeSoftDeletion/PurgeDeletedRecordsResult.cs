@@ -7,4 +7,10 @@ public sealed record PurgeDeletedRecordsResult(
     int LocationsPurged,
     int PositionsPurged,
     PurgeOutcome Outcome,
-    Error? Error = null);
+    int EntitySetsProcessed,
+    int EntitySetsSkipped,
+    int EntitySetsFailed,
+    Error? Error = null)
+{
+    public int TotalPurged => DepartmentsPurged + LocationsPurged + PositionsPurged;
+}

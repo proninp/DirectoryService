@@ -2,9 +2,9 @@
 
 public sealed record SoftDeletionCleanupRetention
 {
-    public required TimeSpan Interval { get; set; } = TimeSpan.FromMinutes(10);
-    public required TimeSpan Timeout { get; set; } = TimeSpan.FromMinutes(20);
-    public required int RetentionDays { get; set; } = 60;
-    public required int BatchSize { get; set; } = 500;
-    public required bool Enabled { get; set; } = true;
+    public TimeSpan Interval { get; init; } = TimeSpan.FromMinutes(10);
+    public TimeSpan Timeout { get; init; } = TimeSpan.FromSeconds(20);
+    public int RetentionDays { get; init; } = 60;
+    public int BatchSize { get; init; } = 500;
+    public bool Enabled { get; init; } = true;
 }
