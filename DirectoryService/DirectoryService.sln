@@ -33,6 +33,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DirectoryService.Shared.Uni
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DirectoryService.IntegrationTests", "tests\DirectoryService.IntegrationTests\DirectoryService.IntegrationTests.csproj", "{906A2257-15E9-42C7-9A21-4921E58EE368}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{E565050C-24BC-493E-B4E6-8BCF0EF666B0}"
+	ProjectSection(SolutionItems) = preProject
+		docs\DS-20-TODO.md = docs\DS-20-TODO.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -91,5 +96,6 @@ Global
 		{17A1EF2D-E7B5-4173-9885-756E61626161} = {EE862901-6D3C-4574-AF4F-80B42FA59C79}
 		{F7ADBE59-C0DF-4ED0-8C32-E4A13E9AD5FC} = {A656D757-E7B6-4E0D-B5AD-52541126AFBD}
 		{906A2257-15E9-42C7-9A21-4921E58EE368} = {A656D757-E7B6-4E0D-B5AD-52541126AFBD}
+		{E565050C-24BC-493E-B4E6-8BCF0EF666B0} = {65AFAFFD-8E8B-4594-97AE-1920395264F8}
 	EndGlobalSection
 EndGlobal
