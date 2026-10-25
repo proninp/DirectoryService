@@ -1,4 +1,5 @@
 ﻿using DirectoryService.Application.Abstractions.Database;
+using DirectoryService.Domain.Entities;
 using DirectoryService.Domain.Entities.Abstractions;
 using Microsoft.EntityFrameworkCore;
 

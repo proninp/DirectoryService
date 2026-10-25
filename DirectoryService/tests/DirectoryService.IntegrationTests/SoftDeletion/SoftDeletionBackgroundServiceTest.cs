@@ -17,11 +17,11 @@ public sealed class SoftDeletionBackgroundServiceTest : DirectoryBaseTest
 {
     private const int RetentionDays = 60;
 
-    private static readonly TimeSpan s_waitTimeout = TimeSpan.FromSeconds(15);
+    private static readonly TimeSpan SemaphoreWaitTimeout = TimeSpan.FromSeconds(15);
 
     // Интервал короткий, чтобы тесты с несколькими итерациями шли быстро;
     // Timeout < Interval, иначе опции не пройдут SoftDeletionCleanupRetentionValidator
-    private static readonly SoftDeletionCleanupRetention s_defaultOptions = new()
+    private static readonly SoftDeletionCleanupRetention DefaultOptions = new()
     {
         Interval = TimeSpan.FromSeconds(1),
         Timeout = TimeSpan.FromMilliseconds(500),
@@ -54,7 +54,7 @@ public sealed class SoftDeletionBackgroundServiceTest : DirectoryBaseTest
         await MarkDeletedAsync<Position>(positionId, DaysAgo(RetentionDays + 30), ct);
 
         // Act
-        var summary = await RunUntilPurgeSummaryAsync(CreateOptions(s_defaultOptions));
+        var summary = await RunUntilPurgeSummaryAsync(CreateOptions(DefaultOptions));
 
         // Assert
         Assert.False(await ExistsAsync<Department>(departmentId, ct));
@@ -86,7 +86,7 @@ public sealed class SoftDeletionBackgroundServiceTest : DirectoryBaseTest
         await MarkDeletedAsync<Position>(positionId, DaysAgo(RetentionDays - 10), ct);
 
         // Act
-        var summary = await RunUntilPurgeSummaryAsync(CreateOptions(s_defaultOptions));
+        var summary = await RunUntilPurgeSummaryAsync(CreateOptions(DefaultOptions));
 
         // Assert
         Assert.True(await ExistsAsync<Department>(departmentId, ct));
@@ -107,7 +107,7 @@ public sealed class SoftDeletionBackgroundServiceTest : DirectoryBaseTest
         var positionId = await CreatePositionAsync(ct);
 
         // Act
-        var summary = await RunUntilPurgeSummaryAsync(CreateOptions(s_defaultOptions));
+        var summary = await RunUntilPurgeSummaryAsync(CreateOptions(DefaultOptions));
 
         // Assert
         Assert.True(await ExistsAsync<Department>(departmentId, ct));
@@ -131,7 +131,7 @@ public sealed class SoftDeletionBackgroundServiceTest : DirectoryBaseTest
             positionIds.Add(positionId);
         }
 
-        var options = s_defaultOptions with { BatchSize = 2 };
+        var options = DefaultOptions with { BatchSize = 2 };
 
         // Act
         var summary = await RunUntilPurgeSummaryAsync(CreateOptions(options));
@@ -157,7 +157,7 @@ public sealed class SoftDeletionBackgroundServiceTest : DirectoryBaseTest
 
         // Act
         var summary = await RunUntilPurgeSummaryAsync(
-            CreateOptions(s_defaultOptions),
+            CreateOptions(DefaultOptions),
             new FixedTimeProvider(shiftedNow));
 
         // Assert
@@ -174,7 +174,7 @@ public sealed class SoftDeletionBackgroundServiceTest : DirectoryBaseTest
         await MarkDeletedAsync<Position>(positionId, DaysAgo(RetentionDays + 30), ct);
 
         var options = CreateOptions(
-            s_defaultOptions with { Enabled = false });
+            DefaultOptions with { Enabled = false });
 
         // Act
         // Первое чтение — для таймера, каждое следующее — отдельная итерация
@@ -194,7 +194,7 @@ public sealed class SoftDeletionBackgroundServiceTest : DirectoryBaseTest
         await MarkDeletedAsync<Position>(positionId, DaysAgo(RetentionDays + 30), ct);
 
         var options = CreateOptions(readNumber =>
-            s_defaultOptions with { Enabled = readNumber > 3 });
+            DefaultOptions with { Enabled = readNumber > 3 });
 
         // Act
         var summary = await RunUntilPurgeSummaryAsync(options);
@@ -215,7 +215,7 @@ public sealed class SoftDeletionBackgroundServiceTest : DirectoryBaseTest
 
         // Валидатор опций такой BatchSize не пропустит, поэтому монитор создаётся без него:
         // тест проверяет второй рубеж — валидацию самой команды
-        var options = new TestOptionsMonitor<SoftDeletionCleanupRetention>(s_defaultOptions with { BatchSize = 0 });
+        var options = new TestOptionsMonitor<SoftDeletionCleanupRetention>(DefaultOptions with { BatchSize = 0 });
 
         // Act
         var rejection = await RunUntilLogAsync(
@@ -240,8 +240,8 @@ public sealed class SoftDeletionBackgroundServiceTest : DirectoryBaseTest
         // Чтения 2 и 3 (первые две итерации) эмулируют невалидный конфиг после hot reload
         var options = CreateOptions(readNumber =>
             readNumber is 2 or 3
-                ? s_defaultOptions with { BatchSize = 0 }
-                : s_defaultOptions);
+                ? DefaultOptions with { BatchSize = 0 }
+                : DefaultOptions);
 
         // Act
         var summary = await RunUntilPurgeSummaryAsync(options);
@@ -301,7 +301,7 @@ public sealed class SoftDeletionBackgroundServiceTest : DirectoryBaseTest
         await service.StartAsync(CancellationToken.None);
         try
         {
-            await TestWait.UntilAsync(condition, s_waitTimeout, description);
+            await TestWait.UntilAsync(condition, SemaphoreWaitTimeout, description);
         }
         catch (TimeoutException e)
         {
