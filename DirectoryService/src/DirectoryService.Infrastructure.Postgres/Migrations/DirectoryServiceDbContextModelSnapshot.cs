@@ -122,7 +122,8 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
                     b.HasIndex("LocationId");
 
                     b.HasIndex("DepartmentId", "LocationId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("is_active = true");
 
                     b.ToTable("department_locations", (string)null);
                 });
@@ -168,7 +169,8 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
                     b.HasIndex("PositionId");
 
                     b.HasIndex("DepartmentId", "PositionId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("is_active = true");
 
                     b.ToTable("department_positions", (string)null);
                 });
@@ -313,7 +315,8 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
                         .HasName("pk_positions");
 
                     b.HasIndex("Name")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("is_active = true");
 
                     b.ToTable("positions", (string)null);
                 });
@@ -340,7 +343,8 @@ namespace DirectoryService.Infrastructure.Postgres.Migrations
                             b1.HasKey("DepartmentId");
 
                             b1.HasIndex("Value")
-                                .IsUnique();
+                                .IsUnique()
+                                .HasFilter("is_active = true");
 
                             b1.ToTable("departments");
 

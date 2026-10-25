@@ -39,6 +39,15 @@ public sealed class DeletePositionTest : DirectoryBaseTest
         var position = await ExecuteInDbAsync(dbContext =>
             dbContext.Positions.FirstOrDefaultAsync(p => p.Id == positionId, ct));
         Assert.Null(position);
+
+        var deletedPosition = await ExecuteInDbAsync(dbContext =>
+            dbContext.Positions
+                .IgnoreQueryFilters()
+                .FirstOrDefaultAsync(p => p.Id == positionId, ct));
+
+        Assert.NotNull(deletedPosition);
+        Assert.False(deletedPosition.IsActive);
+        Assert.NotNull(deletedPosition.DeletedAt);
     }
 
     [Fact]
@@ -86,6 +95,8 @@ public sealed class DeletePositionTest : DirectoryBaseTest
         var position = await ExecuteInDbAsync(dbContext =>
             dbContext.Positions.FirstOrDefaultAsync(p => p.Id == positionId, ct));
         Assert.NotNull(position);
+        Assert.True(position.IsActive);
+        Assert.Null(position.DeletedAt);
     }
 
     [Fact]

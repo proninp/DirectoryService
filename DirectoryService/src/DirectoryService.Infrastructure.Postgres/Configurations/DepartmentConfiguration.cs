@@ -24,7 +24,8 @@ public sealed class DepartmentConfiguration : BaseEntityConfiguration<Department
                 .HasColumnName("slug");
 
             slug.HasIndex(d => d.Value)
-                .IsUnique();
+                .IsUnique()
+                .HasFilter("is_active = true");
         });
 
         builder

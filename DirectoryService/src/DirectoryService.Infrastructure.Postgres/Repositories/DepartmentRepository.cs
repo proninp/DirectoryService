@@ -21,7 +21,7 @@ public sealed class DepartmentRepository(DirectoryServiceDbContext context) : ID
     {
         await context.Database
             .ExecuteSqlInterpolatedAsync(
-                $"SELECT 1 FROM departments WHERE id = {id}", cancellationToken);
+                $"SELECT 1 FROM departments WHERE id = {id} AND is_active = true FOR UPDATE", cancellationToken);
 
         return await context.Departments
             .Include(d => d.DepartmentLocations)

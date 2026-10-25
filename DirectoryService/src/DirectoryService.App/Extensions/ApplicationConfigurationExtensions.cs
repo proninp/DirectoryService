@@ -1,5 +1,6 @@
 ﻿using DirectoryService.App.Middlewares;
 using DirectoryService.Application;
+using DirectoryService.Infrastructure;
 using DirectoryService.Infrastructure.Postgres;
 using Serilog;
 
@@ -12,11 +13,11 @@ public static class ApplicationConfigurationExtensions
         services.AddLogging(configuration);
 
         services.AddControllers();
-        services.AddOpenApi();
 
         services.AddGlobalExceptionHandling();
 
         services.AddDatabaseConfiguration(configuration);
+        services.AddSoftDeletionCleanup(configuration);
         services.AddApplication();
 
         services.AddApiVersioningSupport();

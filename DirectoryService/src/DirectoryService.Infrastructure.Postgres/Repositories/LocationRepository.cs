@@ -36,7 +36,7 @@ public sealed class LocationRepository(DirectoryServiceDbContext context) : ILoc
     public async Task<Location?> GetByIdForUpdate(Guid id, CancellationToken cancellationToken = default)
     {
         await context.Database.ExecuteSqlInterpolatedAsync(
-            $"SELECT 1 FROM locations WHERE id = {id} FOR UPDATE", cancellationToken);
+            $"SELECT 1 FROM locations WHERE id = {id} and is_active = true FOR UPDATE", cancellationToken);
 
         return await context.Locations
             .Include(l => l.DepartmentLocations)

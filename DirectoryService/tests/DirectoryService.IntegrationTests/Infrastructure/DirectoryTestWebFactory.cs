@@ -1,11 +1,13 @@
 ﻿using System.Data.Common;
 using System.Globalization;
+using DirectoryService.Infrastructure.BackgroundServices.SoftDeletion;
 using DirectoryService.Infrastructure.Postgres;
 using DirectoryService.Infrastructure.Postgres.Options;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Npgsql;
 using Respawn;
 using Testcontainers.PostgreSql;
@@ -15,6 +17,8 @@ namespace DirectoryService.IntegrationTests.Infrastructure;
 
 public class TestWebFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
+    private static readonly SemaphoreSlim SemaphoreHostStartLock = new(1, 1);
+
     private readonly PostgreSqlContainer _dbContainer = new PostgreSqlBuilder("postgres")
         .WithDatabase("directory_service_db")
         .WithUsername("postgres")
@@ -38,12 +42,32 @@ public class TestWebFactory : WebApplicationFactory<Program>, IAsyncLifetime
                 options.Username = csBuilder.Username!;
                 options.Password = csBuilder.Password!;
             });
+
+            // Фоновая очистка запускается в тестах вручную, иначе она конкурирует с тестовыми данными
+            var softDeletionService = services.SingleOrDefault(d =>
+                d.ServiceType == typeof(IHostedService) &&
+                d.ImplementationType == typeof(SoftDeletionBackgroundService));
+            if (softDeletionService is not null)
+                services.Remove(softDeletionService);
         });
     }
 
     public async Task InitializeAsync()
     {
         await _dbContainer.StartAsync();
+
+        // Program настраивает глобальный bootstrap-логгер Serilog (Log.Logger), и при параллельном
+        // старте нескольких хостов второй падает с "The logger is already frozen".
+        // Обращение к Services собирает и запускает хост, поэтому сериализуем именно его
+        await SemaphoreHostStartLock.WaitAsync();
+        try
+        {
+            _ = Services;
+        }
+        finally
+        {
+            SemaphoreHostStartLock.Release();
+        }
 
         await using var scope = Services.CreateAsyncScope();
         var context = scope.ServiceProvider.GetRequiredService<DirectoryServiceDbContext>();

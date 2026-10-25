@@ -7,6 +7,7 @@
   <ItemGroup>
     <PackageReference Include="Asp.Versioning.Mvc" />
     <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" />
+    <PackageReference Include="Asp.Versioning.OpenApi" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi"/>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
       <PrivateAssets>all</PrivateAssets>
@@ -24,6 +25,7 @@
     <ProjectReference Include="..\DirectoryService.Application\DirectoryService.Application.csproj" />
     <ProjectReference Include="..\DirectoryService.Contracts\DirectoryService.Contracts.csproj" />
     <ProjectReference Include="..\DirectoryService.Infrastructure.Postgres\DirectoryService.Infrastructure.Postgres.csproj" />
+    <ProjectReference Include="..\DirectoryService.Infrastructure\DirectoryService.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

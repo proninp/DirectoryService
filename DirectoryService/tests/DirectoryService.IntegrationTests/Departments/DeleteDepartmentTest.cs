@@ -39,6 +39,15 @@ public sealed class DeleteDirectoryTest : DirectoryBaseTest
             dbContext.Departments.FirstOrDefaultAsync(d => d.Id == departmentId, ct));
 
         Assert.Null(department);
+
+        var deletedDepartment = await ExecuteInDbAsync(dbContext =>
+            dbContext.Departments
+                .IgnoreQueryFilters()
+                .FirstOrDefaultAsync(d => d.Id == departmentId, ct));
+
+        Assert.NotNull(deletedDepartment);
+        Assert.False(deletedDepartment.IsActive);
+        Assert.NotNull(deletedDepartment.DeletedAt);
     }
 
     [Fact]
@@ -86,6 +95,8 @@ public sealed class DeleteDirectoryTest : DirectoryBaseTest
             dbContext.Departments.FirstOrDefaultAsync(d => d.Id == departmentId, ct));
 
         Assert.NotNull(department);
+        Assert.True(department.IsActive);
+        Assert.Null(department.DeletedAt);
     }
 
     [Fact]
@@ -112,6 +123,8 @@ public sealed class DeleteDirectoryTest : DirectoryBaseTest
             dbContext.Departments.FirstOrDefaultAsync(d => d.Id == departmentId, ct));
 
         Assert.NotNull(department);
+        Assert.True(department.IsActive);
+        Assert.Null(department.DeletedAt);
     }
 
     private async Task<Guid> CreateDepartmentAsync(
